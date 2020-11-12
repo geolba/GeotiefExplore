@@ -1,0 +1,40 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>3D Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- <link href="content/img/favicon.ico" rel="shortcut icon" type="image/x-icon" /> -->
+  <meta name="description" content="3D viewer Geological Survey of Austria">
+  <meta name="author" content="Arno Kaimbacher">
+
+  <!-- <link rel="stylesheet" href="src/css/styles.css?v=1.0"> -->
+  <link rel="stylesheet" type="text/css" href="dist/main.css" />
+
+<!-- <style>
+  .mapDesktop {
+    width: 1174px; 
+    height: 1001px;
+  }
+</style> -->
+</head>
+
+<body>
+ 
+    <div id="webgl" class="mapDesktop">
+      <div id="inset"></div>
+      <div id="progressArea">
+        <img id="loadingImg" alt="" src="images/map/loading.gif" style="display:none;" />
+      </div>
+    </div>
+  
+  <script src="dist/main.js"></script>
+</body>
+
+</html>

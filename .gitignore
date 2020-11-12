@@ -1,0 +1,32 @@
+/node_modules
+/dist
+
+/.vs/lms/v15
+/lms.user
+/lms.sln
+/lms.phpproj.user
+/lms.phpproj
+
+# Composer
+/composer.lock
+/composer.phar
+/vendor
+
+# Linux
+*~
+*.swp
+
+# Windows
+Thumbs.db
+desktop.ini
+
+
+/.idea
+/.vscode
+/.vs
+/.vagrant
+/npm-debug.log
+/yarn-error.log
+
+/notes.txt
+/.env
