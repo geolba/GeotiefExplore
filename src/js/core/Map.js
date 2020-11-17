@@ -11,9 +11,9 @@ class Map extends OrbitControls {
     _controlContainer;
     _controls;
 
-    constructor(camera, scene, domElement, container) {
+    constructor(size, center, camera, scene, domElement, container) {
         // call parent constructor of OrbitControls
-        super(camera, scene, domElement);
+        super(size, center, camera, scene, domElement);
 
         this.container = container;
 

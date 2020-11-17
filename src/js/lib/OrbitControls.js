@@ -72,7 +72,7 @@ class OrbitControls extends EventEmitter {
 
     rotateDifference;
 
-    constructor(camera, scene, domElement) {
+    constructor(size, center, camera, scene, domElement) {
         super();
 
         this.object = camera;
@@ -84,7 +84,7 @@ class OrbitControls extends EventEmitter {
 
         // "target" sets the location of focus, where the control orbits around
         // and where it pans with respect to.
-        this.target = new Vector3();
+        this.target = center; //new Vector3();
         // center is old, deprecated; use "target" instead
         this.center = this.target;
 
@@ -94,8 +94,10 @@ class OrbitControls extends EventEmitter {
         this.zoomSpeed = 1.0;
 
         // Limits to how far you can dolly in and out
-        this.minDistance = 0;
-        this.maxDistance = Infinity;
+        // this.minDistance = 0;
+        // this.maxDistance = Infinity;
+        this.minDistance =  size*0.75;
+        this.maxDistance = size*15;
 
         // Set to true for upside down
         this.upsideDown = false;

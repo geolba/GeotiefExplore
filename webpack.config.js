@@ -18,7 +18,7 @@ const devMode = (process.env.NODE_ENV !== 'production');
 const fileNamePrefix = isProduction ? '[chunkhash].' : '';
 
 module.exports = {
-    mode: process.env.NODE_ENV,
+    // mode: process.env.NODE_ENV,
     context: __dirname,
     entry: './src/js/main.js',
     output: {
@@ -37,19 +37,19 @@ module.exports = {
                     name: 'fonts/[name].[ext]'
                 }
             },
-            {
-                test: /\.(png|jpg|gif)$/,
-                loaders: [
-                    {
-                        loader: 'url-loader',
-                        options: {
-                            limit: 10000,
-                            name: 'images/[name].[ext]'
-                        }
-                    },
-                    'img-loader'
-                ],
-            },
+            // {
+            //     test: /\.(png|jpg|gif)$/,
+            //     loaders: [
+            //         {
+            //             loader: 'url-loader',
+            //             options: {
+            //                 limit: 10000,
+            //                 name: 'images/[name].[ext]'
+            //             }
+            //         },
+            //         'img-loader'
+            //     ],
+            // },
             {
                 test: /\.js$/,
                 exclude: /(node_modules|bower_components)/,
@@ -65,9 +65,8 @@ module.exports = {
                 test: /\.(less|css)$/,
                 use: [
                     {
-                        // loader: (isProduction === true) ? MiniCssExtractPlugin.loader : 'style-loader',
-                        // loader: 'style-loader',
-                        loader: MiniCssExtractPlugin.loader,
+                        loader: (isProduction === true) ? MiniCssExtractPlugin.loader : 'style-loader',
+                        // loader: 'style-loader',                      
                         // loader: MiniCssExtractPlugin.loader,
                         // options: {
                         //     hmr: process.env.NODE_ENV === 'development',
@@ -93,23 +92,31 @@ module.exports = {
     stats: {
         colors: true
     },
-    // devtool: 'source-map',
+    // devtool: 'inline-source-map',
 
     optimization: {
         minimize: isProduction,
-        minimizer: [new TerserPlugin({
-            parallel: true,
-            sourceMap: true,
-            terserOptions: {
-                extractComments: 'all',
-                compress: {
-                    drop_console: true,
-                    drop_debugger: true,
+        minimizer: [
+            new TerserPlugin({
+                // cache: true,
+                parallel: true,
+                // sourceMap: true, // Must be set to true if using source-maps in production
+                extractComments: true,
+                terserOptions: {
+                    
+                    compress: {
+                        directives: false,
+                    //     drop_console: true,
+                    //     drop_debugger: true,
+                    //     keep_classnames: false,
+                    //     keep_fnames: false,
+                    },
+                    mangle: true, // Note `mangle.properties` is `false` by default.
                     keep_classnames: false,
                     keep_fnames: false,
-                },
-            }
-        })],
+                }
+            })
+        ],
     },
 
     plugins: [
@@ -119,6 +126,7 @@ module.exports = {
             CONSTANT_VALUE: JSON.stringify(process.env.CONSTANT_VALUE),
         }),
         // extractLess,
+
         new MiniCssExtractPlugin({ // Make sure MiniCssExtractPlugin instance is included in array before the PurifyCSSPlugin
             // Options similar to the same options in webpackOptions.output
             // both options are optional
@@ -126,7 +134,8 @@ module.exports = {
             // chunkFilename: '[id].css',
             filename: '[name].css',
             chunkFilename: '[id].css',
-        }),     
+        }),
+
         // new PurifyCSSPlugin({
         //     paths: glob.sync(__dirname + '/*.html'),
         //     minimize: true,
@@ -144,15 +153,15 @@ if (isProduction === true) {
         // module.exports.optimization.minimizer.push(
         //     new UglifyJsPlugin({ sourceMap: true })
         // );
-        function () { // Create a manifest.json file that contain the hashed file names of generated static resources
-            this.plugin("done", function (status) {
-                require("fs").writeFileSync(
-                    __dirname + "/dist/manifest.json",
-                    JSON.stringify(status.toJson().assetsByChunkName)
-                );
-            });
-        },
-        
+        // function () { // Create a manifest.json file that contain the hashed file names of generated static resources
+        //     this.plugin("done", function (status) {
+        //         require("fs").writeFileSync(
+        //             __dirname + "/dist/manifest.json",
+        //             JSON.stringify(status.toJson().assetsByChunkName)
+        //         );
+        //     });
+        // },
+
     );
     //development
 } else {

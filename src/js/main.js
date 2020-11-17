@@ -4,7 +4,9 @@ import { AmbientLight } from 'three/src/lights/AmbientLight';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Scene } from 'three/src/scenes/Scene';
-import { BoxLayer } from './layer/BoxLayer';
+// import { BoxLayer } from './layer/BoxLayer';
+import { Vector3} from 'three/src/math/Vector3';
+import { DxfLayer } from './layer/DxfLayer';
 // import * as util from './core/utilities';
 // import { OrbitControls } from './lib/OrbitControls.js'
 import { Map } from './core/Map';
@@ -42,7 +44,9 @@ class Application {
         // document.body.appendChild(this.renderer.domElement);
         this.renderer.setSize(this.width, this.height);
         this.renderer.setClearColor(bgcolor, 1); // second param is opacity, 0 => transparent       
-        this.renderer.render
+        var Empty = Object.freeze([]);
+        this.renderer.clippingPlanes = Empty; // GUI sets it to globalPlanes
+        this.renderer.localClippingEnabled = true;
         this.container.appendChild(this.renderer.domElement);
 
         /* Scene: that will hold all our elements such as objects, cameras and lights. */
@@ -60,15 +64,54 @@ class Application {
         var far = 2000; //Anything beyond this distance will not be rendered                
         this.camera = new PerspectiveCamera(angle, aspect, near, far);
         //this.camera.position.z = 20;
-        this.camera.position.set(0, -0.1, 150);
+        // this.camera.position.set(0, -0.1, 150);      
         // this.camera.lookAt(new THREE.Vector3(0, 0, 0));   
 
-        // this.controls = new OrbitControls(this.camera, this.scene, this.renderer.domElement);
-        this.map = new Map(this.camera, this.scene, this.renderer.domElement, this.container);
-        let boxLayer = new BoxLayer({ width: 10, height: 10, depth: 10 });
-        this.map.addLayer(boxLayer);
+        this.camera = new PerspectiveCamera( 30, this.width / this.height, 100, 100000 );
+        this.camera.up.set( 0, 0, 1 );
+        const dirLight = new DirectionalLight( 0xffffff, 1 );
+        dirLight.position.set( 585000 + 10000, 6135000 + 10000, -500 + 5000 );
+        this.camera.add( dirLight );
 
-        domEvent.on(window, 'click', this.onWindowResize, this);
+        let x = { min: 3955850, max: 4527300, avg: 4282010 };
+        let y=  { min: 2183600, max: 2502700, avg: 2302070 };
+        let z = { min: -60066, max: 3574.94, avg: -13616.3 };
+        const center = new Vector3(x.avg, y.avg, z.avg);
+        const size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);
+        const camDirection = new Vector3(-0.5, -Math.SQRT1_2, 0.5);
+        const camOffset = camDirection.multiplyScalar(size * 2);
+        this.camera.position.copy(center);
+        this.camera.position.add(camOffset);
+        this.camera.near = size * 0.1;
+        this.camera.far = size * 25;
+        this.camera.updateProjectionMatrix();
+
+
+        // this.controls = new OrbitControls(this.camera, this.scene, this.renderer.domElement);
+        this.map = new Map(size, center, this.camera, this.scene, this.renderer.domElement, this.container);
+        // this.map.target = center;
+        // this.map.minDistance =  size*0.75;
+        // this.map.maxDistance = size*15;
+       
+        // let boxLayer = new BoxLayer({ width: 10, height: 10, depth: 10 });
+        // this.map.addLayer(boxLayer);
+
+
+        let dxfLayer = new DxfLayer({
+            geomId: 134, q: true, type: "3dface", name: "Mittelpannon", description: "test"
+        });
+        dxfLayer.addListener('add', this.animate, this); 
+        // dxfLayer.addListener('added', function(){
+        //     console.log('added');         
+        //   });
+        // dxfLayer.idx = [0, 1, 2, 3, 4, 5];
+        // dxfLayer.vertices = new Float32Array([10.421, -20.878, 0.068, 11.241, -20.954, 0.055, 10.225, -20.297, 0.078, 0.161, -6.548, 0.535, -0.163, -6.675, 0.538, 0.116, -6.874, 0.537,]);
+       
+        this.map.addLayer(dxfLayer);
+
+      
+
+        // domEvent.on(window, 'click', this.onWindowResize, this);
 
         // util.setLoading("webgl");  
         this.start();
@@ -80,15 +123,15 @@ class Application {
         }
         else {
             this._setCanvasSize(this.container.clientWidth, this.container.clientHeight);
-        }        
+        }
     }
 
-    _setCanvasSize (width, height) {
+    _setCanvasSize(width, height) {
         this.width = width;
         this.height = height;
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(width, height);  
+        this.renderer.setSize(width, height);
         this.animate();
     }
 
@@ -143,10 +186,10 @@ class Application {
         this.renderer.render(this.scene, this.camera);
     }
 
-    add(layer) {
-        this.objects.push(layer);
-        this.scene.add(layer.getMesh());
-    }
+    // add(layer) {
+    //     this.objects.push(layer);
+    //     this.scene.add(layer.getMesh());
+    // }
 }
 
 var container = document.getElementById("webgl");
