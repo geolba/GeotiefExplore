@@ -20,6 +20,7 @@ class DxfLayer extends Layer {
         this.visible = true;
         this.opacity = 1;
         this.materialParameter = [];
+        this.materialsArray = [];
         for (var k in params) {
             this[k] = params[k];
         }
@@ -29,16 +30,23 @@ class DxfLayer extends Layer {
         this.borderVisible = false;
     }
 
+    setWireframeMode (wireframe) {
+        this.materialsArray.forEach(function (mat) {
+            //if (m.w) return;
+            //m.mat.wireframe = wireframe;
+            mat.wireframe = wireframe;
+        });
+    }
+
     setVisible(visible) {
         this.visible = visible;
-        // this.objectGroup.visible = visible;
-        //Q3D.application.queryObjNeedsUpdate = true;
+        // this.objectGroup.visible = visible;       
     }
 
     async onAdd(map) {
-        await this.build(this.getScene());
-        //this.update();
+        await this.build(this.getScene());       
         map.update();
+        // this.emit('add');
     }
 
     //build BufferGeometry with Index
@@ -46,7 +54,7 @@ class DxfLayer extends Layer {
 
         let geometry = new BufferGeometry();
         // let positions = new Float32BufferAttribute(this.vertices, 3);       
-        let posArray = await (this.points(134));
+        let posArray = await (this.points(this.geomId));
         console.log(posArray);
         let positions = new Float32BufferAttribute(posArray, 3);
         geometry.setAttribute('position', positions);
@@ -55,7 +63,7 @@ class DxfLayer extends Layer {
         //var indices = this.indices = new TypeArray(this.idx);
 
         // let indexArray = this.indices = new Uint16Array(this.idx);
-        let indexArray = await (this.edges(134));
+        let indexArray = await (this.edges(this.geomId));
         let indices = new Uint16BufferAttribute(indexArray, 1);//.setDynamic(true);
         geometry.setIndex(indices);
 
@@ -68,6 +76,7 @@ class DxfLayer extends Layer {
         this.material = new MeshBasicMaterial({
             color: color
         });
+        this.materialsArray.push(this.material);
         let mesh = this.mainMesh = new Mesh(geometry, this.material);
         // mesh.userData.layerId = this.index;
         // this.addObject(mesh, true);
@@ -75,7 +84,6 @@ class DxfLayer extends Layer {
         if (app_scene) {
             app_scene.add(mesh);
         }
-        // this.emit('add');
     }
 
 

@@ -5,7 +5,7 @@ import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Scene } from 'three/src/scenes/Scene';
 // import { BoxLayer } from './layer/BoxLayer';
-import { Vector3} from 'three/src/math/Vector3';
+import { Vector3 } from 'three/src/math/Vector3';
 import { DxfLayer } from './layer/DxfLayer';
 // import * as util from './core/utilities';
 // import { OrbitControls } from './lib/OrbitControls.js'
@@ -18,7 +18,8 @@ class Application {
 
     constructor(container) {
         this.container = container;
-        this.running = false; // this is public
+        this.running = false;
+        this.wireframeMode = false;
 
         this.objects = [];
 
@@ -67,14 +68,14 @@ class Application {
         // this.camera.position.set(0, -0.1, 150);      
         // this.camera.lookAt(new THREE.Vector3(0, 0, 0));   
 
-        this.camera = new PerspectiveCamera( 30, this.width / this.height, 100, 100000 );
-        this.camera.up.set( 0, 0, 1 );
-        const dirLight = new DirectionalLight( 0xffffff, 1 );
-        dirLight.position.set( 585000 + 10000, 6135000 + 10000, -500 + 5000 );
-        this.camera.add( dirLight );
+        this.camera = new PerspectiveCamera(30, this.width / this.height, 100, 100000);
+        this.camera.up.set(0, 0, 1);
+        const dirLight = new DirectionalLight(0xffffff, 1);
+        dirLight.position.set(585000 + 10000, 6135000 + 10000, -500 + 5000);
+        this.camera.add(dirLight);
 
         let x = { min: 3955850, max: 4527300, avg: 4282010 };
-        let y=  { min: 2183600, max: 2502700, avg: 2302070 };
+        let y = { min: 2183600, max: 2502700, avg: 2302070 };
         let z = { min: -60066, max: 3574.94, avg: -13616.3 };
         const center = new Vector3(x.avg, y.avg, z.avg);
         const size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);
@@ -92,7 +93,7 @@ class Application {
         // this.map.target = center;
         // this.map.minDistance =  size*0.75;
         // this.map.maxDistance = size*15;
-       
+
         // let boxLayer = new BoxLayer({ width: 10, height: 10, depth: 10 });
         // this.map.addLayer(boxLayer);
 
@@ -100,21 +101,41 @@ class Application {
         let dxfLayer = new DxfLayer({
             geomId: 134, q: true, type: "3dface", name: "Mittelpannon", description: "test"
         });
-        dxfLayer.addListener('add', this.animate, this); 
-        // dxfLayer.addListener('added', function(){
-        //     console.log('added');         
-        //   });
         // dxfLayer.idx = [0, 1, 2, 3, 4, 5];
         // dxfLayer.vertices = new Float32Array([10.421, -20.878, 0.068, 11.241, -20.954, 0.055, 10.225, -20.297, 0.078, 0.161, -6.548, 0.535, -0.163, -6.675, 0.538, 0.116, -6.874, 0.537,]);
-       
+
         this.map.addLayer(dxfLayer);
 
-      
-
         // domEvent.on(window, 'click', this.onWindowResize, this);
+        domEvent.on(window, 'keydown', this.keydown, this);
+
 
         // util.setLoading("webgl");  
         this.start();
+    }
+
+    keydown(e) {
+        if (e.ctrlKey || e.altKey) return;
+        let keyPressed = e.which;
+        if (!e.shiftKey) {
+            //if (keyPressed == 27) app.closePopup(); // ESC           
+            if (keyPressed === 87) {
+                this.setWireframeMode();    // W
+            }
+        }
+    }
+
+    setWireframeMode() {
+        let wireframe = !this.wireframeMode;
+        if (wireframe === this.wireframeMode) return;
+
+        for (var key in this.map._layers) {
+            let layer =  this.map._layers[key];
+            layer.setWireframeMode(wireframe);
+        }
+
+        this.wireframeMode = wireframe;
+        this.animate();
     }
 
     onWindowResize() {
@@ -173,23 +194,8 @@ class Application {
     }
 
     animate() {
-        if (this.running) {
-            // requestAnimationFrame(() => {
-            //     this.animate();
-            // }, 1000 / 30);
-
-            // this.objects.forEach((object) => {
-            //     object.update();
-            // });
-        }
-
         this.renderer.render(this.scene, this.camera);
     }
-
-    // add(layer) {
-    //     this.objects.push(layer);
-    //     this.scene.add(layer.getMesh());
-    // }
 }
 
 var container = document.getElementById("webgl");
