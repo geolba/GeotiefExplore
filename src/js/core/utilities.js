@@ -107,6 +107,16 @@ export function extend(dest) {
 	return dest;
 }
 
+// @function create(proto: Object, properties?: Object): Object
+// Compatibility polyfill for [Object.create](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
+export var create = Object.create || (function () {
+	function F() {}
+	return function (proto) {
+		F.prototype = proto;
+		return new F();
+	};
+})()
+
 export function showLoading () {
 	var element = dom.byId("loadingImg");
 	//domUtil.show(_loading);
@@ -133,11 +143,15 @@ export function setOptions (obj, options) {
 	return obj.options;
 }
 
-export function stamp (){
-	var lastId = 0,
-		key = '_gba_id';
-	return function (obj) {
-		obj[key] = obj[key] || ++lastId;
-		return obj[key];
-	};
+// @property lastId: Number
+// Last unique ID used by [`stamp()`](#util-stamp)
+export var lastId = 0;
+
+// @function stamp(obj: Object): Number
+// Returns the unique ID of an object, assigning it one if it doesn't have it.
+export function stamp (obj){
+	let key = '_gba_id';
+	obj[key] = obj[key] || ++lastId;
+	return obj[key];
+
 }

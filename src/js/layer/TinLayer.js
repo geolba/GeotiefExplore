@@ -2,6 +2,8 @@
 import { BufferGeometry } from 'three/src/core/BufferGeometry';
 import { Float32BufferAttribute, Uint16BufferAttribute } from 'three/src/core/BufferAttribute';
 import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial.js';
+import { MeshStandardMaterial } from 'three/src/materials/MeshStandardMaterial';
+import { DoubleSide } from 'three/src/constants'
 import { Mesh } from 'three/src/objects/Mesh';
 import { Layer } from './Layer';
 import { BitStream } from '../lib/bitstream';
@@ -9,7 +11,7 @@ import { BitStream } from '../lib/bitstream';
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
 
-class DxfLayer extends Layer {
+class TinLayer extends Layer {
 
 
 
@@ -30,7 +32,7 @@ class DxfLayer extends Layer {
         this.borderVisible = false;
     }
 
-    setWireframeMode (wireframe) {
+    setWireframeMode(wireframe) {
         this.materialsArray.forEach(function (mat) {
             //if (m.w) return;
             //m.mat.wireframe = wireframe;
@@ -44,7 +46,7 @@ class DxfLayer extends Layer {
     }
 
     async onAdd(map) {
-        await this.build(this.getScene());       
+        await this.build(this.getScene());
         map.update();
         // this.emit('add');
     }
@@ -55,7 +57,7 @@ class DxfLayer extends Layer {
         let geometry = new BufferGeometry();
         // let positions = new Float32BufferAttribute(this.vertices, 3);       
         let posArray = await (this.points(this.geomId));
-        console.log(posArray);
+        // console.log(posArray);
         let positions = new Float32BufferAttribute(posArray, 3);
         geometry.setAttribute('position', positions);
 
@@ -72,9 +74,13 @@ class DxfLayer extends Layer {
         geometry.computeVertexNormals();// computed vertex normals are orthogonal to the face f
         geometry.computeBoundingBox();
 
-        let color = parseInt("907A5C", 16);
-        this.material = new MeshBasicMaterial({
-            color: color
+        let color = parseInt(this.color, 16);
+        this.material = new MeshStandardMaterial({
+            color: color,
+            metalness: 0.1,
+            roughness: 0.75,
+            flatShading: true,
+            side: DoubleSide
         });
         this.materialsArray.push(this.material);
         let mesh = this.mainMesh = new Mesh(geometry, this.material);
@@ -89,23 +95,22 @@ class DxfLayer extends Layer {
 
     async points(geomId) {
         const url = POINTURL + geomId;
-        const buffer = await this.request(url);
-        return this.unpackVertices(buffer);
+        const buffer = await this.request(url);      
+        return this.unpackVertices(buffer);       
     }
 
     async edges(geomId) {
         const url = EDGEURL + geomId;
-        const buffer = await this.request(url);
-        return this.unpackEdges(buffer);
+        const buffer = await this.request(url);       
+        return this.unpackEdges(buffer);       
     }
 
     async request(url) {
         const response = await fetch(url);
         if (response.ok) {
             return response.arrayBuffer();
-        }
-        else {
-            console.log('could not fetch geometry data');
+        } else {
+            throw new Error("HTTP error, status = " + response.status);
         }
     }
 
@@ -175,4 +180,4 @@ class DxfLayer extends Layer {
 }
 
 
-export { DxfLayer };
+export { TinLayer };

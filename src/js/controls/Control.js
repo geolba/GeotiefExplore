@@ -8,16 +8,17 @@ class Control {
     // @section
     // @aka Control options
     options = {
-        position: 'topright'
+        position: 'topright',
     };
 
     constructor(defaults) {
         if (!(this instanceof Control)) {
             throw new TypeError("Control constructor cannot be called as a function.");
         }
+        // this.options = defaults;
         // properties     
         util.setOptions(this, defaults);
-    }    
+    }
 
     getPosition() {
         return this.options.position;

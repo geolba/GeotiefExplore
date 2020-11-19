@@ -1,16 +1,13 @@
-// import { DirectionalLight, AmbientLight, WebGLRenderer, PerspectiveCamera, Scene } from 'three';
 import { DirectionalLight } from 'three/src/lights/DirectionalLight';
 import { AmbientLight } from 'three/src/lights/AmbientLight';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Scene } from 'three/src/scenes/Scene';
-// import { BoxLayer } from './layer/BoxLayer';
 import { Vector3 } from 'three/src/math/Vector3';
-import { DxfLayer } from './layer/DxfLayer';
-// import * as util from './core/utilities';
-// import { OrbitControls } from './lib/OrbitControls.js'
+import { TinLayer } from './layer/TinLayer';
 import { Map } from './core/Map';
 import * as domEvent from './core/domEvent';
+// import { Coordinates } from './controls/Coordinates';
 
 import '../css/page.css'; /* style loader will import it */
 
@@ -39,20 +36,24 @@ class Application {
     createScene() {
 
         /* Renderer */
-        var bgcolor = 0xfdfdfd;
+        // var bgcolor = 0xfdfdfd;
+        let bgcolor = 0xfdfdfd;
         this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
+        this.renderer.setPixelRatio( window.devicePixelRatio );
         // this.renderer.setSize(window.innerWidth, window.innerHeight);
         // document.body.appendChild(this.renderer.domElement);
         this.renderer.setSize(this.width, this.height);
         this.renderer.setClearColor(bgcolor, 1); // second param is opacity, 0 => transparent       
-        var Empty = Object.freeze([]);
-        this.renderer.clippingPlanes = Empty; // GUI sets it to globalPlanes
-        this.renderer.localClippingEnabled = true;
+        // let Empty = Object.freeze([]);
+        // this.renderer.clippingPlanes = Empty; // GUI sets it to globalPlanes
+        // this.renderer.localClippingEnabled = true;
         this.container.appendChild(this.renderer.domElement);
 
         /* Scene: that will hold all our elements such as objects, cameras and lights. */
         this.scene = new Scene();
         //app.scene.add(new THREE.AmbientLight(0xeeeeee));
+        // const ambient = new AmbientLight( 0xffffff, 0.5 );
+        // this.scene.add(ambient);
         this._buildDefaultLights(this.scene);
         //app.scene.autoUpdate = false;
         //// show axes in the screen
@@ -70,6 +71,7 @@ class Application {
 
         this.camera = new PerspectiveCamera(30, this.width / this.height, 100, 100000);
         this.camera.up.set(0, 0, 1);
+        
         const dirLight = new DirectionalLight(0xffffff, 1);
         dirLight.position.set(585000 + 10000, 6135000 + 10000, -500 + 5000);
         this.camera.add(dirLight);
@@ -89,24 +91,43 @@ class Application {
 
 
         // this.controls = new OrbitControls(this.camera, this.scene, this.renderer.domElement);
-        this.map = new Map(size, center, this.camera, this.scene, this.renderer.domElement, this.container);
+        this.map = new Map(size, center, this.camera, this.scene, this.renderer.domElement, this.container);        
         // this.map.target = center;
         // this.map.minDistance =  size*0.75;
         // this.map.maxDistance = size*15;
+        // let coordinates = new Coordinates({ camera: this.camera, crs: "EPSG:3034" }).addTo(this.map); 
 
-        // let boxLayer = new BoxLayer({ width: 10, height: 10, depth: 10 });
-        // this.map.addLayer(boxLayer);
-
-
-        let dxfLayer = new DxfLayer({
-            geomId: 134, q: true, type: "3dface", name: "Mittelpannon", description: "test"
+        let dxf134Layer = new TinLayer({
+            geomId: 134, q: true, type: "3dface", name: "South Alpine Superunit", description: "test", color: "907A5C"
         });
-        // dxfLayer.idx = [0, 1, 2, 3, 4, 5];
-        // dxfLayer.vertices = new Float32Array([10.421, -20.878, 0.068, 11.241, -20.954, 0.055, 10.225, -20.297, 0.078, 0.161, -6.548, 0.535, -0.163, -6.675, 0.538, 0.116, -6.874, 0.537,]);
+        this.map.addLayer(dxf134Layer);
 
-        this.map.addLayer(dxfLayer);
+        let dxf135Layer = new TinLayer({
+            geomId: 135, q: true, type: "3dface", name: "Adriatic Plate", description: "test2", color: "A0512D"
+        });
+        this.map.addLayer(dxf135Layer);
 
-        // domEvent.on(window, 'click', this.onWindowResize, this);
+        let dxf136Layer = new TinLayer({
+            geomId: 136, q: true, type: "3dface", name: "Austroalpine Superunit", description: "test2", color: "CC4D00"
+        });
+        this.map.addLayer(dxf136Layer);
+
+        let dxf137Layer = new TinLayer({
+            geomId: 137, q: true, type: "3dface", name: "Penninic Superunit", description: "test2", color: "80CCFF"
+        });
+        this.map.addLayer(dxf137Layer);
+
+        let dxf139Layer = new TinLayer({
+            geomId: 139, q: true, type: "3dface", name: "Sub-Penninic Superunit, Helvetic Superunit & Allochthonous Molasse", description: "test2", color: "FF80CC"
+        });
+        this.map.addLayer(dxf139Layer);
+
+        let dxf140Layer = new TinLayer({
+            geomId: 140, q: true, type: "3dface", name: "Eurasian Plate, including autochtomous sedimentary cover", description: "test2", color: "FFB3B3"
+        });
+        this.map.addLayer(dxf140Layer);
+
+        domEvent.on(window, 'resize', this.onWindowResize, this);
         domEvent.on(window, 'keydown', this.keydown, this);
 
 
@@ -157,31 +178,31 @@ class Application {
     }
 
     _buildDefaultLights(scene) {
-        var deg2rad = Math.PI / 180;
+        let deg2rad = Math.PI / 180;
 
         // ambient light
         scene.add(new AmbientLight(0x999999));
         //scene.add(new THREE.AmbientLight(0xeeeeee));
 
         // directional lights
-        var opt = {
+        let opt = {
             azimuth: 220,   // note: default light azimuth of gdaldem hillshade is 315.
             altitude: 45    // altitude angle
         };
         //appSettings.Options.light.directional;
-        var lambda = (90 - opt.azimuth) * deg2rad;
-        var phi = opt.altitude * deg2rad;
+        let lambda = (90 - opt.azimuth) * deg2rad;
+        let phi = opt.altitude * deg2rad;
 
-        var x = Math.cos(phi) * Math.cos(lambda),
+        let x = Math.cos(phi) * Math.cos(lambda),
             y = Math.cos(phi) * Math.sin(lambda),
             z = Math.sin(phi);
 
-        var light1 = new DirectionalLight(0xffffff, 0.5);
+        let light1 = new DirectionalLight(0xffffff, 0.5);
         light1.position.set(x, y, z);
         scene.add(light1);
 
         // thin light from the opposite direction
-        var light2 = new DirectionalLight(0xffffff, 0.1);
+        let light2 = new DirectionalLight(0xffffff, 0.1);
         light2.position.set(-x, -y, -z);
         scene.add(light2);
     }
@@ -199,7 +220,7 @@ class Application {
 }
 
 var container = document.getElementById("webgl");
-let app = new Application(container);
+new Application(container);
 // app.add(new BoxLayer({
 //     width: 10,
 //     height: 10,
