@@ -3,6 +3,7 @@ import * as dom from '../core/domUtil';
 import { Vector3 } from 'three/src/math/Vector3';
 import proj4 from 'proj4/dist/proj4';
 import * as util from '../core/utilities';
+import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 
 class Coordinates extends Control {
 
@@ -14,9 +15,11 @@ class Coordinates extends Control {
         numDigits: 5,
         lngFormatter: undefined,
         latFormatter: undefined,
-        prefix: ""
+        prefix: "",
+        camera: new PerspectiveCamera()
     };
-    map = {};
+    map;
+    visible = false;
 
     constructor(options) {
         super(options);
@@ -24,33 +27,24 @@ class Coordinates extends Control {
         util.setOptions(this, options);
     }
     // get options() {
-    //     return util.extend(this._options, super._options);
+    //     return this.#options;
     // }
 
     // set options(defaults) {
-    //     this._options = util.extend(this._options, defaults);;
+    //     this.#options = util.extend(this.#options, defaults);
     // }
     // set options(defaults) {
-    //     this._options = value;
+    //     this.#options = defaults;
     // }
 
     onAdd(map) {
-        proj4.defs([
-            [
-            'EPSG:4326',
-            '+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees'],
-            [
-            'EPSG:3034',
-            '+proj=lcc +lat_1=35 +lat_2=65 +lat_0=52 +lon_0=10 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +units=m +no_defs'
-            ]
-            ]);
+        proj4.defs("EPSG:3034", "+proj=lcc +lat_1=35 +lat_2=65 +lat_0=52 +lon_0=10 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+
         this.map = map;
-        //this._container = L.DomUtil.create('div', 'gba-control-coordinates');
-        this._container = dom.createDom("div", { "class": "gba-control-coordinates" });
-        //map.on('mousemove', this._onMouseMove, this);
+        let container = this._container = dom.createDom("div", { "class": "gba-control-coordinates" });
+        this.visible = false;      
         map.addListener('mouse-move', this._onMouseMove, this);
-        //this._container.innerHTML = this.options.emptyString;
-        return this._container;
+        return container;
     }
 
     onRemove(map) {
@@ -58,34 +52,25 @@ class Coordinates extends Control {
     }
 
     _onMouseMove(event) {
-        // var canvasOffset = $(this._map.domElement).offset();
-        // let rect = this._map.domElement.getBoundingClientRect();
         let canvasOffset = this._getOffset(this.map.domElement);
-        let offsetX = event.clientX - canvasOffset.left;
-        let offsetY = event.clientY - canvasOffset.top;
+        let xClickedOnCanvas = event.clientX - canvasOffset.left;
+        let yClickedonCanvas = event.clientY - canvasOffset.top;
         let width = this._map.domElement.clientWidth;
         let height = this._map.domElement.clientHeight;
 
-        let x = (offsetX / width) * 2 - 1;
-        let y = -(offsetY / height) * 2 + 1;
-        let vector = new Vector3(x, y, 1);
-        vector.unproject(this.options.camera);
-        //var lng = this.options.lngFormatter ? this.options.lngFormatter(e.latlng.lng) : L.Util.formatNum(e.latlng.lng, this.options.numDigits);
-        //var lat = this.options.latFormatter ? this.options.latFormatter(e.latlng.lat) : L.Util.formatNum(e.latlng.lat, this.options.numDigits);
-        //var value = this.options.lngFirst ? lng + this.options.separator + lat : lat + this.options.separator + lng;
-        //var prefixAndValue = this.options.prefix + ' ' + value;
+        let x = (xClickedOnCanvas / width) * 2 - 1;
+        let y = -(yClickedonCanvas / height) * 2 + 1;
+        let mouse = new Vector3(x, y);
+        mouse.unproject(this.options.camera);
+        // vector.sub(this.options.camera.position);
+        // vector.normalize();
+        this.emit('onPoint', mouse);
 
-        // clicked coordinates: skalierung wieder wegrechnen:
-        let pt = vector; //this.options.dataservice.toMapCoordinates(vector.x, vector.y, 1);
-        // let dest = new Proj4js.Proj("EPSG:4326");
-        // let source = new Proj4js.Proj(this.options.dataservice.crs);
         let dest = new proj4.Proj("EPSG:4326");
         let source = new proj4.Proj("EPSG:3034");
-        let minPoint = { x: pt.x, y: pt.y, spatialReference: { wkid: 3034 } };
-        let point84 = proj4.transform(source, dest, minPoint);
+        let point84 = proj4.transform(source, dest, mouse);
         let koordx = this._dec2sex(point84.x, 'X');
-        let koordy = this._dec2sex(point84.y, 'y');
-        //document.getElementById("info").innerHTML = "LON: " + koordx + ", " + "LAT: " + koordy;
+        let koordy = this._dec2sex(point84.y, 'y');        
         this._container.innerHTML = "LON: " + koordx + ", " + "LAT: " + koordy;
     }
 
@@ -108,14 +93,12 @@ class Coordinates extends Control {
         let degr = Math.floor(plus);
         let minu = Math.floor(60 * (plus - degr));
         let sec = Math.floor(60 * (60 * (plus - degr) - minu));
-        let secStr = "";
         let compass = "?";
-        let minuStr = "";
         if (minu < 10) {
-            minuStr = "0" + minu;
+            minu = "0" + minu.toString();;
         }
         if (sec < 10) {
-            secStr = "0" + sec;
+            sec = "0" + sec.toString();
         }
         if (dir === 'y') {
             compass = dec < 0 ? "S" : "N";
@@ -123,7 +106,7 @@ class Coordinates extends Control {
         else {
             compass = dec < 0 ? "W" : "E";
         }
-        return "" + degr + "° " + minuStr + "' " + secStr + '" ' + compass;
+        return "" + degr + "° " + minu + "' " + sec + '" ' + compass;
     }
 
 }

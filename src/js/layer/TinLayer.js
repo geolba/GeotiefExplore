@@ -1,7 +1,6 @@
 // import { Group } from 'three/src/objects/Group';
 import { BufferGeometry } from 'three/src/core/BufferGeometry';
 import { Float32BufferAttribute, Uint16BufferAttribute } from 'three/src/core/BufferAttribute';
-import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial.js';
 import { MeshStandardMaterial } from 'three/src/materials/MeshStandardMaterial';
 import { DoubleSide } from 'three/src/constants'
 import { Mesh } from 'three/src/objects/Mesh';

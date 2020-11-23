@@ -1,17 +1,22 @@
 // import { Class } from '../core/Class';
 import * as util from '../core/utilities';
 // import * as dom from '../core/domUtil';
+import { EventEmitter } from '../core/EventEmitter';
+
 
 // export var Control = Class.extend({
-class Control {
+class Control extends EventEmitter {
 
     // @section
     // @aka Control options
     options = {
         position: 'topright',
     };
+    _map;
+    _container;
 
     constructor(defaults) {
+        super();
         if (!(this instanceof Control)) {
             throw new TypeError("Control constructor cannot be called as a function.");
         }
@@ -27,6 +32,10 @@ class Control {
     getContainer() {
         return this._container;
     }
+     
+    // abstract onRemove(map) : void;
+
+    // abstract onAdd(map) : HTMLElement;
 
     addTo(map) {
         this._map = map;
@@ -48,6 +57,7 @@ class Control {
 
         return this;
     }
+    
 
     removeFrom(map) {
         var pos = this.getPosition(),

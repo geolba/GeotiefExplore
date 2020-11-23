@@ -7,7 +7,10 @@ import { Vector3 } from 'three/src/math/Vector3';
 import { TinLayer } from './layer/TinLayer';
 import { Map } from './core/Map';
 import * as domEvent from './core/domEvent';
-// import { Coordinates } from './controls/Coordinates';
+import { Coordinates } from './controls/Coordinates';
+import { Mesh } from 'three/src/objects/Mesh';
+import { SphereGeometry } from 'three/src/geometries/SphereGeometry';
+import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
 
 import '../css/page.css'; /* style loader will import it */
 
@@ -35,11 +38,17 @@ class Application {
 
     createScene() {
 
+        let opt = { r: 200, c:   0x38eeff, o: 0.8 };
+        this.queryMarker = new Mesh(new SphereGeometry(opt.r),
+            new MeshLambertMaterial({ color: opt.c, opacity: opt.o, transparent: false }));
+           
+        this.queryMarker.visible = true;
+        this.queryMarker.position.set(4282010, 2302070, -13616.3);
         /* Renderer */
         // var bgcolor = 0xfdfdfd;
         let bgcolor = 0xfdfdfd;
         this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
-        this.renderer.setPixelRatio( window.devicePixelRatio );
+        this.renderer.setPixelRatio(window.devicePixelRatio);
         // this.renderer.setSize(window.innerWidth, window.innerHeight);
         // document.body.appendChild(this.renderer.domElement);
         this.renderer.setSize(this.width, this.height);
@@ -58,20 +67,19 @@ class Application {
         //app.scene.autoUpdate = false;
         //// show axes in the screen
         //app.scene.add(new THREE.AxisHelper(100));
+        this.scene.add(this.queryMarker);
 
         /* Camera */
         var angle = 45;
         var aspect = this.width / this.height;
         var near = 0.1; //This is the distance at which the camera will start rendering scene objects
         var far = 2000; //Anything beyond this distance will not be rendered                
-        this.camera = new PerspectiveCamera(angle, aspect, near, far);
-        //this.camera.position.z = 20;
-        // this.camera.position.set(0, -0.1, 150);      
-        // this.camera.lookAt(new THREE.Vector3(0, 0, 0));   
+        this.camera = new PerspectiveCamera(angle, aspect, near, far);      
+        // this.camera.position.set(0, -0.1, 150);
+        // this.camera.lookAt(new Vector3(0, 0, 0));
 
-        this.camera = new PerspectiveCamera(30, this.width / this.height, 100, 100000);
-        this.camera.up.set(0, 0, 1);
-        
+        this.camera = new PerspectiveCamera(30, this.width / this.height, 100, 100000);        
+
         const dirLight = new DirectionalLight(0xffffff, 1);
         dirLight.position.set(585000 + 10000, 6135000 + 10000, -500 + 5000);
         this.camera.add(dirLight);
@@ -89,13 +97,17 @@ class Application {
         this.camera.far = size * 25;
         this.camera.updateProjectionMatrix();
 
-
-        // this.controls = new OrbitControls(this.camera, this.scene, this.renderer.domElement);
-        this.map = new Map(size, center, this.camera, this.scene, this.renderer.domElement, this.container);        
+        // create map
+        this.map = new Map(size, center, this.camera, this.scene, this.renderer.domElement, this.container);
         // this.map.target = center;
         // this.map.minDistance =  size*0.75;
         // this.map.maxDistance = size*15;
-        // let coordinates = new Coordinates({ camera: this.camera, crs: "EPSG:3034" }).addTo(this.map); 
+        let coordinates = new Coordinates({ camera: this.camera, crs: "EPSG:3034" }).addTo(this.map);
+        // coordinates.addListener('onPoint', (vector) => {           
+        //     this.queryMarker.position.set(vector.x, vector.y, vector.z);       
+        //     this.queryMarker.updateMatrixWorld();
+        //     this.animate();
+        // }, this);
 
         let dxf134Layer = new TinLayer({
             geomId: 134, q: true, type: "3dface", name: "South Alpine Superunit", description: "test", color: "907A5C"
@@ -129,9 +141,6 @@ class Application {
 
         domEvent.on(window, 'resize', this.onWindowResize, this);
         domEvent.on(window, 'keydown', this.keydown, this);
-
-
-        // util.setLoading("webgl");  
         this.start();
     }
 
@@ -151,7 +160,7 @@ class Application {
         if (wireframe === this.wireframeMode) return;
 
         for (var key in this.map._layers) {
-            let layer =  this.map._layers[key];
+            let layer = this.map._layers[key];
             layer.setWireframeMode(wireframe);
         }
 
