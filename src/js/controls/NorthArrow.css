@@ -1,0 +1,53 @@
+#inset {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    border: none;
+    width: 120px;
+    height: 120px;
+    z-index: 9999999;
+}
+
+/* label */
+.label {
+    padding: 2px;
+    text-shadow: -1px -1px #FFF, 0 -1px #FFF, 1px -1px #FFF, -1px 0 #FFF, 1px 0 #FFF, -1px 1px #FFF, 0 1px #FFF, 1px 1px #FFF;
+    position: absolute;
+    pointer-events: none;
+}
+
+.red-label {  
+    color: #f00;
+    padding: 2px;
+    text-shadow: -1px -1px #FFF, 0 -1px #FFF, 1px -1px #FFF, -1px 0 #FFF, 1px 0 #FFF, -1px 1px #FFF, 0 1px #FFF, 1px 1px #FFF;
+    position: absolute;
+    pointer-events: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.green-label {   
+    color: #7cfc00;
+    padding: 2px;
+    text-shadow: -1px -1px #FFF, 0 -1px #FFF, 1px -1px #FFF, -1px 0 #FFF, 1px 0 #FFF, -1px 1px #FFF, 0 1px #FFF, 1px 1px #FFF;
+    position: absolute;
+    pointer-events: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.blue-label {  
+    color: #00bfff;
+    padding: 2px;
+    text-shadow: -1px -1px #FFF, 0 -1px #FFF, 1px -1px #FFF, -1px 0 #FFF, 1px 0 #FFF, -1px 1px #FFF, 0 1px #FFF, 1px 1px #FFF;
+    position: absolute;
+    pointer-events: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}

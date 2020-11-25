@@ -15,6 +15,7 @@ class Map extends OrbitControls {
         // call parent constructor of OrbitControls
         super(size, center, camera, scene, domElement);
 
+        this.camera = camera;
         this.container = container;
 
         //init the control corners

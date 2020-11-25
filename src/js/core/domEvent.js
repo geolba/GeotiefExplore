@@ -1,3 +1,6 @@
+import * as browser from '../core/browser';
+import * as util from '../core/utilities';
+
  //static function
  var stampForFn = (function () {
     var lastId = 0,
@@ -74,6 +77,54 @@ export function addListener(obj, type, fn, context) { // (HTMLElement, String, F
 // Alias to [`L.DomEvent.on`](#domevent-on)
 export { addListener as on };
 
+
+function addOne(obj, type, fn, context) {  
+
+
+    var id = type + util.stamp(fn) + (context ? '_' + util.stamp(context) : '');
+    var eventsKey = '_gba_' + type + id;
+
+	if (obj[eventsKey] && obj[eventsKey][id]) { return this; }
+
+	var handler = function (e) {
+		return fn.call(context || obj, e || window.event);
+	};
+
+	var originalHandler = handler;
+
+	if (browser.pointer && type.indexOf('touch') === 0) {
+		// Needs DomEvent.Pointer.js
+		addPointerListener(obj, type, handler, id);
+
+	} else if (browser.touch && (type === 'dblclick') && !browserFiresNativeDblClick()) {
+		addDoubleTapListener(obj, handler, id);
+
+	} else if ('addEventListener' in obj) {
+
+		if (type === 'touchstart' || type === 'touchmove' || type === 'wheel' ||  type === 'mousewheel') {
+			obj.addEventListener(mouseSubst[type] || type, handler, Browser.passiveEvents ? {passive: false} : false);
+
+		} else if (type === 'mouseenter' || type === 'mouseleave') {
+			handler = function (e) {
+				e = e || window.event;
+				if (isExternalTarget(obj, e)) {
+					originalHandler(e);
+				}
+			};
+			obj.addEventListener(mouseSubst[type], handler, false);
+
+		} else {
+			obj.addEventListener(type, originalHandler, false);
+		}
+
+	} else if ('attachEvent' in obj) {
+		obj.attachEvent('on' + type, handler);
+	}
+
+	obj[eventsKey] = obj[eventsKey] || {};
+	obj[eventsKey][id] = handler;
+}
+
 export function removeListener(obj, type, fn) {  // (HTMLElement, String, Function)
 
     var id = stampForFn(fn);
@@ -81,13 +132,7 @@ export function removeListener(obj, type, fn) {  // (HTMLElement, String, Functi
     var handler = obj[key];
 
     if (!handler) { return this; }
-
-    //if (L.Browser.pointer && type.indexOf('touch') === 0) {
-    //    this.removePointerListener(obj, type, id);
-    //} else if (L.Browser.touch && (type === 'dblclick') && this.removeDoubleTapListener) {
-    //    this.removeDoubleTapListener(obj, id);
-
-    //} else if ('removeEventListener' in obj) {
+    
     if ('removeEventListener' in obj) {
         if (type === 'mousewheel') {
             obj.removeEventListener('DOMMouseScroll', handler, false);
@@ -137,6 +182,16 @@ export function stopPropagation(e) {
     return this;
 }
 
+
+// @function disableClickPropagation(el: HTMLElement): this
+// Adds `stopPropagation` to the element's `'click'`, `'doubleclick'`,
+// `'mousedown'` and `'touchstart'` events (plus browser variants).
+export function disableClickPropagation(el) {
+	addListener(el, 'mousedown touchstart dblclick', stopPropagation);
+	addOne(el, 'click', fakeStop);
+	return this;
+}
+
 export function preventDefault(e) {
 
     if (e.preventDefault) {
@@ -149,9 +204,22 @@ export function preventDefault(e) {
 
 var skipEvents = {};
 
+export function fakeStop(e) {
+	// fakes stopPropagation by setting a special event flag, checked/reset with skipped(e)
+	skipEvents[e.type] = true;
+}
 export function skipped(e) {
     var skipped = skipEvents[e.type];
     // reset when checking, as it's only used in map container and propagates outside of the map
     skipEvents[e.type] = false;
     return skipped;
 }
+
+
+// @function stop(ev: DOMEvent): this
+// // Does `stopPropagation` and `preventDefault` at the same time.
+// export function stop(e) {
+// 	preventDefault(e);
+// 	stopPropagation(e);
+// 	return this;
+// }

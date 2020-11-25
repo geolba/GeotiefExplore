@@ -155,3 +155,14 @@ export function stamp (obj){
 	return obj[key];
 
 }
+
+export function hasTouch () {
+	var phantomjs = navigator.userAgent.toLowerCase().indexOf('phantom') !== -1;
+
+	var isTouchDevice = phantomjs
+		|| 'ontouchstart' in window
+		|| (window.DocumentTouch && document instanceof window.DocumentTouch)
+		|| ("onpointerdown" in document && navigator.maxTouchPoints > 0)
+		|| window.navigator.msMaxTouchPoints;
+	return isTouchDevice;
+}

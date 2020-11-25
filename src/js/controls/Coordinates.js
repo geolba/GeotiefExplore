@@ -5,7 +5,9 @@ import proj4 from 'proj4/dist/proj4';
 import * as util from '../core/utilities';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 
-class Coordinates extends Control {
+import './Coordinates.css';
+
+export class Coordinates extends Control {
 
     options = {
         position: 'bottomright',
@@ -110,5 +112,3 @@ class Coordinates extends Control {
     }
 
 }
-
-export { Coordinates };

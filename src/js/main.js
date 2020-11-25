@@ -8,6 +8,7 @@ import { TinLayer } from './layer/TinLayer';
 import { Map } from './core/Map';
 import * as domEvent from './core/domEvent';
 import { Coordinates } from './controls/Coordinates';
+import { NortArrow } from './controls/NorthArrow';
 import { Mesh } from 'three/src/objects/Mesh';
 import { SphereGeometry } from 'three/src/geometries/SphereGeometry';
 import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
@@ -87,7 +88,7 @@ class Application {
         let x = { min: 3955850, max: 4527300, avg: 4282010 };
         let y = { min: 2183600, max: 2502700, avg: 2302070 };
         let z = { min: -60066, max: 3574.94, avg: -13616.3 };
-        const center = new Vector3(x.avg, y.avg, z.avg);
+        const center = new Vector3(x.avg, y.avg, 1000);
         const size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);
         const camDirection = new Vector3(-0.5, -Math.SQRT1_2, 0.5);
         const camOffset = camDirection.multiplyScalar(size * 2);
@@ -98,16 +99,18 @@ class Application {
         this.camera.updateProjectionMatrix();
 
         // create map
-        this.map = new Map(size, center, this.camera, this.scene, this.renderer.domElement, this.container);
-        // this.map.target = center;
+        this.map = new Map(size, center, this.camera, this.scene, this.renderer.domElement, this.container);        
         // this.map.minDistance =  size*0.75;
         // this.map.maxDistance = size*15;
+        
+        //add map controls:
         let coordinates = new Coordinates({ camera: this.camera, crs: "EPSG:3034" }).addTo(this.map);
         // coordinates.addListener('onPoint', (vector) => {           
         //     this.queryMarker.position.set(vector.x, vector.y, vector.z);       
-        //     this.queryMarker.updateMatrixWorld();
+        //     // this.queryMarker.updateMatrixWorld();
         //     this.animate();
         // }, this);
+        this.northArrow = new NortArrow({ headLength: 1, headWidth: 1 }).addTo(this.map);
 
         let dxf134Layer = new TinLayer({
             geomId: 134, q: true, type: "3dface", name: "South Alpine Superunit", description: "test", color: "907A5C"
@@ -225,13 +228,9 @@ class Application {
 
     animate() {
         this.renderer.render(this.scene, this.camera);
+        this.northArrow.animate();
     }
 }
 
 var container = document.getElementById("webgl");
 new Application(container);
-// app.add(new BoxLayer({
-//     width: 10,
-//     height: 10,
-//     depth: 10
-// }));
