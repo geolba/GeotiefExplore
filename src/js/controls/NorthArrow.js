@@ -98,7 +98,7 @@ export class NortArrow extends Control {
         let zDirection = zTo.clone().sub(from);
         this.objectGroup.add(new ArrowHelper(zDirection, from, 6, 0x00bfff, headLength, headWidth)); //8 is the length,  Blue = z; 20 and 10 are head length and width
 
-        let opt = { r: 200, c: 0x38eeff, o: 0.8 };
+        // let opt = { r: 200, c: 0x38eeff, o: 0.8 };
         // this._queryMarker = new Mesh(new SphereGeometry(opt.r),
         //     new MeshLambertMaterial({ color: opt.c, opacity: opt.o, transparent: false }));
         // this._queryMarker.visible = true;

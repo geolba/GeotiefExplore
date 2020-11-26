@@ -39,10 +39,10 @@ class Application {
 
     createScene() {
 
-        let opt = { r: 200, c:   0x38eeff, o: 0.8 };
+        let opt = { r: 200, c: 0x38eeff, o: 0.8 };
         this.queryMarker = new Mesh(new SphereGeometry(opt.r),
             new MeshLambertMaterial({ color: opt.c, opacity: opt.o, transparent: false }));
-           
+
         this.queryMarker.visible = true;
         this.queryMarker.position.set(4282010, 2302070, -13616.3);
         /* Renderer */
@@ -75,11 +75,11 @@ class Application {
         var aspect = this.width / this.height;
         var near = 0.1; //This is the distance at which the camera will start rendering scene objects
         var far = 2000; //Anything beyond this distance will not be rendered                
-        this.camera = new PerspectiveCamera(angle, aspect, near, far);      
+        this.camera = new PerspectiveCamera(angle, aspect, near, far);
         // this.camera.position.set(0, -0.1, 150);
         // this.camera.lookAt(new Vector3(0, 0, 0));
 
-        this.camera = new PerspectiveCamera(30, this.width / this.height, 100, 100000);        
+        this.camera = new PerspectiveCamera(30, this.width / this.height, 100, 100000);
 
         const dirLight = new DirectionalLight(0xffffff, 1);
         dirLight.position.set(585000 + 10000, 6135000 + 10000, -500 + 5000);
@@ -94,15 +94,16 @@ class Application {
         const camOffset = camDirection.multiplyScalar(size * 2);
         this.camera.position.copy(center);
         this.camera.position.add(camOffset);
+        // this.camera.position.set(0, 0, 1500);
         this.camera.near = size * 0.1;
         this.camera.far = size * 25;
         this.camera.updateProjectionMatrix();
 
         // create map
-        this.map = new Map(size, center, this.camera, this.scene, this.renderer.domElement, this.container);        
+        this.map = new Map(size, center, this.camera, this.scene, this.renderer.domElement, this.container);
         // this.map.minDistance =  size*0.75;
         // this.map.maxDistance = size*15;
-        
+
         //add map controls:
         let coordinates = new Coordinates({ camera: this.camera, crs: "EPSG:3034" }).addTo(this.map);
         // coordinates.addListener('onPoint', (vector) => {           
