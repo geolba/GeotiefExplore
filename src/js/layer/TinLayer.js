@@ -41,7 +41,8 @@ class TinLayer extends Layer {
 
     setVisible(visible) {
         this.visible = visible;
-        // this.objectGroup.visible = visible;       
+        this.mainMesh.visible = visible;    
+        this.emit('visibility-change');
     }
 
     async onAdd(map) {

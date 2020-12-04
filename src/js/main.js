@@ -9,6 +9,7 @@ import { Map } from './core/Map';
 import * as domEvent from './core/domEvent';
 import { Coordinates } from './controls/Coordinates';
 import { NortArrow } from './controls/NorthArrow';
+import { LayerControl } from './controls/LayerControl';
 import { Mesh } from 'three/src/objects/Mesh';
 import { SphereGeometry } from 'three/src/geometries/SphereGeometry';
 import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
@@ -142,6 +143,11 @@ class Application {
             geomId: 140, q: true, type: "3dface", name: "Eurasian Plate, including autochtomous sedimentary cover", description: "test2", color: "FFB3B3"
         });
         this.map.addLayer(dxf140Layer);
+
+        new LayerControl(this.map.layers, {
+            collapsed: true
+        }).addTo(this.map);
+
 
         domEvent.on(window, 'resize', this.onWindowResize, this);
         domEvent.on(window, 'keydown', this.keydown, this);

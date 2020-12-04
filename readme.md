@@ -21,6 +21,10 @@ Configure your database connection in .env-file e.g.:
 ```ini
 NODE_ENV=production
 ```
+
+Update npm dependencies:\
+`npm update`
+
 Build production files:\
 `npm run prod`
 

@@ -26,6 +26,10 @@ class Map extends OrbitControls {
         this.initControls();
     }
 
+    get layers() {
+        return this._layers;
+    }
+
     _initControlPos() {
         //var test = document.getElementById("webgl");
 

@@ -1,0 +1,134 @@
+/* layers control */
+.gba-controllayers {  
+    background: none repeat scroll 0 0 #FFF;
+   border-radius: 5px;
+}
+
+/* der eigentliche Button */
+.gba-controllayers-toggle {
+ width: 30px;
+   height: 30px;
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+   cursor: pointer;
+   border-radius: 5px;
+   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAMAAAAM7l6QAAABLFBMVEWZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmVlZWWlpaXl5eYmJjT09P///+ZmZmdnZ2qqqq3t7fOzs7Pz8/Q0NDR0dHS0tKTk5PU1NTV1dWUlJTKysrMzMzNzc2kpKSlpaWpqambm5uvr6+xsbGioqK+vr7W1tbh4eHi4uLw8PD29vb4+Pj7+/v8/PygoKDY2NjIyMiurq6SkpKwsLCjo6OysrK0tLS1tbW2tracnJy4uLjLy8vZ2dna2trc3Nzf39+6urq8vLzj4+Pl5eXm5ubo6Ojp6enq6uqRkZHz8/P19fW/v7/39/fAwMDCwsKnp6f9/f3+/v6enp7FxcXGxsaampqfn5/Dw8PhTh9TAAAAFHRSTlMAAk9hdXZ+t8fJytPY3N/i7O3v8vSJ2KIAAAFdSURBVHhehZPlcuswEEadpk0Z0orNGGSGMjMz9973f4fGkI7G47rnlzRn9WlntBISqcWVX5hLCsI4i2FMWIjTk8JynJ4R0vwWOQ7i91O8RmZVXRVNHKmxKa62KW3VmIl5HUj20KIeVzJ0QtqB8jX9oVF2AKcBqJxTnrcjyYSBho50TMP0SN5ErsZFu0cjeMzmsasVGk3vCbrhwMsO0yWbwG8NOJVG+ORh0YSjztFtf9Dm7Z36tY6DzjHon6qq0eyM5P2JpuV29iD29L9dxTZ0TSGXXVd2mrqi64Z9UBE9vW/buoum2Dev3QtD0T3qZAN54S//CfEL1EFd0bylZdSqfjiDSPq0ggJfEvJcgOjnSSArZ4b3BxDrQ0KQfzEMSts5v4DYmTUGw+OAwbusWsOOs1slgCOGCYP+maHKoi95HYBgoQp9GejQICPEeKb/+gYT8Z8okZpPR7M0mxS+AQ3gZKp5dNfSAAAAAElFTkSuQmCC') /*img/layer.png*/;
+   background-position: 50% 50%;
+   background-repeat: no-repeat;
+   display: block;
+}
+
+
+.gba-controllayers .gba-controllayers-container {
+   display: none;
+}
+.gba-controllayers-expanded .gba-controllayers-container {
+   display: block;
+   position: relative;
+}
+
+.gba-controllayers-expanded .gba-controllayers-toggle {
+   display: none;
+}
+
+.gba-controllayers-expanded {
+   padding: 6px 10px 6px 6px;
+   color: #333;
+   background: #eaeaea;
+}
+
+.gba-controllayers-selector {
+   margin-top: 2px;
+   position: relative;
+   top: 1px;
+}
+
+.gba-controllayers label {
+   display: block;
+}
+
+.gba-controllayers-separator {
+   height: 0;
+   border-top: 1px solid #ddd;
+   margin: 5px -10px 5px -6px;
+}
+
+
+
+
+.gbaLegendServiceLabel {
+   font-weight: bold;
+}
+
+.gbaLegendLayerLabel {
+   padding-top: 5px;
+}
+
+
+.checkboxFive {
+position: relative;
+width:35px;
+}
+input[type=checkbox] {
+     position: absolute; 
+   overflow: hidden; 
+   clip: rect(0 0 0 0); 
+   height:1px; 
+   width:1px;   
+   padding:0;
+   border:0;
+}
+
+
+/**Create the box for the checkbox*/ 
+.checkboxFive label {
+   cursor: pointer;
+   position: absolute;
+   width: 16px;
+   height: 16px;
+   top: 0;
+   left: 0;
+   background: #eee;
+   border: 1px solid #ddd;
+}
+/* Display the tick inside the checkbox */
+.checkboxFive label:after {
+   opacity: 0.2;
+   content: '';
+   position: absolute;
+   width: 8px;
+   height: 5px;
+   background: transparent;
+   top: 3px;
+   left: 3px;
+   border: 3px solid #333;
+   border-top: none;
+   border-right: none;
+   -webkit-transform: rotate(-45deg);
+   -moz-transform: rotate(-45deg);
+   -o-transform: rotate(-45deg);
+   -ms-transform: rotate(-45deg);
+   transform: rotate(-45deg);
+}
+/**
+
+* Create the hover event of the tick
+
+*/
+
+.checkboxFive label:hover::after {
+opacity: 0.5;
+}
+
+/**
+
+* Create the checkbox state for the tick
+
+*/
+
+.checkboxFive input[type=checkbox]:checked + label:after {
+opacity: 1;
+}
+

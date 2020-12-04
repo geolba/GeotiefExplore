@@ -1,10 +1,9 @@
 import * as util from './utilities';
 
- var eventsKey = '_events';
+var eventsKey = '_events';
 
 class EventEmitter {
     constructor() {
-        var test = "test";
     }
 
     _getEvents() {
@@ -147,6 +146,7 @@ class EventEmitter {
         }
         return this;
     }
+
     hasEventListeners(type) { // (String) -> Boolean
         var events = this[eventsKey];
         return !!events && ((type in events && events[type].length > 0) ||
@@ -189,18 +189,15 @@ class EventEmitter {
         return this;
     }
 
-
-
-
 }
 
-// aliases; we should ditch those eventually
+// // aliases; we should ditch those eventually
 
-// @method on(…): this
-// Alias to [`on(…)`](#evented-on)
-EventEmitter.on = EventEmitter.addListener;
+// // @method on(…): this
+// // Alias to [`on(…)`](#evented-on)
+// EventEmitter.prototype.on = EventEmitter.addListener;
 
-// @method off(…): this
-EventEmitter.off = EventEmitter.removeListener;
+// // @method off(…): this
+// EventEmitter.prototype.off = EventEmitter.removeListener;
 
 export { EventEmitter };
