@@ -16,6 +16,7 @@ export class LayerControl extends Control {
     };
 
     //private class fileds:
+    _container;
     _mainMap;
     _scene;
     _objectGroup;
@@ -42,13 +43,28 @@ export class LayerControl extends Control {
     onAdd(map) {
         this._mainMap = map;
 
-        let className = "gba-controllayers"
-        let container = this._container = dom.createDom("div", { "class": className });
+        let className = "gba-controllayers";
+        let container;
+        let toggleable = false;
+
+        if (this.options.parentDiv) {
+            container = this._container = document.getElementById(this.options.parentDiv);
+            dom.addClass(container, className);
+            toggleable  = false;
+        } else {
+            container = this._container = dom.createDom("div", { "class": className });
+            toggleable = true;
+        }
+
+       
+
+
+
         domEvent.on(container, 'click', domEvent.stopPropagation);
 
         let layerContainer = this._layerContainer =  dom.createDom('div', { "class": className + '-container' }, container);
 
-        if (this.options.collapsed) {
+        if (this.options.collapsed && toggleable == true) {
             domEvent.on(container, 'mouseenter', this._expand, this);
             domEvent.on(container, 'mouseleave', this._collapse, this);
 
@@ -58,17 +74,20 @@ export class LayerControl extends Control {
             domEvent.on(this._layersLink, 'focus', this._expand, this);
         }
         else {
-            this._expand();
+            // this._expand();
+            this._container.classList.add("gba-controllayers-parent-expanded");
         }
         this._baseLayersList = dom.createDom('div', { "class": className + '-base' }, layerContainer);
         this._separator = dom.createDom('div', { "class": className + '-separator' }, layerContainer);
         //this._overlaysList = dom.createDom('div', { "class": className + '-overlays' }, layerContainer);
-        var overlayTable = dom.createDom("table", { cellpadding: 0, cellspacing: 0, width: "95%", "class": className + '-overlays' }, layerContainer);
+        var overlayTable = dom.createDom("table", { cellpadding: 0, cellspacing: 0, width: "95%", "class": className + '-overlays u-full-width' }, layerContainer);
         this._overlaysList = dom.createDom("tbody", {}, overlayTable);
 
         this._updateLayerList();
 
-        return container;
+        if (toggleable == true) {
+            return container;
+        }
     }
 
     _addLayer(layer, name, overlay) {
@@ -112,21 +131,26 @@ export class LayerControl extends Control {
         var legendEntryRow = dom.createDom("tr", { style: "display: row-table; height: 20px;" }, container);
         //domStyle.set(legendEntryRow, 'display', rowVisibility);
         //dom.setProperties(legendEntryRow, { style: "display: row-table;" });
+        
+        var legendDataCell = dom.createDom("td", { "style": "width:25px;vertical-align: top;"}, legendEntryRow);
+        let legendDiv = dom.createDom("div", { "style": "width:20px; height:20px;"}, legendDataCell);
+        legendDiv.style.backgroundColor = "#" + obj.layer.color;
+
         var chkDataCell = dom.createDom("td", { "class": "checkboxFive" }, legendEntryRow);
-        var lblDataCell = dom.createDom("td", {}, legendEntryRow);
+        var lblDataCell = dom.createDom("td", {"style": "vertical-align: top;"}, legendEntryRow);
 
 
         var input = dom.createDom("input", { type: 'checkbox', checked: checked, id: util.stamp(obj.layer) }, chkDataCell);
         input.layerId = util.stamp(obj.layer);
         domEvent.on(input, 'click', function () { this._onInputClick(util.stamp(obj.layer)); }, this);
-        var chkLabel = dom.createDom("label", { for: util.stamp(obj.layer) }, chkDataCell);
+        dom.createDom("label", { for: util.stamp(obj.layer) }, chkDataCell);
 
-        //var span = dom.createDom("span", { innerHTML: " " + obj.name }, lblDataCell);
+        dom.createDom("span", { innerHTML: " " + obj.name }, lblDataCell);
         //legend entry label
-        var _table = dom.createDom("table", { width: "95%", dir: "ltr" }, lblDataCell);
-        var _tbody = dom.createDom("tbody", {}, _table);
-        var _tr = dom.createDom("tr", {}, _tbody);
-        var _td = dom.createDom("td", { innerHTML: obj.name, align: this.alignRight ? "right" : "left" }, _tr);
+        // var _table = dom.createDom("table", { width: "95%", dir: "ltr" }, lblDataCell);
+        // var _tbody = dom.createDom("tbody", {}, _table);
+        // var _tr = dom.createDom("tr", {}, _tbody);
+        // var _td = dom.createDom("td", { innerHTML: obj.name, align: this.alignRight ? "right" : "left" }, _tr);
 
 
 

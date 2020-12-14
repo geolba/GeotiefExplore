@@ -1,8 +1,15 @@
 {
+    "name": "geo-tief",
+    "version": "1.0.0",
+    "description": "3D geology viewer",
+    "main": "dist/main.js",
     "dependencies": {
+        "normalize.css": "^8.0.1",
         "proj4": "^2.6.3",
         "three": "^0.123.0"
     },
+    "author": "Arno Kaimbacher",
+    "license": "MIT",
     "devDependencies": {
         "@babel/core": "^7.12.9",
         "@babel/plugin-proposal-class-properties": "^7.12.1",
@@ -28,5 +35,10 @@
         "serve": "http-server",
         "prod": "rm -rf dist && webpack --progress --mode=production",
         "watch": "concurrently \"npm run serve\" \"npx webpack --progress --mode=development --watch\" "
-    }
+    },
+    "keywords": [
+        "3D",
+        "geology",
+        "GeoTief"
+    ]
 }

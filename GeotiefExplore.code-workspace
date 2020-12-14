@@ -4,11 +4,12 @@
 			"path": "."
 		}
 	],
-	"settings": {},
+	"settings": {
+		"svg.preview.background": "custom"
+	},
 	"launch": {
 		"version": "0.2.0",
-		"configurations": [	
-			
+		"configurations": [
 			{
 				"type": "chrome",
 				"request": "launch",
@@ -16,21 +17,20 @@
 				// "port": 9222,
 				"url": "http://localhost:8080",
 				"webRoot": "${workspaceFolder}",
-				"breakOnLoad": true,		
+				"breakOnLoad": true,
 				// "sourceMapPathOverrides": {
 				// 	"webpack:///./~/*": "${workspaceFolder}/node_modules/*", 
 				// 	"webpack:///./*":   "${workspaceFolder}/*", 
 				// 	"webpack:///*":     "*",     
 				// 	"webpack:///src/*": "${workspaceFolder}/*", 
 				// },		
-				
 				// "sourceMapPathOverrides": {
 				// 	// "webpack:///src/*": "${workspaceFolder}/*", 
 				// 	"webpack:///./*": "${workspaceFolder}/*"
 				//   },
-				  "sourceMaps": true,
-				  "timeout": 15000				  
-			  }   
+				"sourceMaps": true,
+				"timeout": 15000
+			}
 		]
 	}
 }

@@ -13,6 +13,7 @@ import { LayerControl } from './controls/LayerControl';
 import { Mesh } from 'three/src/objects/Mesh';
 import { SphereGeometry } from 'three/src/geometries/SphereGeometry';
 import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
+import * as util from './core/utilities';
 
 import '../css/page.css'; /* style loader will import it */
 
@@ -22,6 +23,9 @@ class Application {
         this.container = container;
         this.running = false;
         this.wireframeMode = false;
+        this.canvas;
+        this._canvasImageUrl;
+        this.downloadButton
 
         this.objects = [];
 
@@ -35,7 +39,17 @@ class Application {
             this._fullWindow = true;
         }
 
+        // this.canvas = document.querySelector('#imgCanvas');
+        // this.$topTextInput = document.querySelector('#topText');
+        // this.$bottomTextInput = document.querySelector('#bottomText');
+        // this.$imageInput = document.querySelector('#image');
+        this.downloadButton = document.querySelector('#btnDownloadCanvasImage');
+        this.menuIcon = document.querySelector('#menu-icon');
+        this.navigation = document.getElementsByClassName('navigation')[0];
+        // this.addEventListeners();
+
         this.createScene();
+        this.addEventListeners();
     }
 
     createScene() {
@@ -49,7 +63,7 @@ class Application {
         /* Renderer */
         // var bgcolor = 0xfdfdfd;
         let bgcolor = 0xfdfdfd;
-        this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
+        this.renderer = new WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         // this.renderer.setSize(window.innerWidth, window.innerHeight);
         // document.body.appendChild(this.renderer.domElement);
@@ -106,12 +120,14 @@ class Application {
         // this.map.maxDistance = size*15;
 
         //add map controls:
-        let coordinates = new Coordinates({ camera: this.camera, crs: "EPSG:3034" }).addTo(this.map);
-        // coordinates.addListener('onPoint', (vector) => {           
-        //     this.queryMarker.position.set(vector.x, vector.y, vector.z);       
-        //     // this.queryMarker.updateMatrixWorld();
-        //     this.animate();
-        // }, this);
+        if (!util.hasTouch) {
+            let coordinates = new Coordinates({ camera: this.camera, crs: "EPSG:3034" }).addTo(this.map);
+            // coordinates.addListener('onPoint', (vector) => {           
+            //     this.queryMarker.position.set(vector.x, vector.y, vector.z);       
+            //     // this.queryMarker.updateMatrixWorld();
+            //     this.animate();
+            // }, this);
+        }
         this.northArrow = new NortArrow({ headLength: 1, headWidth: 1 }).addTo(this.map);
 
         let dxf134Layer = new TinLayer({
@@ -145,12 +161,13 @@ class Application {
         this.map.addLayer(dxf140Layer);
 
         new LayerControl(this.map.layers, {
-            collapsed: true
+            collapsed: true,
+            parentDiv: 'layer-control-parent-id'
         }).addTo(this.map);
 
 
-        domEvent.on(window, 'resize', this.onWindowResize, this);
-        domEvent.on(window, 'keydown', this.keydown, this);
+        // domEvent.on(window, 'resize', this.onWindowResize, this);
+        // domEvent.on(window, 'keydown', this.keydown, this);
         this.start();
     }
 
@@ -237,6 +254,130 @@ class Application {
         this.renderer.render(this.scene, this.camera);
         this.northArrow.animate();
     }
+
+    addEventListeners() {
+
+        domEvent.on(window, 'resize', this.onWindowResize, this);
+        domEvent.on(window, 'keydown', this.keydown, this);
+
+        // let inputNodes = [this.$topTextInput, this.$bottomTextInput, this.$imageInput];
+        // inputNodes.forEach(element => domEvent.on(element, 'keyup', this.createMeme, this));
+        // //if image is changed
+        // inputNodes.forEach(element => domEvent.on(element, 'change', this.createMeme, this));
+
+        domEvent.on(this.downloadButton, 'click', this.downloadMapImage, this);
+
+        domEvent.on(this.menuIcon, 'click', function (e) {
+            e.preventDefault();
+            this.navigation.classList.toggle("active");
+        }, this);
+
+        var tabButtons = [].slice.call(document.querySelectorAll('ul.tab-nav li span.button'));
+
+        tabButtons.map(function (button) {
+            button.addEventListener('click', function () {
+                document.querySelector('li span.active.button').classList.remove('active');
+                button.classList.add('active');
+
+                document.querySelector('.tab-pane.active').classList.remove('active');
+                document.querySelector(button.getAttribute('name')).classList.add('active');
+            })
+        })
+
+    }
+
+    downloadMapImage() {
+        // if(!this.$imageInput.files[0]) {
+        //   this.$imageInput.parentElement.classList.add('has-error');
+        //   return;
+        // }
+        // if(this.$bottomTextInput.value === '') {
+        //   this.$imageInput.parentElement.classList.remove('has-error');
+        //   this.$bottomTextInput.parentElement.classList.add('has-error');
+        //   return;
+        // }
+        // this.$imageInput.parentElement.classList.remove('has-error');
+        // this.$bottomTextInput.parentElement.classList.remove('has-error');
+
+        // const imageSource = this.renderer.domElement.toDataURL('image/png');
+        // const att = document.createAttribute('href');
+        // att.value = imageSource.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+        // this.downloadButton.setAttributeNode(att);
+        // this.renderer.preserveDrawingBuffer = true;
+        // this.renderer.render(this.scene, this.camera);
+        this.saveCanvasImage(this.renderer.domElement);
+    }
+
+    saveCanvasImage(canvas) {
+        // !HTMLCanvasElement.prototype.toBlob
+        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement.toBlob
+        // decode the String
+        var binStr = atob(canvas.toDataURL("image/png").split(',')[1]);
+        var len = binStr.length;
+        var arr = new Uint8Array(len);
+
+        for (var i = 0; i < len; i++) {
+            arr[i] = binStr.charCodeAt(i);
+        }
+
+        this.saveBlob(new Blob([arr], { type: "image/png" }));
+
+
+    }
+
+    saveBlob(blob) {
+        // ie
+        if (window.navigator.msSaveBlob !== undefined) {
+            window.navigator.msSaveBlob(blob, filename);
+            //app.popup.hide();
+        }
+        else {
+            // create object url
+            if (this._canvasImageUrl) {
+                URL.revokeObjectURL(this._canvasImageUrl);
+            }
+            this._canvasImageUrl = URL.createObjectURL(blob);
+            // display a link to save the image
+            var e = this.downloadButton;//document.createElement("a");           
+            e.href = this._canvasImageUrl;
+
+        }
+    }
+
+    createMeme() {
+        let context = this.$canvas.getContext('2d');
+
+        // font size of top and bottom text
+        let fontSize = ((this.canvas.width + this.canvas.height) / 2) * 4 / 100;
+        context.font = `${fontSize}pt sans-serif`;
+        context.textAlign = 'center';
+        context.textBaseline = 'top';
+
+        /**
+         * Stroke Text Style
+         */
+        context.lineWidth = fontSize / 5;
+        context.strokeStyle = 'black';
+        /**
+         * Fill Text Style
+         */
+        context.fillStyle = 'white';
+        // Fix lines over M
+        context.lineJoin = 'round';
+
+        // get he value of the top text an dbottom text from the input fields
+        let topText = this.$topTextInput.value.toUpperCase();
+        let bottomText = this.$bottomTextInput.value.toUpperCase();
+
+        // Top Text: first parameter text, second and thir parameters contain location where the text should start rendering
+        context.strokeText(topText, this.canvas.width / 2, this.canvas.height * (5 / 100));
+        context.fillText(topText, this.canvas.width / 2, this.canvas.height * (5 / 100));
+
+        // Bottom Text
+        context.strokeText(bottomText, this.canvas.width / 2, this.canvas.height * (90 / 100));
+        context.fillText(bottomText, this.canvas.width / 2, this.canvas.height * (90 / 100));
+    }
+
 }
 
 var container = document.getElementById("webgl");

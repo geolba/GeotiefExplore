@@ -86,6 +86,43 @@ export function setProperties(element, properties) {
     }
 }
 
+// @function addClass(el: HTMLElement, name: String)
+// Adds `name` to the element's class attribute.
+export function addClass(el, name) {
+	if (el.classList !== undefined) {
+		var classes = util.trim(name).split(/\s+/);
+		for (var i = 0, len = classes.length; i < len; i++) {
+			el.classList.add(classes[i]);
+		}
+	} else if (!hasClass(el, name)) {
+		var className = getClass(el);
+		setClass(el, (className ? className + ' ' : '') + name);
+	}
+}
+
+
+// @function setClass(el: HTMLElement, name: String)
+// Sets the element's class.
+export function setClass(el, name) {
+	if (el.className.baseVal === undefined) {
+		el.className = name;
+	} else {
+		// in case of SVG element
+		el.className.baseVal = name;
+	}
+}
+
+// @function getClass(el: HTMLElement): String
+// Returns the element's class.
+export function getClass(el) {
+	// Check if the element is an SVGElementInstance and use the correspondingElement instead
+	// (Required for linked SVG elements in IE11.)
+	if (el.correspondingElement) {
+		el = el.correspondingElement;
+	}
+	return el.className.baseVal === undefined ? el.className : el.className.baseVal;
+}
+
 let ATTRIBUTE_MAP = {
     'cellpadding': 'cellPadding',
     'cellspacing': 'cellSpacing',

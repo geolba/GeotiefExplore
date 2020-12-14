@@ -166,3 +166,9 @@ export function hasTouch () {
 		|| window.navigator.msMaxTouchPoints;
 	return isTouchDevice;
 }
+
+// @function trim(str: String): String
+// Compatibility polyfill for [String.prototype.trim](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String/Trim)
+export function trim(str) {
+	return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
+}

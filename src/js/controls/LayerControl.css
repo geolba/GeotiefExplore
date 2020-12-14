@@ -39,6 +39,14 @@
    background: #eaeaea;
 }
 
+.gba-controllayers-parent-expanded .gba-controllayers-container {
+   display: block;
+   position: relative;
+}
+.gba-controllayers-parent-expanded {  
+   color: #333;  
+}
+
 .gba-controllayers-selector {
    margin-top: 2px;
    position: relative;
@@ -58,25 +66,20 @@
 
 
 
-.gbaLegendServiceLabel {
-   font-weight: bold;
-}
-
-.gbaLegendLayerLabel {
-   padding-top: 5px;
-}
-
 
 .checkboxFive {
 position: relative;
 width:35px;
+height: 31py;
+
+vertical-align: super;
 }
 input[type=checkbox] {
      position: absolute; 
    overflow: hidden; 
    clip: rect(0 0 0 0); 
-   height:1px; 
-   width:1px;   
+   /* height:1px; 
+   width:1px;    */
    padding:0;
    border:0;
 }
@@ -86,12 +89,15 @@ input[type=checkbox] {
 .checkboxFive label {
    cursor: pointer;
    position: absolute;
-   width: 16px;
-   height: 16px;
-   top: 0;
-   left: 0;
+   width: 20px;
+   height: 20px;
+   margin-left: auto;
+margin-right: auto;
+left: 0;
+right: 0;
+text-align: center;
    background: #eee;
-   border: 1px solid #ddd;
+   /* border: 1px solid #ddd; */
 }
 /* Display the tick inside the checkbox */
 .checkboxFive label:after {
@@ -101,7 +107,7 @@ input[type=checkbox] {
    width: 8px;
    height: 5px;
    background: transparent;
-   top: 3px;
+   top: 5px;
    left: 3px;
    border: 3px solid #333;
    border-top: none;

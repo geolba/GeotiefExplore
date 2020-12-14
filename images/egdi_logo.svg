@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1"
+   width="181"
+   height="51"
+   viewBox="0 0 908 338"
+   id="svg53"
+   sodipodi:docname="egdi_logo.svg"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2560"
+     inkscape:window-height="1537"
+     id="namedview855"
+     showgrid="true"
+     inkscape:zoom="10.617915"
+     inkscape:cx="101.42827"
+     inkscape:cy="18.327117"
+     inkscape:window-x="2552"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg53"
+     inkscape:snap-grids="false"
+     inkscape:snap-to-guides="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid871" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata59">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs57" />
+  <text
+     font-size="200"
+     font-weight="bold"
+     x="-88.939621"
+     y="204.3934"
+     fill="#000000"
+     id="text44"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:176.732px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#1772b6;stroke:none;stroke-opacity:1;fill-opacity:0.682353;">EGDI</text>
+  <path
+     id="svg_5"
+     d="m 941.44193,286.59145 -150.38624,54.3767 -150.69914,-54.59419 149.88456,-54.07154 c 44.41157,15.11532 111.75814,38.07261 151.20082,54.28903 z"
+     stroke-opacity="null"
+     stroke-linecap="null"
+     stroke-linejoin="null"
+     stroke-width="0.917161"
+     stroke="null"
+     fill-opacity="null"
+     fill="#b91e1e"
+     sodipodi:nodetypes="ccccc"
+     style="fill:#ffcf00;fill-opacity:0.68235296" />
+  <path
+     id="rect61"
+     style="fill:#cf4922;fill-rule:evenodd;stroke-width:5.98077;fill-opacity:0.68235296"
+     d="M 790.75737,92.943673 941.68682,146.66828 941.44193,286.59145 790.24111,232.30242 Z"
+     sodipodi:nodetypes="ccccc" />
+  <path
+     style="fill:#900c07;fill-opacity:0.68235296;stroke:none;stroke-width:6.00462px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 790.75737,92.943673 640.93489,146.08834 790.15658,201.0559"
+     id="path899"
+     sodipodi:nodetypes="ccc" />
+  <path
+     style="fill:#1772b6;fill-opacity:0.68235296;stroke:none;stroke-width:6.07844px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 617.45905,161.77508 -0.6944,107.83162 150.95277,-53.61708 z"
+     id="path901"
+     sodipodi:nodetypes="cccc" />
+  <path
+     id="rect61-1"
+     style="fill:#94bd22;fill-rule:evenodd;stroke-width:6.07844;fill-opacity:0.68235296"
+     d="M 466.61374,75.854645 617.32028,130.75134 616.76465,269.6067 465.57094,215.33794 Z"
+     sodipodi:nodetypes="ccccc" />
+  <path
+     id="svg_5-9"
+     style="display:inline;stroke-width:6.62745;fill:#dddd00;fill-opacity:0.68235296"
+     d="M 619.13024,21.349472 466.61374,75.854645 617.3175,130.74977 768.54857,76.935603 C 730.52682,61.328962 655.73869,39.89961 619.13024,21.349472 Z"
+     sodipodi:nodetypes="ccccc" />
+</svg>
