@@ -120,7 +120,7 @@ class Application {
         // this.map.maxDistance = size*15;
 
         //add map controls:
-        if (!util.hasTouch) {
+        if (util.hasTouch() == false) {
             let coordinates = new Coordinates({ camera: this.camera, crs: "EPSG:3034" }).addTo(this.map);
             // coordinates.addListener('onPoint', (vector) => {           
             //     this.queryMarker.position.set(vector.x, vector.y, vector.z);       

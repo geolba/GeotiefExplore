@@ -3,6 +3,8 @@ import * as dom from '../core/domUtil';
 import * as domEvent from '../core/domEvent';
 
 class HomeButton extends Control {
+
+    map;
     options = {
         position: 'topright',
         homeText: '+',
@@ -85,14 +87,13 @@ class HomeButton extends Control {
         //var link = L.DomUtil.create('a', className, container);
         let link = dom.createDom("span", { "class": className, innerHTML: html, title: title }, container);
 
-        // let stop = domEvent.stopPropagation();
-        domEvent.on(link, 'click', fn, context);
+        // let stop = domEvent.stopPropagation;
+        domEvent
         // .on(link, 'click', stop)
         // .on(link, 'mousedown', stop)
         // .on(link, 'dblclick', stop)
-        // .on(link, 'click', domEvent.preventDefault())
-        // //.on(link, 'click', fn.bind(this));
-        // .on(link, 'click', fn, context);
+        // .on(link, 'click', domEvent.preventDefault)       
+        .on(link, 'click', fn, context);
 
         return link;
     }

@@ -3,7 +3,7 @@ import * as util from './utilities';
  * @namespace DomUtil
  *
  * Utility functions to work with the [DOM](https://developer.mozilla.org/docs/Web/API/Document_Object_Model)
- * tree, used by Leaflet internally.
+ * tree, used by 3D viewer internally.
  *
  * Most functions expecting or returning a `HTMLElement` also work for
  * SVG elements. The only difference is that classes refer to CSS classes
@@ -100,6 +100,15 @@ export function addClass(el, name) {
 	}
 }
 
+// @function removeClass(el: HTMLElement, name: String)
+// Removes `name` from the element's class attribute.
+export function removeClass(el, name) {
+	if (el.classList !== undefined) {
+		el.classList.remove(name);
+	} else {
+		setClass(el, util.trim((' ' + getClass(el) + ' ').replace(' ' + name + ' ', ' ')));
+	}
+}
 
 // @function setClass(el: HTMLElement, name: String)
 // Sets the element's class.

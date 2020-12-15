@@ -1,6 +1,7 @@
 import { OrbitControls } from '../lib/OrbitControls';
 import * as dom from './domUtil';
 import { HomeButton } from '../controls/HomeButton';
+import { ZoomControl } from '../controls/ZoomControl';
 import * as util from './utilities';
 
 class Map extends OrbitControls {
@@ -57,6 +58,9 @@ class Map extends OrbitControls {
         // this._controls.homeControl = (new HomeButton()).addTo(this);
         let homeControl = this._controls.homeControl = new HomeButton();
         homeControl.addTo(this);
+
+        let zoomControl = this._controls.zoomControl = new ZoomControl();
+        zoomControl.addTo(this);
     }
 
     addLayer(layer) {

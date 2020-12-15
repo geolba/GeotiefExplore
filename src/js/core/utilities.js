@@ -110,14 +110,14 @@ export function extend(dest) {
 // @function create(proto: Object, properties?: Object): Object
 // Compatibility polyfill for [Object.create](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
 export var create = Object.create || (function () {
-	function F() {}
+	function F() { }
 	return function (proto) {
 		F.prototype = proto;
 		return new F();
 	};
 })()
 
-export function showLoading () {
+export function showLoading() {
 	var element = dom.byId("loadingImg");
 	//domUtil.show(_loading);
 	if (element) {
@@ -125,7 +125,7 @@ export function showLoading () {
 	}
 }
 
-export function hideLoading () {
+export function hideLoading() {
 	var element = dom.byId("loadingImg");
 	if (element) {
 		element.style.display = "none";
@@ -133,7 +133,7 @@ export function hideLoading () {
 }
 
 // Merges the given properties to the `options` of the `obj` object, returning the resulting options. See `Class options`
-export function setOptions (obj, options) {
+export function setOptions(obj, options) {
 	if (!Object.prototype.hasOwnProperty.call(obj, 'options')) {
 		obj.options = obj.options ? create(obj.options) : {};
 	}
@@ -149,21 +149,21 @@ export var lastId = 0;
 
 // @function stamp(obj: Object): Number
 // Returns the unique ID of an object, assigning it one if it doesn't have it.
-export function stamp (obj){
+export function stamp(obj) {
 	let key = '_gba_id';
 	obj[key] = obj[key] || ++lastId;
 	return obj[key];
 
 }
 
-export function hasTouch () {
-	var phantomjs = navigator.userAgent.toLowerCase().indexOf('phantom') !== -1;
+export function hasTouch() {
+	let phantomjs = navigator.userAgent.toLowerCase().indexOf('phantom') !== -1;
 
-	var isTouchDevice = phantomjs
+	let isTouchDevice = phantomjs
 		|| 'ontouchstart' in window
-		|| (window.DocumentTouch && document instanceof window.DocumentTouch)
+		// || (window.DocumentTouch && document instanceof window.DocumentTouch)
 		|| ("onpointerdown" in document && navigator.maxTouchPoints > 0)
-		|| window.navigator.msMaxTouchPoints;
+		|| (window.navigator.msMaxTouchPoints > 0);
 	return isTouchDevice;
 }
 
