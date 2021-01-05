@@ -159,9 +159,9 @@ class EventEmitter {
             return this;
         }
 
-        var event = util.extend({}, data, { type: type, target: this });
+        let event = util.extend({}, data, { type: type, target: this });
 
-        var events = this[eventsKey],
+        let events = this[eventsKey],
             listeners, i, len, typeIndex, contextId;
 
         if (events[type]) {

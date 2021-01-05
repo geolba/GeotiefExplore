@@ -1,0 +1,105 @@
+.gba-control-slider {  
+    background: none repeat scroll 0 0 #FFF;    
+}
+
+.gba-control-slider.vertical {
+    width: 26px;    
+    height: 100%;
+    /* background-color: azure; */
+}
+
+.gba-control-slider.horizontal {
+    height: 26px;
+    padding-right: 5px;
+}
+
+.gba-control-slider .leaflet-range-icon {
+    display: inline-block;   
+    width: 26px;
+    height: 26px;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDAwMDAwIiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCiAgICA8cGF0aCBkPSJNMCAwaDI0djI0SDB6IiBmaWxsPSJub25lIi8+DQogICAgPHBhdGggZD0iTTE1IDE3djJoMnYtMmgydi0yaC0ydi0yaC0ydjJoLTJ2Mmgyem01LTE1SDRjLTEuMSAwLTIgLjktMiAydjE2YzAgMS4xLjkgMiAyIDJoMTZjMS4xIDAgMi0uOSAyLTJWNGMwLTEuMS0uOS0yLTItMnpNNSA1aDZ2Mkg1VjV6bTE1IDE1SDRMMjAgNHYxNnoiLz4NCjwvc3ZnPg==');
+}
+
+.gba-control-slider input[type=range] {   
+    cursor: pointer;  
+    -webkit-appearance: none;
+    z-index: 200;
+    width: 100%;
+    border: 1px solid #e6e6e6;
+    background-color: #e6e6e6;
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e6e6e6), to(#d2d2d2));
+    background-image: -webkit-linear-gradient(right, #e6e6e6, #d2d2d2);
+    background-image: -moz-linear-gradient(right, #e6e6e6, #d2d2d2);
+    background-image: -ms-linear-gradient(right, #e6e6e6, #d2d2d2);
+    background-image: -o-linear-gradient(right, #e6e6e6, #d2d2d2)
+}
+
+.gba-control-slider input[type=range][orient=horizontal] {
+    margin-top: 5px;
+    width: 150px;
+}
+
+.gba-control-slider input[type=range][orient=vertical] {
+    height: 150px;
+    /* writing-mode: bt-lr; */
+
+    /*
+     * -webkit-appearance is non-standard and may break in the future:
+     * https://developer.mozilla.org/en-US/docs/Web/CSS/-moz-appearance
+     * However, for now it's the only way to get a vertical range input on Chrome.
+     */
+    /* -webkit-appearance: slider-vertical; */
+
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+
+    /* -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg) */
+}
+
+input[type=range].range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    background: #FF0000;
+    cursor: pointer;
+}
+
+input[type=range].round {
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px
+}
+
+
+
+
+/* .gba-control-slider span {
+    width: 30px;
+    height: 30px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    border-radius: 5px;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAAAAAAeW/F+AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAeUlEQVQoz8XTIQ6AMAyF4d3/BrUkSA6CRcAJJoYYDgX5ESxhoi1goPZL9rp2C+JW+Ip3lzOLwz0w2AxAazFn2dmJ5LUWiQ8YqhyVRaR0ofGlGleqt8Ydl1NUrtIVLsq7e2eyPbUVgM1fqD3zBuiclYxM7lOcf/wGSh2kFUcUTGKFMQAAAABJRU5ErkJggg==');
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    display: block;
+} */
+
+/*paragraph for showing the value*/
+.gba-control-slider p.gba-control-slider-value {
+    line-height: 26px;   
+    text-align: center;
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.1em;
+    display: none;
+}

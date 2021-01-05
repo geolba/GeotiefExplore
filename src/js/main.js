@@ -10,6 +10,7 @@ import * as domEvent from './core/domEvent';
 import { Coordinates } from './controls/Coordinates';
 import { NortArrow } from './controls/NorthArrow';
 import { LayerControl } from './controls/LayerControl';
+import { SliderControl } from './controls/SliderControl';
 import { Mesh } from 'three/src/objects/Mesh';
 import { SphereGeometry } from 'three/src/geometries/SphereGeometry';
 import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
@@ -165,6 +166,8 @@ class Application {
             parentDiv: 'layer-control-parent-id'
         }).addTo(this.map);
 
+        //slider for scaling z value
+        this.slider = new SliderControl({ layers: this.map.layers }).addTo(this.map);
 
         // domEvent.on(window, 'resize', this.onWindowResize, this);
         // domEvent.on(window, 'keydown', this.keydown, this);

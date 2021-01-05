@@ -41,8 +41,13 @@ class TinLayer extends Layer {
 
     setVisible(visible) {
         this.visible = visible;
-        this.mainMesh.visible = visible;    
+        this.mainMesh.visible = visible;
         this.emit('visibility-change');
+    }
+
+    scaleZ(z) {
+        this.mainMesh.scale.z = z;
+        //this.objectGroup.scale.z = z;
     }
 
     async onAdd(map) {
@@ -95,14 +100,14 @@ class TinLayer extends Layer {
 
     async points(geomId) {
         const url = POINTURL + geomId;
-        const buffer = await this.request(url);      
-        return this.unpackVertices(buffer);       
+        const buffer = await this.request(url);
+        return this.unpackVertices(buffer);
     }
 
     async edges(geomId) {
         const url = EDGEURL + geomId;
-        const buffer = await this.request(url);       
-        return this.unpackEdges(buffer);       
+        const buffer = await this.request(url);
+        return this.unpackEdges(buffer);
     }
 
     async request(url) {
