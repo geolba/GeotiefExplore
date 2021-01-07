@@ -1,9 +1,9 @@
-.gba-control-slider {  
+/* .gba-control-slider {  
     background: none repeat scroll 0 0 #FFF;    
-}
+} */
 
 .gba-control-slider.vertical {
-    width: 26px;    
+    /* width: 26px;     */
     height: 100%;
     /* background-color: azure; */
 }

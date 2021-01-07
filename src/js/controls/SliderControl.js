@@ -131,7 +131,7 @@ export class SliderControl extends Control {
     }
 
     _updateValue(e) {
-        this.value = e.value;//this.slider.value;
+        this.value = e[0];//this.slider.value;
         if (this.options.showValue) {
             this._sliderValue.innerHTML = this.value;
         }
@@ -146,7 +146,7 @@ export class SliderControl extends Control {
         //},this);
         for (var prop in this._map._layers) {
             if (this._map._layers.hasOwnProperty(prop)) {
-                var layer = this._map._layers[prop];
+                let layer = this._map._layers[prop];
                 // if (layer.declaredClass === "GridLayer" || layer.declaredClass === "DxfLayer" || layer.declaredClass === "DemLayer")
                 layer.scaleZ(this.value);
             }

@@ -6,7 +6,7 @@
     "dependencies": {
         "normalize.css": "^8.0.1",
         "proj4": "^2.6.3",
-        "three": "^0.123.0"
+        "three": "^0.124.0"
     },
     "author": "Arno Kaimbacher",
     "license": "MIT",

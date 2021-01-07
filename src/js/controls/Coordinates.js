@@ -53,7 +53,8 @@ export class Coordinates extends Control {
         map.removeListener('mouse-move', this._onMouseMove, this);
     }
 
-    _onMouseMove(event) {
+    _onMouseMove(e) {
+        let event = e[0];
         let canvasOffset = this._getOffset(this.map.domElement);
         let xClickedOnCanvas = event.clientX - canvasOffset.left;
         let yClickedonCanvas = event.clientY - canvasOffset.top;

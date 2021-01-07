@@ -3,7 +3,10 @@ import * as util from './utilities';
 var eventsKey = '_events';
 
 class EventEmitter {
+    // events = {};
+
     constructor() {
+        this.events = {};
     }
 
     _getEvents() {
@@ -93,6 +96,10 @@ class EventEmitter {
         return this;
     }
 
+    on(eventName, fn, context) {
+        return this.addListener(eventName, fn, context);
+    }
+
     removeListener(evt, fn, context) { // ([String, Function, Object]) or (Object[, Object])
 
         if (!this[eventsKey]) {
@@ -147,6 +154,10 @@ class EventEmitter {
         return this;
     }
 
+    off(eventName, fn, context) {
+        return this.removeListener(eventName, fn, context);
+      }
+
     hasEventListeners(type) { // (String) -> Boolean
         var events = this[eventsKey];
         return !!events && ((type in events && events[type].length > 0) ||
@@ -154,12 +165,14 @@ class EventEmitter {
     }
 
     // (String[, Object])
-    emit(type, data) {
+    // emit(type, data) {
+    emit(type, ...args) {
         if (!this.hasEventListeners(type)) {
             return this;
         }
 
-        let event = util.extend({}, data, { type: type, target: this });
+        // let event = util.extend({}, data, { type: type, target: this });
+        let event = util.extend({}, args, { type: type, target: this });
 
         let events = this[eventsKey],
             listeners, i, len, typeIndex, contextId;
@@ -169,7 +182,11 @@ class EventEmitter {
             listeners = events[type].slice();
 
             for (i = 0, len = listeners.length; i < len; i++) {
-                listeners[i].action.call(listeners[i].context, event);
+                // listeners[i].action.call(listeners[i].context, event);
+                let listener = listeners[i];
+                listener.action.call(listener.context, event);
+                
+                // listener.apply(this, args);
             }
         }
 
@@ -181,7 +198,9 @@ class EventEmitter {
 
             if (listeners) {
                 for (i = 0, len = listeners.length; i < len; i++) {
-                    listeners[i].action.call(listeners[i].context, event);
+                    // listeners[i].action.call(listeners[i].context, event);
+                    let listener = listeners[i];
+                    listener.action.call(listener.context, event);
                 }
             }
         }
