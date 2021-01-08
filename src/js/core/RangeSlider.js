@@ -1,7 +1,8 @@
 import { EventEmitter } from './EventEmitter';
-import * as dom from '../core/domUtil';
-import * as util from '../core/utilities';
-import * as domEvent from '../core/domEvent';
+import * as dom from './domUtil';
+import * as util from './utilities';
+import * as domEvent from './domEvent';
+import * as browser from './browser';
 
 import './RangeSlider.css';
 
@@ -9,6 +10,7 @@ class RangeSlider extends EventEmitter {
 
     over = false;
     inDrag = false;
+    touchCapable = false;
 
     options = {
         value: 0, // set default value on initiation from `0` to `100` (percentage based)
@@ -22,16 +24,21 @@ class RangeSlider extends EventEmitter {
         stepSize: 1
     };
 
-    constructor(elem, options) {
+    constructor(options) {
         super();
 
         util.setOptions(this, options);
         this.value = this.options.value;
 
-        this.element = elem;
+        if (browser.touch && browser.mobile) {
+            this.touchCapable = true;
+        }        
+    }
 
+    addTo(parentDiv) {
         //this._initLayout();
-        this.picker = dom.createDom("div", {
+        this.element = parentDiv;
+        this.template = dom.createDom("div", {
             "class": 'slider', innerHTML:
                 '<div class="range-slider-track">' +
                 '<div class="slider-selection"></div>' +
@@ -41,24 +48,23 @@ class RangeSlider extends EventEmitter {
                 '<div class="slider-ticks"></div>' +
                 '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
 
-        }, this.element);
+        }, parentDiv);
 
-        this.id = this.options.id;
-        // var tooltip = this.options.tooltip;
-        this.tooltip = this.picker.getElementsByClassName('tooltip')[0];
+        this.id = this.options.id;      
+        this.tooltip = this.template.getElementsByClassName('tooltip')[0];
         this.tooltipInner = this.tooltip.getElementsByClassName('tooltip-inner')[0];
-        this.sliderTrack = this.picker.getElementsByClassName('range-slider-track')[0];
-        this.sliderTicks = this.picker.getElementsByClassName('slider-ticks')[0];
+        this.sliderTrack = this.template.getElementsByClassName('range-slider-track')[0];
+        this.sliderTicks = this.template.getElementsByClassName('slider-ticks')[0];
 
 
         this.orientation = this.options.orientation;
 
         if (this.orientation === "horizontal") {
-            dom.addClass(this.picker, "slider-horizontal");
-            //.addClass('slider-horizontal')
+            dom.addClass(this.template, "slider-horizontal");
+            
             //.css('width', this.element.outerWidth());             
-            //$(this.picker).css('width', $(this.element).outerWidth());
-            //this.picker.style.width = this.element['offsetWidth'] + 'px';
+            //$(this.template).css('width', $(this.element).outerWidth());
+            //this.template.style.width = this.element['offsetWidth'] + 'px';
             this.orientation = 'horizontal';
             this.stylePos = 'left';
             this.mousePos = 'pageX';
@@ -67,11 +73,10 @@ class RangeSlider extends EventEmitter {
             dom.addClass(this.tooltip, "top");
             this.tooltip.style.top = -this.tooltip['offsetHeight'] - 14 + 'px';
         } else {
-            dom.addClass(this.picker, "slider-vertical");
+            dom.addClass(this.template, "slider-vertical");
             this.stylePos = 'top';
             this.mousePos = 'pageY';
-            this.sizePos = 'offsetHeight';
-            // this.tooltip.addClass('right')[0].style.left = '100%';
+            this.sizePos = 'offsetHeight';          
             dom.addClass(this.tooltip, "right");
             this.tooltip.style.left = "100%";
         }
@@ -84,7 +89,7 @@ class RangeSlider extends EventEmitter {
         //    this.range = true;
         //}
 
-        let positionStep = 160/4;
+        let positionStep = 160 / 4;
         let topPosition = 0;
         for (let i = this.min; i <= this.max; i = i + this.stepSize) {
             let sliderTick = dom.createDom("div", {
@@ -95,16 +100,15 @@ class RangeSlider extends EventEmitter {
         }
 
         this.selection = this.options.selection;
-        this.selectionEl = this.picker.getElementsByClassName('slider-selection')[0];
+        this.selectionEl = this.template.getElementsByClassName('slider-selection')[0];
         if (this.selection === 'none') {
-            //this.selectionEl.addClass('hide');
             dom.addClass(this.selectionEl, "hide");
         }
         this.selectionElStyle = this.selectionEl.style;
 
-        this.handle1 = this.picker.getElementsByClassName('slider-handle')[0];
+        this.handle1 = this.template.getElementsByClassName('slider-handle')[0];
         this.handle1Stype = this.handle1.style;
-        this.handle2 = this.picker.getElementsByClassName('slider-handle')[1];
+        this.handle2 = this.template.getElementsByClassName('slider-handle')[1];
         this.handle2Stype = this.handle2.style;
 
         var handle = this.options.handle;
@@ -141,17 +145,39 @@ class RangeSlider extends EventEmitter {
             this.stepSize * 100 / this.diff
         ];
 
-        //this.offset = this.picker.offset();
-        // this.offset = $(this.picker).offset();
-        this.offset = this._getOffset(this.picker);
-
-        this.size = this.picker[this.sizePos];
-
+        //this.offset = this.template.offset();
+        // this.offset = $(this.template).offset();
+        this.offset = this._getOffset(this.template);
+        this.size = this.template[this.sizePos];
         //this.formater = options.formater;
-
         this.layout();
 
-        domEvent.on(this.picker, "mousedown", this.mousedown, this);
+
+        // domEvent
+        // .on(this.template, 'mousedown touchstart', domEvent.stopPropagation)
+        // .on(this.template, 'click', domEvent.stopPropagation)
+        // .on(this.template, 'dblclick', domEvent.stopPropagation)
+        // .on(this.template, 'mousedown touchstart', domEvent.preventDefault)
+        // .on(this.template, 'mousedown touchstart', this.mousedown, this);
+
+        if (this.touchCapable) {
+            // Touch: Bind touch events:	
+            domEvent.on(this.template, 'touchstart', domEvent.stopPropagation)	
+            domEvent.on(this.template, 'touchstart', domEvent.preventDefault);	
+            domEvent.on(this.template, 'touchstart', this.mousedown, this);
+        } else {
+            domEvent.on(this.template, 'mousedown', domEvent.stopPropagation);
+            domEvent.on(this.template, 'click', domEvent.stopPropagation);
+            domEvent.on(this.template, 'dblclick', domEvent.stopPropagation);
+            domEvent.on(this.template, 'mousedown', domEvent.preventDefault);
+            domEvent.on(this.template, 'mousedown', this.mousedown, this);
+        }
+
+
+
+        // domEvent.on(this.template, "mousedown touchstart", this.mousedown, this);
+
+
         dom.addClass(this.tooltip, "hide");
     }
 
@@ -197,17 +223,16 @@ class RangeSlider extends EventEmitter {
     }
 
     mousedown(ev) {
-
         // Touch: Get the original event:
-        if (this.touchCapable && ev.type === 'touchstart') {
-            ev = ev.originalEvent;
-        }
+        // if (this.touchCapable && ev.type === 'touchstart') {
+        //     ev = ev.originalEvent;
+        // }
 
-        //this.offset = this.picker.offset();
-        // this.offset = $(this.picker).offset();
-        this.offset = this._getOffset(this.picker);
+        //this.offset = this.template.offset();
+        // this.offset = $(this.template).offset();
+        this.offset = this._getOffset(this.template);
 
-        this.size = this.picker[this.sizePos];
+        this.size = this.template[this.sizePos];
 
         let percentage = this.getPercentage(ev);
 
@@ -223,12 +248,19 @@ class RangeSlider extends EventEmitter {
         // this.percentage[this.dragged] = percentage;
         // this.layout();
 
-        domEvent.on(this.picker, "mousemove", this.mousemove, this);
-        domEvent.on(this.picker, 'mouseup', this.mouseup, this);
-        domEvent.on(this.picker, 'mouseleave', this.onMouseLeave, this);
+        if (this.touchCapable) {
+            // Touch: Bind touch events:          
+            domEvent.on(this.template, 'touchmove', this.mousemove, this);
+            domEvent.on(this.template, 'touchend', this.mouseup, this);
+            // domEvent.on(this.template, 'touchcancel', this.onMouseLeave, this);
+        } else {
+            domEvent.on(this.template, 'mousemove', this.mousemove, this);
+            domEvent.on(this.template, 'mouseup', this.mouseup, this);
+            domEvent.on(this.template, 'mouseleave', this.onMouseLeave, this);
+        }
 
         this.inDrag = true;
-        let value = this.calculateValue();
+        // let value = this.calculateValue();
         //if (this.options.inverse === true) {
         //    val = val * -1;
         //}
@@ -250,9 +282,9 @@ class RangeSlider extends EventEmitter {
         this.sliderTrack.style.cursor = "grab";
 
         // Touch: Get the original event:
-        if (this.touchCapable && ev.type === 'touchmove') {
-            ev = ev.originalEvent;
-        }
+        // if (this.touchCapable && ev.type === 'touchmove') {
+        //     ev = ev.originalEvent;
+        // }
 
         let percentage = this.getPercentage(ev);
         // if (this.range) {
@@ -286,9 +318,18 @@ class RangeSlider extends EventEmitter {
         this.handle1.style.cursor = "pointer";
         this.sliderTrack.style.cursor = "pointer";
 
-        domEvent.off(this.picker, "mousemove", this.mousemove, this);
-        domEvent.off(this.picker, 'mouseup', this.mouseup, this);
-        domEvent.off(this.picker, 'mouseleave', this.onMouseLeave, this);
+
+
+        if (this.touchCapable) {
+            // Touch: Bind touch events:           
+            domEvent.off(this.template, "touchmove", this.mousemove, this);
+            domEvent.off(this.template, 'touchend', this.mouseup, this);
+            // domEvent.off(this.template, 'touchcancel', this.onMouseLeave, this);
+        } else {
+            domEvent.off(this.template, "mousemove", this.mousemove, this);
+            domEvent.off(this.template, 'mouseup', this.mouseup, this);
+            domEvent.off(this.template, 'mouseleave', this.onMouseLeave, this);
+        }
 
         this.inDrag = false;
         //if (this.over == false) {
@@ -304,9 +345,17 @@ class RangeSlider extends EventEmitter {
         this.handle1.style.cursor = "pointer";
         this.sliderTrack.style.cursor = "pointer";
 
-        domEvent.off(this.picker, "mousemove", this.mousemove, this);
-        domEvent.off(this.picker, 'mouseup', this.mouseup, this);
-        domEvent.off(this.picker, 'mouseleave', this.onMouseLeave, this);
+
+        if (this.touchCapable) {
+            // Touch: Bind touch events:           
+            domEvent.off(this.template, "touchmove", this.mousemove, this);
+            domEvent.off(this.template, 'touchend', this.mouseup, this);
+            // domEvent.off(this.template, 'touchcancel', this.onMouseLeave, this);
+        } else {
+            domEvent.off(this.template, "mousemove", this.mousemove, this);
+            domEvent.off(this.template, 'mouseup', this.mouseup, this);
+            domEvent.off(this.template, 'mouseleave', this.onMouseLeave, this);
+        }
 
         this.inDrag = false;
 
@@ -324,15 +373,16 @@ class RangeSlider extends EventEmitter {
             ];
             this.value = val;
         } else {
-            val = (this.min + Math.round((this.diff * this.percentage[0] / 100) / this.stepSize) * this.stepSize);
+            val = (this.
+                min + Math.round((this.diff * this.percentage[0] / 100) / this.stepSize) * this.stepSize);
             this.value = [val, this.value[1]];
         }
         return val;
     }
 
     getPercentage(ev) {
-        if (this.touchCapable) {
-            ev = ev.touches[0];
+        if (this.touchCapable && ev.touches) {
+            ev = ev.touches[0];      
         }
         let percentage = (ev[this.mousePos] - this.offset[this.stylePos]) * 100 / this.size;
         percentage = Math.round(percentage / this.percentage[2]) * this.percentage[2];

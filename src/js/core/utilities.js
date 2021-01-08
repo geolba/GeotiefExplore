@@ -147,7 +147,7 @@ export function setOptions(obj, options) {
 // Last unique ID used by [`stamp()`](#util-stamp)
 export var lastId = 0;
 
-// @function stamp(obj: Object): Number
+// @function stampForFn(obj: Object): Number
 // Returns the unique ID of an object, assigning it one if it doesn't have it.
 export function stamp(obj) {
 	let key = '_gba_id';
@@ -155,6 +155,17 @@ export function stamp(obj) {
 	return obj[key];
 
 }
+
+//  //static function
+//  var stamp = (function () {
+//     //var lastId = 0,
+//     let key = '_gba_id';
+//     return function (obj) {
+//         obj[key] = obj[key] || ++lastId;
+//         return obj[key];
+//     };
+// }());
+// export { stamp };
 
 export function hasTouch() {
 	let phantomjs = navigator.userAgent.toLowerCase().indexOf('phantom') !== -1;
@@ -171,4 +182,10 @@ export function hasTouch() {
 // Compatibility polyfill for [String.prototype.trim](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String/Trim)
 export function trim(str) {
 	return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
+}
+
+// @function splitWords(str: String): String[]
+// Trims and splits the string on whitespace and returns the array of parts.
+export function splitWords(str) {
+	return trim(str).split(/\s+/);
 }

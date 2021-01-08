@@ -1,7 +1,6 @@
 import { Control } from "./Control";
 import * as dom from '../core/domUtil';
 import * as util from '../core/utilities';
-import * as domEvent from '../core/domEvent';
 import { RangeSlider } from '../core/RangeSlider';
 
 import './SliderControl.css';
@@ -79,13 +78,14 @@ export class SliderControl extends Control {
         // this.slider.setAttribute("step", this.options.step);
         // this.slider.setAttribute("value", this.options.value);
 
-        this.slider = new RangeSlider(this._sliderContainer, {
+        this.slider = new RangeSlider({
             orientation: "vertical",
             value: 1,
             max: 5, min: 1,
             inverse: true,
             id: "z-slider"
         });
+        this.slider.addTo(this._sliderContainer);
 
         //if (this.options.syncSlider) {
         //    L.DomEvent.on(this.slider, "input", function (e) {

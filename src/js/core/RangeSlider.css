@@ -7,7 +7,8 @@
 
     .slider.slider-vertical {
       height: 160px;
-      width: 30px;
+      width: 35px;
+      z-index: 9;
     }
 
     .slider.slider-vertical .range-slider-track {
