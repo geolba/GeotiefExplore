@@ -5,16 +5,22 @@ import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Scene } from 'three/src/scenes/Scene';
 import { Vector3 } from 'three/src/math/Vector3';
 import { TinLayer } from './layer/TinLayer';
+import { DemLayer } from './layer/DemLayer';
 import { Map } from './core/Map';
 import * as domEvent from './core/domEvent';
 import { Coordinates } from './controls/Coordinates';
 import { NortArrow } from './controls/NorthArrow';
 import { LayerControl } from './controls/LayerControl';
+import { MobileDialog } from './controls/MobileDialog';
+import { BasemapControl } from './controls/BasemapControl';
 import { SliderControl } from './controls/SliderControl';
 import { Mesh } from 'three/src/objects/Mesh';
 import { SphereGeometry } from 'three/src/geometries/SphereGeometry';
 import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
 import * as util from './core/utilities';
+import * as browser from './core/browser';
+import * as domUtil from './core/domUtil';
+import { BoxLayer } from './layer/BoxLayer';
 
 import '../css/page.css'; /* style loader will import it */
 
@@ -49,18 +55,30 @@ class Application {
         this.navigation = document.getElementsByClassName('navigation')[0];
         // this.addEventListeners();
 
+        this.mapIcon = document.querySelector('#menu-map-icon');
+       
+
         this.createScene();
         this.addEventListeners();
     }
 
     createScene() {
 
-        let opt = { r: 200, c: 0x38eeff, o: 0.8 };
+        var dirNode = document.getElementsByTagName("body")[0];
+        if (browser.touch == true) {
+            //dirNode.setAttribute("dir", "ltr");
+            domUtil.addClass(dirNode, "touch");
+        } else {
+            domUtil.addClass(dirNode, "notouch");
+        }
+
+        // let opt = { r: 200, c: 0x38eeff, o: 0.8 };
+        var opt = { r: 5, c: 0xffff00, o: 1 };
         this.queryMarker = new Mesh(new SphereGeometry(opt.r),
-            new MeshLambertMaterial({ color: opt.c, opacity: opt.o, transparent: false }));
+            new MeshLambertMaterial({ color: opt.c, opacity: opt.o, transparent: (opt.o < 1) }));
 
         this.queryMarker.visible = true;
-        this.queryMarker.position.set(4282010, 2302070, -13616.3);
+        // this.queryMarker.position.set(4282010, 2302070, -13616.3);
         /* Renderer */
         // var bgcolor = 0xfdfdfd;
         let bgcolor = 0xfdfdfd;
@@ -97,15 +115,17 @@ class Application {
 
         this.camera = new PerspectiveCamera(30, this.width / this.height, 100, 100000);
 
-        const dirLight = new DirectionalLight(0xffffff, 1);
-        dirLight.position.set(585000 + 10000, 6135000 + 10000, -500 + 5000);
-        this.camera.add(dirLight);
+        // const dirLight = new DirectionalLight(0xffffff, 1);
+        // dirLight.position.set(585000 + 10000, 6135000 + 10000, -500 + 5000);
+        // this.camera.add(dirLight);
 
         let x = { min: 3955850, max: 4527300, avg: 4282010 };
         let y = { min: 2183600, max: 2502700, avg: 2302070 };
         let z = { min: -60066, max: 3574.94, avg: -13616.3 };
-        const center = new Vector3(x.avg, y.avg, 1000);
+        const center = new Vector3 ( (x.min + x.max) / 2, (y.min + y.max) / 2, z.avg );
+        // const center = new Vector3(x.avg, y.avg, z.avg);
         const size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);
+
         const camDirection = new Vector3(-0.5, -Math.SQRT1_2, 0.5);
         const camOffset = camDirection.multiplyScalar(size * 2);
         this.camera.position.copy(center);
@@ -115,26 +135,72 @@ class Application {
         this.camera.far = size * 25;
         this.camera.updateProjectionMatrix();
 
+
+        /* Camera */
+        // // const center = new Vector3();
+        // var angle = 45;
+        // var aspect = this.width / this.height;
+        // var near = 0.1; //This is the distance at which the camera will start rendering scene objects
+        // var far = 2000; //Anything beyond this distance will not be rendered                
+        // this.camera = new PerspectiveCamera(angle, aspect, near, far);        
+        // this.camera.position.set(0, -0.1, 150);
+        // this.camera.lookAt(new Vector3(0, 0, 0));
+
         // create map
         this.map = new Map(size, center, this.camera, this.scene, this.renderer.domElement, this.container);
         // this.map.minDistance =  size*0.75;
         // this.map.maxDistance = size*15;
 
+        // let boxLayer = new BoxLayer({ 
+        //     width: 10000, height: 10000, depth: 10000, name: 'test-box', color: 800080 
+        // });
+        // this.map.addLayer(boxLayer);
+
         //add map controls:
         if (util.hasTouch() == false) {
             let coordinates = new Coordinates({ camera: this.camera, crs: "EPSG:3034" }).addTo(this.map);
-            // coordinates.addListener('onPoint', (vector) => {           
-            //     this.queryMarker.position.set(vector.x, vector.y, vector.z);       
+            // coordinates.addListener('onPoint', (args) => {
+            //     let vector = args[0];
+            //     this.queryMarker.position.set(vector.x, vector.y, vector.z);
             //     // this.queryMarker.updateMatrixWorld();
             //     this.animate();
             // }, this);
         }
         this.northArrow = new NortArrow({ headLength: 1, headWidth: 1 }).addTo(this.map);
 
+        // this.dialog = new MobileDialog("Help", { klass: "fm_about", parentDiv: 'basemap-control-parent' }).addTo(this.map);
+
+        let demLayer = new DemLayer({
+            q: 0, shading: true, type: 'dem', name: 'DEM Layer', color: 16382457,
+            "materialParameter": [{
+                "i": 0,
+                "materialtypee": 0,
+                "ds": 1,
+                "bottomZ": 3000, //-18.70583629319634
+            }]
+        });
+        demLayer.addBlock({
+            "width": 226,
+            "plane": {
+                "width": x.max - x.min, //100.0,
+                // "offsetX": 0,
+                // "offsetY": 0,
+                // "offsetX" : x.avg,
+                // "offsetY" : y.avg,
+                "offsetX" : center.x,
+                "offsetY" : center.y,
+                "height": y.max - y.min, //78.59618717504333
+            },
+            "dem_values": [],
+            "height": 178
+        });
+        this.map.addLayer(demLayer);
+        this.map.currentBasemap = demLayer;
+
         let dxf134Layer = new TinLayer({
             geomId: 134, q: true, type: "3dface", name: "South Alpine Superunit", description: "test", color: "907A5C"
         });
-        this.map.addLayer(dxf134Layer);
+        this.map.addLayer(dxf134Layer);        
 
         let dxf135Layer = new TinLayer({
             geomId: 135, q: true, type: "3dface", name: "Adriatic Plate", description: "test2", color: "A0512D"
@@ -164,6 +230,10 @@ class Application {
         new LayerControl(this.map.layers, {
             collapsed: true,
             parentDiv: 'layer-control-parent-id'
+        }).addTo(this.map);
+
+        this.basemapControl = new BasemapControl('Baselayer', {
+            parentDiv: 'basemap-control-parent'
         }).addTo(this.map);
 
         //slider for scaling z value
@@ -259,6 +329,10 @@ class Application {
     }
 
     addEventListeners() {
+
+        domEvent.on(this.mapIcon, 'click', () => {
+            this.basemapControl.show();
+        }, this);
 
         domEvent.on(window, 'resize', this.onWindowResize, this);
         domEvent.on(window, 'keydown', this.keydown, this);

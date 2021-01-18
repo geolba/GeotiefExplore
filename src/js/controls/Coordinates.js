@@ -63,7 +63,7 @@ export class Coordinates extends Control {
 
         let x = (xClickedOnCanvas / width) * 2 - 1;
         let y = -(yClickedonCanvas / height) * 2 + 1;
-        let mouse = new Vector3(x, y);
+        let mouse = new Vector3(x, y, 1);
         mouse.unproject(this.options.camera);
         // vector.sub(this.options.camera.position);
         // vector.normalize();
@@ -75,6 +75,7 @@ export class Coordinates extends Control {
         let koordx = this._dec2sex(point84.x, 'X');
         let koordy = this._dec2sex(point84.y, 'y');        
         this._container.innerHTML = "LON: " + koordx + ", " + "LAT: " + koordy;
+        // this._container.innerHTML = "x: " + mouse.x + ", " + "y: " + mouse.y;
     }
 
     _getOffset(element) {

@@ -25,6 +25,14 @@ class Map extends OrbitControls {
         }
         this._layers = {};
         this.initControls();
+
+        this.basemaps = {
+            "currentVersion": 10.01,
+            "services": [
+                { "name": "esri:topograhy", "type": "MapServer", 'image': 'background_esri_world_topography.png', 'title': 'ESRI Topograhy' },
+                { "name": "esri:imagery", "type": "MapServer", 'image': 'background_esri_world_imagery.png', 'title': 'ESRI Imagery' },
+            ]
+        };
     }
 
     get layers() {
@@ -82,7 +90,7 @@ class Map extends OrbitControls {
         return this;
     }
 
-    hasLayer (layer) {
+    hasLayer(layer) {
         return !!layer && (util.stamp(layer) in this._layers);
     }
 

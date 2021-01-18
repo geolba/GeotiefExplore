@@ -2,7 +2,7 @@
 import { BufferGeometry } from 'three/src/core/BufferGeometry';
 import { Float32BufferAttribute, Uint16BufferAttribute } from 'three/src/core/BufferAttribute';
 import { MeshStandardMaterial } from 'three/src/materials/MeshStandardMaterial';
-import { DoubleSide } from 'three/src/constants'
+import { DoubleSide } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Layer } from './Layer';
 import { BitStream } from '../lib/bitstream';

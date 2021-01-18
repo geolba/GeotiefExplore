@@ -15,3 +15,6 @@ export var mobile = typeof orientation !== 'undefined' || userAgentContains('mob
 function userAgentContains(str) {
 	return navigator.userAgent.toLowerCase().indexOf(str) >= 0;
 }
+
+// @property ie: Boolean; `true` for all Internet Explorer versions (not Edge).
+export var ie = 'ActiveXObject' in window;

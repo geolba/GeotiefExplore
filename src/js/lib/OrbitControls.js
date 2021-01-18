@@ -96,6 +96,7 @@ class OrbitControls extends EventEmitter {
         // Limits to how far you can dolly in and out
         // this.minDistance = 0;
         // this.maxDistance = Infinity;
+       
         this.minDistance =  size*0.75;
         this.maxDistance = size*15;
 
@@ -397,8 +398,10 @@ class OrbitControls extends EventEmitter {
     reset() {
         state = STATE.NONE;
         this.target.copy(this.target0);//0 0 0
+        
         this.object.position.copy(this.position0);
-        //this.object.position.set(0, 0, 180);
+        // this.object.position.set(0, 0, 180);
+        
         this.update();
     }
 

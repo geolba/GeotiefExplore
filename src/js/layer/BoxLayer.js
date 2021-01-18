@@ -5,15 +5,28 @@ import { Layer } from './Layer'
 
 class BoxLayer extends Layer {
 
-    constructor(size) {
+    constructor(params) {
         super();
 
-        this.geometry = new BoxGeometry(size.width, size.height, size.depth);
+        this.visible = true;
+        this.name = params.name;
+        this.color = params.color;
+        this.geometry = new BoxGeometry(params.width, params.height, params.depth);
         this.material = new MeshBasicMaterial({
-            color: 800080
+            color: this.color
         });
-
+        this.materials = [];
+        this.materials.push(this.material);
         this.mesh = new Mesh(this.geometry, this.material);
+        this.mesh.position.x = 4282010;
+        this.mesh.position.y = 2302070;
+        this.mesh.position.z =  -13616.3;
+    }
+
+    setVisible(visible) {
+        this.visible = visible;
+        this.mesh.visible = visible;
+        this.emit('visibility-change');
     }
 
     onAdd(map) {
@@ -29,6 +42,19 @@ class BoxLayer extends Layer {
 
     getMesh() {
         return this.mesh;
+    }
+
+    scaleZ(z) {
+        this.mesh.scale.z = z;
+        //this.objectGroup.scale.z = z;
+    }
+
+    setWireframeMode(wireframe) {
+        this.materials.forEach(function (mat) {
+            //if (m.w) return;
+            //m.mat.wireframe = wireframe;
+            mat.wireframe = wireframe;
+        });
     }
 }
 
