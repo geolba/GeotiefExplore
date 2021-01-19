@@ -82,6 +82,13 @@ section {
     top: 30px;
     left: 30px;
     right: 30px;
+    /* Old browsers */
+    background: #cde6f9;
+    background-image: -moz-linear-gradient(top, #cde6f9 0%, white 70%, #6b716f);
+    background: -webkit-linear-gradient(top, #cde6f9 0%, white 70%, #6b716f);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    background: linear-gradient(top, #cde6f9 0%, white 60%, #6b716f);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cde6f9', endColorstr='#6b716f', GradientType=0);
 }
 
 #inset {
@@ -717,6 +724,17 @@ there.
 /* smaller than tablet */
 
 @media (max-width: 750px) {
+    .mapDesktop {
+        /* overflow: hidden;
+        position: absolute; */
+        bottom: 0px;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+    }
+    .main {
+        padding-top: 0;
+    }
     .header ul li {
         display: list-item;
         float: none;

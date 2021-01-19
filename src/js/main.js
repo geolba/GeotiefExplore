@@ -11,7 +11,6 @@ import * as domEvent from './core/domEvent';
 import { Coordinates } from './controls/Coordinates';
 import { NortArrow } from './controls/NorthArrow';
 import { LayerControl } from './controls/LayerControl';
-import { MobileDialog } from './controls/MobileDialog';
 import { BasemapControl } from './controls/BasemapControl';
 import { SliderControl } from './controls/SliderControl';
 import { Mesh } from 'three/src/objects/Mesh';
@@ -20,7 +19,6 @@ import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
 import * as util from './core/utilities';
 import * as browser from './core/browser';
 import * as domUtil from './core/domUtil';
-import { BoxLayer } from './layer/BoxLayer';
 
 import '../css/page.css'; /* style loader will import it */
 
@@ -56,7 +54,7 @@ class Application {
         // this.addEventListeners();
 
         this.mapIcon = document.querySelector('#menu-map-icon');
-       
+
 
         this.createScene();
         this.addEventListeners();
@@ -87,7 +85,9 @@ class Application {
         // this.renderer.setSize(window.innerWidth, window.innerHeight);
         // document.body.appendChild(this.renderer.domElement);
         this.renderer.setSize(this.width, this.height);
-        this.renderer.setClearColor(bgcolor, 1); // second param is opacity, 0 => transparent       
+        //this.renderer.setClearColor(bgcolor, 1); // second param is opacity, 0 => transparent  
+        this.renderer.setClearColor(0x000000, 0.0);
+
         // let Empty = Object.freeze([]);
         // this.renderer.clippingPlanes = Empty; // GUI sets it to globalPlanes
         // this.renderer.localClippingEnabled = true;
@@ -122,7 +122,7 @@ class Application {
         let x = { min: 3955850, max: 4527300, avg: 4282010 };
         let y = { min: 2183600, max: 2502700, avg: 2302070 };
         let z = { min: -60066, max: 3574.94, avg: -13616.3 };
-        const center = new Vector3 ( (x.min + x.max) / 2, (y.min + y.max) / 2, z.avg );
+        const center = new Vector3((x.min + x.max) / 2, (y.min + y.max) / 2, z.avg);
         // const center = new Vector3(x.avg, y.avg, z.avg);
         const size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);
 
@@ -187,8 +187,8 @@ class Application {
                 // "offsetY": 0,
                 // "offsetX" : x.avg,
                 // "offsetY" : y.avg,
-                "offsetX" : center.x,
-                "offsetY" : center.y,
+                "offsetX": center.x,
+                "offsetY": center.y,
                 "height": y.max - y.min, //78.59618717504333
             },
             "dem_values": [],
@@ -200,7 +200,7 @@ class Application {
         let dxf134Layer = new TinLayer({
             geomId: 134, q: true, type: "3dface", name: "South Alpine Superunit", description: "test", color: "907A5C"
         });
-        this.map.addLayer(dxf134Layer);        
+        this.map.addLayer(dxf134Layer);
 
         let dxf135Layer = new TinLayer({
             geomId: 135, q: true, type: "3dface", name: "Adriatic Plate", description: "test2", color: "A0512D"
