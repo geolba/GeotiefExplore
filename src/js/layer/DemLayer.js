@@ -15,14 +15,14 @@ import { TextureLoader } from 'three/src/loaders/TextureLoader';
 export class DemLayer extends Layer {
 
     images = [{
-        "width": 1154,
+        "width": 904,
         "url": "https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/export",
-        "height": 907,
+        "height": 509,
         "bboxSR": 3034
     }, {
-        "width": 1154,
+        "width": 904,
         "url": "https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export",
-        "height": 907,
+        "height": 509,
         "bboxSR": 3034
     }
     ];
@@ -281,11 +281,14 @@ export class DemLayer extends Layer {
     }
 
     async requestImage(url, imageParameter) {
+        let bbox = this.baseExtent.x.min + "," + this.baseExtent.y.min + "," + this.baseExtent.x.max + "," + this.baseExtent.y.max;
         let params = {
-            "width": imageParameter.width,
-            "height": imageParameter.height,
+            // "width": imageParameter.width,
+            // "height": imageParameter.height,
+            "size": imageParameter.width + "," + imageParameter.height,
             "bboxSR": imageParameter.bboxSR,
-            "bbox": "3955850,2183600,4527300,2502700",
+            // "bbox": "3955850,2183470.1545778836,4527300,2502829.8454221168",
+            "bbox": bbox,
             "format": "png",
             "f": "pjson"
         };
