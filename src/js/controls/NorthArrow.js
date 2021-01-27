@@ -9,10 +9,6 @@ import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { Scene } from 'three/src/scenes/Scene';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 
-// import { SphereGeometry } from 'three/src/geometries/SphereGeometry';
-// import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
-// import { Mesh } from 'three/src/objects/Mesh';
-
 import './NorthArrow.css';
 
 export class NortArrow extends Control {

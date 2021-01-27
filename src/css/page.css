@@ -51,14 +51,13 @@ section {
     /* margin: 10px; */
 }
 
-.input-area {
-    /* flex: 1;
+/*.input-area {
+     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; */
-    /* margin: 10px; */
-}
+    justify-content: center;     
+}*/
 
 .btnDownloadMeme {
     margin-top: 10px;
@@ -569,7 +568,6 @@ label>.label-body {
     color: #757575;
     background-color: white;
     border-bottom: 1px solid #dcdcdc;
-    /* border-bottom: 1px solid #dcdcdc; */
 }
 
 .navigation ul {
@@ -773,6 +771,8 @@ there.
 
 @media (min-width: 1200px) {}
 
+
+
 .tab-content {
     min-height: 390px;
 }
@@ -813,4 +813,42 @@ ul.tab-nav li span.active.button {
 .tab-content .tab-pane.active {
     display: block;
     /* visibility: visible; */
+}
+
+
+
+.red-label {  
+    color: #f00;
+    padding: 2px;
+    text-shadow: -1px -1px #FFF, 0 -1px #FFF, 1px -1px #FFF, -1px 0 #FFF, 1px 0 #FFF, -1px 1px #FFF, 0 1px #FFF, 1px 1px #FFF;
+    position: absolute;
+    pointer-events: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.green-label {   
+    color: #7cfc00;
+    padding: 2px;
+    text-shadow: -1px -1px #FFF, 0 -1px #FFF, 1px -1px #FFF, -1px 0 #FFF, 1px 0 #FFF, -1px 1px #FFF, 0 1px #FFF, 1px 1px #FFF;
+    position: absolute;
+    pointer-events: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.blue-label {  
+    color: #00bfff;
+    padding: 2px;
+    text-shadow: -1px -1px #FFF, 0 -1px #FFF, 1px -1px #FFF, -1px 0 #FFF, 1px 0 #FFF, -1px 1px #FFF, 0 1px #FFF, 1px 1px #FFF;
+    position: absolute;
+    pointer-events: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
 }

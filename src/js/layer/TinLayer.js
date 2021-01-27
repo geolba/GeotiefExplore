@@ -53,7 +53,6 @@ class TinLayer extends Layer {
     async onAdd(map) {
         await this.build(this.getScene());
         map.update();
-        // this.emit('add');
     }
 
     //build BufferGeometry with Index

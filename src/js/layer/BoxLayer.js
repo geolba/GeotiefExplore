@@ -11,6 +11,7 @@ class BoxLayer extends Layer {
         this.visible = true;
         this.name = params.name;
         this.color = params.color;
+        this.center = params.center;
         this.geometry = new BoxGeometry(params.width, params.height, params.depth);
         this.material = new MeshBasicMaterial({
             color: this.color
@@ -18,9 +19,10 @@ class BoxLayer extends Layer {
         this.materials = [];
         this.materials.push(this.material);
         this.mesh = new Mesh(this.geometry, this.material);
-        this.mesh.position.x = 4282010;
-        this.mesh.position.y = 2302070;
-        this.mesh.position.z =  -13616.3;
+        // this.mesh.position.x = 4282010;
+        // this.mesh.position.y = 2302070;
+        // this.mesh.position.z =  -13616.3;
+        this.mesh.position.set(this.center.x, this.center.y, this.center.z);
     }
 
     setVisible(visible) {

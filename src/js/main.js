@@ -5,11 +5,13 @@ import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Scene } from 'three/src/scenes/Scene';
 import { Vector3 } from 'three/src/math/Vector3';
 import { TinLayer } from './layer/TinLayer';
+import { GridLayer } from './layer/GridLayer';
+// import { BoxLayer } from './layer/BoxLayer';
 import { DemLayer } from './layer/DemLayer';
 import { Map } from './core/Map';
 import * as domEvent from './core/domEvent';
 import { Coordinates } from './controls/Coordinates';
-import { NortArrow } from './controls/NorthArrow';
+// import { NortArrow } from './controls/NorthArrow';
 import { LayerControl } from './controls/LayerControl';
 import { BasemapControl } from './controls/BasemapControl';
 import { SliderControl } from './controls/SliderControl';
@@ -108,36 +110,32 @@ class Application {
         var aspect = this.width / this.height;
         var near = 0.1; //This is the distance at which the camera will start rendering scene objects
         var far = 2000; //Anything beyond this distance will not be rendered                
-        this.camera = new PerspectiveCamera(angle, aspect, near, far);
+        // this.camera = new PerspectiveCamera(angle, aspect, near, far);
         // this.camera.position.set(0, -0.1, 150);
         // this.camera.lookAt(new Vector3(0, 0, 0));
 
         this.camera = new PerspectiveCamera(30, this.width / this.height, 100, 100000);
-
         // const dirLight = new DirectionalLight(0xffffff, 1);
         // dirLight.position.set(585000 + 10000, 6135000 + 10000, -500 + 5000);
         // this.camera.add(dirLight);
-
 
         let x = { min: 3955850, max: 4527300, avg: 4282010 };  
         // let y = { min: 2183600, max: 2502700, avg: 2302070 };
         let y = { min: 2182271.6538, max: 2504028.3462 , avg: 2302070 };
         let z = { min: -60066, max: 3574.94, avg: -13616.3 };
-        const center = new Vector3((x.min + x.max) / 2, (y.min + y.max) / 2, z.avg);
+        const center = new Vector3((x.min + x.max) / 2, (y.min + y.max) / 2, 0);
         // const center = new Vector3(x.avg, y.avg, z.avg);
-        const size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);
-
-        
+        const size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);        
         let baseExtent= {
             x: x,
             y: y
         };
 
         const camDirection = new Vector3(-0.5, -Math.SQRT1_2, 0.5);
+        // const camDirection = new Vector3(0, 0, 1);
         const camOffset = camDirection.multiplyScalar(size * 2);
-        this.camera.position.copy(center);
-        this.camera.position.add(camOffset);
-        // this.camera.position.set(0, 0, 1500);
+        this.camera.position.copy(center);        
+        this.camera.position.add(camOffset);       
         this.camera.near = size * 0.1;
         this.camera.far = size * 25;
         this.camera.updateProjectionMatrix();
@@ -153,13 +151,13 @@ class Application {
         // this.camera.position.set(0, -0.1, 150);
         // this.camera.lookAt(new Vector3(0, 0, 0));
 
-        // create map
-        this.map = new Map(size, center, this.camera, this.scene, this.renderer.domElement, this.container);
+        // create map 
+        this.map = new Map(x, y, z, size, center, this.camera, this.scene, this.renderer.domElement, this.container);
         // this.map.minDistance =  size*0.75;
         // this.map.maxDistance = size*15;
 
         // let boxLayer = new BoxLayer({ 
-        //     width: 10000, height: 10000, depth: 10000, name: 'test-box', color: 800080 
+        //     width: 10000, height: 10000, depth: 10000, name: 'center-box', color: 800080 , center: center
         // });
         // this.map.addLayer(boxLayer);
 
@@ -173,9 +171,7 @@ class Application {
             //     this.animate();
             // }, this);
         }
-        this.northArrow = new NortArrow({ headLength: 1, headWidth: 1 }).addTo(this.map);
-
-        // this.dialog = new MobileDialog("Help", { klass: "fm_about", parentDiv: 'basemap-control-parent' }).addTo(this.map);
+        // this.northArrow = new NortArrow({ headLength: 1, headWidth: 1 }).addTo(this.map);
 
         let demLayer = new DemLayer({
             q: 0, shading: true, type: 'dem', name: 'DEM Layer', color: 16382457, "baseExtent": baseExtent,
@@ -233,6 +229,9 @@ class Application {
             geomId: 140, q: true, type: "3dface", name: "Eurasian Plate, including autochtomous sedimentary cover", description: "test2", color: "FFB3B3"
         });
         this.map.addLayer(dxf140Layer);
+
+        this.gridlayer = new GridLayer({  center: center,  name: "coordinate grid", appWidth: this.width, appHeight: this.height });
+        this.map.addLayer(this.gridlayer);
 
         new LayerControl(this.map.layers, {
             collapsed: true,
@@ -332,7 +331,8 @@ class Application {
 
     animate() {
         this.renderer.render(this.scene, this.camera);
-        this.northArrow.animate();
+        // this.northArrow.animate();
+        this.gridlayer.animate();
     }
 
     addEventListeners() {
@@ -464,5 +464,5 @@ class Application {
 
 }
 
-var container = document.getElementById("webgl");
+let container = document.getElementById("webgl");
 new Application(container);
