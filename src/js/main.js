@@ -152,7 +152,9 @@ class Application {
         // this.camera.lookAt(new Vector3(0, 0, 0));
 
         // create map 
-        this.map = new Map(x, y, z, size, center, this.camera, this.scene, this.renderer.domElement, this.container);
+        let map = this.map = new Map(x, y, z, size, center, this.camera, this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta?modelid=11');
+        this.mapTitle = document.querySelector('#map-title');
+        this.mapTitle.innerHTML += map.title;
         // this.map.minDistance =  size*0.75;
         // this.map.maxDistance = size*15;
 
@@ -239,7 +241,7 @@ class Application {
         }).addTo(this.map);
 
         this.basemapControl = new BasemapControl('Baselayer', {
-            parentDiv: 'basemap-control-parent'
+            position: 'topright'
         }).addTo(this.map);
 
         //slider for scaling z value
@@ -337,9 +339,9 @@ class Application {
 
     addEventListeners() {
 
-        domEvent.on(this.mapIcon, 'click', () => {
-            this.basemapControl.show();
-        }, this);
+        // domEvent.on(this.mapIcon, 'click', () => {
+        //     this.basemapControl.show();
+        // }, this);
 
         domEvent.on(window, 'resize', this.onWindowResize, this);
         domEvent.on(window, 'keydown', this.keydown, this);

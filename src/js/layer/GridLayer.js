@@ -1,23 +1,17 @@
 import { BufferGeometry } from 'three/src/core/BufferGeometry';
 import { Float32BufferAttribute } from 'three/src/core/BufferAttribute';
 import { LineBasicMaterial } from 'three/src/materials/LineBasicMaterial';
-import { PointsMaterial } from 'three/src/materials/PointsMaterial';
 import { LineSegments } from 'three/src/objects/LineSegments';
 import { Layer } from './Layer';
 import { Group } from 'three/src/objects/Group';
-// import { Color } from 'three/src/math/Color';
 import { Vector3 } from 'three/src/math/Vector3';
-import { Geometry } from 'three/src/core/Geometry';
 import { Line } from 'three/src/objects/Line';
-import { Points } from 'three/src/objects/Points';
 
 export class GridLayer extends Layer {
 
     constructor(params) {
         super();
         this.type = 'GridLayer';
-
-        //this.features = [];        
         this.visible = true;
         this.opacity = 1;
         this.materials = [];
@@ -61,10 +55,8 @@ export class GridLayer extends Layer {
 
     onAdd(map) {
         let divisions = 5;
-        // let size = map.length / 10;
 
-
-        let gridXZ = this.build(map.length, divisions, map.center.y, map.width);
+        let gridXZ = this.build(map.length, divisions, map.y.max, map.width);
         // gridXZ.position.set(this.center.x, this.center.y, this.center.z);
 
         // size = map.width / 10;
@@ -72,7 +64,10 @@ export class GridLayer extends Layer {
         // gridYZ.rotation.z = Math.PI / 2;
         // gridYZ.position.set(this.center.x, this.center.y, this.center.z);
 
-        let gridY = this.buildY(map.width, divisions, map.center.z, map.width);
+        let gridBottomZ = this.gridBottomZ = -(map.width / 2);
+        this.buildY(map.width, divisions, gridBottomZ, map.width);
+
+        this.buildZ(map.height, divisions, map.y.max);
 
         //waagrechtes grid
         // // let gridXY = this.build(map.length, divisions, 0, map.width);
@@ -86,7 +81,30 @@ export class GridLayer extends Layer {
         this.getScene().add(this.labelConnectorGroup);
     }
 
-    buildY(size, divisions, constant, height) {
+    buildZ(size, divisions, constant) {
+        let step = size / divisions;
+        let vertices = [];
+
+        for (let k = this._map.z.min; k <= this._map.z.max + 1; k = k + step) {
+            vertices.push(this._map.x.min, constant, k, this._map.x.max, constant, k);
+        }
+
+        let geometry = new BufferGeometry();
+        let positions = new Float32BufferAttribute(vertices, 3);
+        geometry.setAttribute('position', positions);
+        let material = new LineBasicMaterial({
+            linewidth: 1,
+            color: 0xA0A1A3
+        });
+        this.materials.push(material);
+
+        //THREE.LineSegments.call(this, geometry, material);
+        let lineSegments = new LineSegments(geometry, material);
+        this.objectGroup.add(lineSegments);
+        return lineSegments;
+    }
+
+    buildY(size, divisions, constant) {
         let step = size / divisions;
         let vertices = [];
 
@@ -156,54 +174,41 @@ export class GridLayer extends Layer {
     buildLabels(divisions = 5) {
         let size = this._map.length;
         let step = size / divisions;
-
         // this.parent = parent;
         // this.parentElement = parentElement;
-        // var width = 80;
         let labels = new Array();
 
         // for (let k = - halfSize; k <= halfSize; k = k + step) {
         for (let k = this._map.x.min; k <= this._map.x.max; k = k + step) {
-            if (k % 1 != 0) k = this._round(k, 2);
-            let info = { a: k, size: step, axis: "x", color: 0xff0000, cl: "red-label", h: 0.6, centroid: [[k, this._map.center.y, this._map.width / 2]] };
+            let xCoordinate = (k % 1 != 0) ? this._round(k, 2) : k;
+            let info = { a: xCoordinate, size: step, axis: "x", color: 0xff0000, cl: "red-label", h: 0.6, centroid: [[k, this._map.y.max, this._map.width / 2]] };
             labels.push(info);
         }
 
-        size = this._map.width;
-        step = size / divisions;
-        for (let k = this._map.y.min; k <= this._map.y.max; k = k + step) {
-            if (k % 1 != 0) k = this._round(k, 2);
-            let info = { a: k, size: step, axis: "y", color: 0x00ff00, cl: "green-label", h: 0.6, centroid: [[this._map.x.min, k, this._map.center.z]] };
+        let ySize = this._map.width;
+        let yStep = ySize / divisions;
+        for (let k = this._map.y.min; k <= this._map.y.max; k = k + yStep) {
+            let yCoordinate = (k % 1 != 0) ? this._round(k, 2) : k;
+            let info = { a: yCoordinate, size: yStep, axis: "y", color: 0x3ad29f, cl: "green-label", h: 0.6, centroid: [[this._map.x.min, k, this.gridBottomZ]] };
             labels.push(info);
         }
 
-        //label
-        // this.f = [
-        //     { a: [i18n.widgets.gridlayer.east], cl: "red-label", h: 0.0, centroid: [[0, width / 2 + 15, this.height]], axis: true },
-        //     { a: [this._map.getMapX(-10)], cl: "red-label", h: 0.0, centroid: [[-10, width / 2, this.height]] },
-        //     { a: [this._map.getMapX(-20)], cl: "red-label", h: 0.6, centroid: [[-20, width / 2, this.height]] },
-        //     { a: [this._map.getMapX(-30)], cl: "red-label", h: 0.6, centroid: [[-30, width / 2, this.height]] },
-        //     { a: [this._map.getMapX(-40)], cl: "red-label", h: 0.6, centroid: [[-40, width / 2, this.height]] },
-        //     { a: [this._map.getMapX(-50)], cl: "red-label", h: 0.6, hs: 4, centroid: [[-50, width / 2, this.height]] },
-        //     { a: [this._map.getMapX(0)], cl: "red-label", h: 0.6, centroid: [[0, width / 2, this.height]] },
-        //     { a: [this._map.getMapX(10)], cl: "red-label", h: 0.6, centroid: [[10, width / 2, this.height]] },
-        //     { a: [this._map.getMapX(20)], cl: "red-label", h: 0.6, centroid: [[20, width / 2, this.height]] },
-        //     { a: [this._map.getMapX(30)], cl: "red-label", h: 0.6, centroid: [[30, width / 2, this.height]] },
-        //     { a: [this._map.getMapX(40)], cl: "red-label", h: 0.6, centroid: [[40, width / 2, this.height]] },
-        //     { a: [this._map.getMapX(50)], cl: "red-label", h: 0.6, centroid: [[50, width / 2, this.height]] }
-        // ];
+        let zSize = this._map.height;
+        let zStep = zSize / divisions;
+        for (let k = this._map.z.min; k <= this._map.z.max + 1; k = k + zStep) {
+            // vertices.push(this._map.x.min, constant, k, this._map.x.max, constant, k);
+            let zCoordinate = (k % 1 != 0) ? this._round(k, 2) : k;
+            let info = { a: zCoordinate, size: yStep, axis: "z", color: 0x6b716f, cl: "grey-label", h: 0.6, centroid: [[this._map.x.min, this._map.y.max, k]] };
+            labels.push(info);
+        }
+
+       
         var getCentroidFunc = function (f) { return f.centroid; };
 
         // Layer must belong to a project
         let labelInfo = this.labelInfo;
         if (labelInfo === undefined || getCentroidFunc === undefined) return;
 
-        // // let line_mat = new LineBasicMaterial({ color: Gba3D.Options.label.connectorColor });
-        // let line_mat = new LineBasicMaterial({
-        //     linewidth: 1,
-        //     color: 0x80CCFF
-        // });
-        // this.labelConnectorGroup = new Group();
         this.labelConnectorGroup.userData.layerId = this.index;
         // if (parent) {
         //     parent.add(this.labelConnectorGroup);
@@ -245,7 +250,6 @@ export class GridLayer extends Layer {
                 e.className = classLabel;// "label";
                 this.labelParentElement.appendChild(e);
 
-                // let z = labelHeightFunc(f, pt);
                 let pt0, pt1;
                 if (f.axis == "x") {
                     pt0 = new Vector3(pt[0], pt[1], pt[2]);    // bottom
@@ -254,11 +258,15 @@ export class GridLayer extends Layer {
                 else if (f.axis == "y") {
                     pt0 = new Vector3(pt[0], pt[1], pt[2]);
                     pt1 = new Vector3(pt[0] - horizontalShiftLabel - f.size, pt[1], pt[2]);
+                } else if (f.axis == "z") {
+                    pt0 = new Vector3(pt[0], pt[1], pt[2]);
+                    pt1 = new Vector3(pt[0] - horizontalShiftLabel - f.size, pt[1], pt[2]);
                 }
-                // create connector - not for axis 
-                // if (f.axis !== true) {
-                let geom = new Geometry();
-                geom.vertices.push(pt1, pt0);
+
+                let step = size / divisions;
+                let vertices = [];
+                vertices.push(pt1, pt0);
+                let geom = new BufferGeometry().setFromPoints(vertices);
 
                 let line = new Line(geom, line_mat);
                 // line.position.set(this.center.x, this.center.y, this.center.z);
@@ -294,9 +302,9 @@ export class GridLayer extends Layer {
         let autosize = true;
         let camera = this._map.camera;
         let camera_pos = camera.position;
-        let c2t = this._map.target.clone().sub(camera_pos);
+        let c2t = this._map.center.clone().sub(camera_pos);
         let c2l = new Vector3();
-        
+
         //neu
         // app.labels = app.controls.gridlayer.labels;
         let scaleFactor = this.scale;

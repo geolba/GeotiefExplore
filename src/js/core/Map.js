@@ -12,22 +12,29 @@ class Map extends OrbitControls {
     _controlContainer;
     _controls;
 
-    constructor(x, y, z, size, center, camera, scene, domElement, container) {
+    constructor(x, y, z, size, center, camera, scene, container, serviceUrl) {
         // call parent constructor of OrbitControls
-        super(size, center, camera, scene, domElement);
+        super(size, center, camera, scene, container);
 
         this.camera = camera;
         this.container = container;
         this.length = x.max - x.min;      
         this.width = y.max - y.min;
+        this.height = z.max - z.min;
         this.x = x;
         this.y = y;
         this.z = z;
+        this.center = center;
 
         //init the control corners
         if (this._initControlPos) {
             this._initControlPos();
         }
+
+         // to do: initialize map title via serviceUrl:
+        this.title = "Geological 3D model of Austria";
+
+        // to do: initialize layers via serviceUrl:
         this._layers = {};
         this.initControls();
 

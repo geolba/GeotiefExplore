@@ -59,6 +59,11 @@ section {
     justify-content: center;     
 }*/
 
+#map-title {
+    display: block;
+    padding: 1em;
+}
+
 .btnDownloadMeme {
     margin-top: 10px;
 }
@@ -101,7 +106,6 @@ section {
 }
 
 /* control positioning */
-
 .gba-control {
     position: relative;
     z-index: 7;
@@ -391,7 +395,6 @@ a:hover {
 
 /* Buttons
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-
 .button, button, input[type="submit"], input[type="reset"], input[type="button"] {
     display: inline-block;
     height: 38px;
@@ -432,7 +435,6 @@ a:hover {
 
 /* Forms
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-
 input[type="email"], input[type="number"], input[type="search"], input[type="text"], input[type="tel"], input[type="url"], input[type="password"], textarea, select {
     height: 38px;
     padding: 6px 10px;
@@ -722,6 +724,11 @@ there.
 /* smaller than tablet */
 
 @media (max-width: 750px) {
+    #map-title {
+        display: none;
+        padding: 1em;
+    }
+
     .mapDesktop {
         /* overflow: hidden;
         position: absolute; */
@@ -830,7 +837,7 @@ ul.tab-nav li span.active.button {
 }
 
 .green-label {   
-    color: #7cfc00;
+    color: #3ad29f;
     padding: 2px;
     text-shadow: -1px -1px #FFF, 0 -1px #FFF, 1px -1px #FFF, -1px 0 #FFF, 1px 0 #FFF, -1px 1px #FFF, 0 1px #FFF, 1px 1px #FFF;
     position: absolute;
@@ -841,8 +848,8 @@ ul.tab-nav li span.active.button {
     user-select: none;
 }
 
-.blue-label {  
-    color: #00bfff;
+.grey-label {  
+    color: #6b716f;
     padding: 2px;
     text-shadow: -1px -1px #FFF, 0 -1px #FFF, 1px -1px #FFF, -1px 0 #FFF, 1px 0 #FFF, -1px 1px #FFF, 0 1px #FFF, 1px 1px #FFF;
     position: absolute;

@@ -8,4 +8,5 @@
     margin: 0;
     color: #333;    
     font: 11px/1.500 'Open Sans', sans-serif; 
+    margin-bottom: 0 !important;
 }
