@@ -105,7 +105,7 @@ export class GridLayer extends Layer {
     }
 
     buildY(size, divisions, constant) {
-        let step = size / divisions;
+        let step =  this._round(size / divisions, 4);
         let vertices = [];
 
         for (let k = this._map.y.min; k <= this._map.y.max; k = k + step) {
@@ -186,7 +186,7 @@ export class GridLayer extends Layer {
         }
 
         let ySize = this._map.width;
-        let yStep = ySize / divisions;
+        let yStep =  this._round(ySize / divisions, 4);
         for (let k = this._map.y.min; k <= this._map.y.max; k = k + yStep) {
             let yCoordinate = (k % 1 != 0) ? this._round(k, 2) : k;
             let info = { a: yCoordinate, size: yStep, axis: "y", color: 0x3ad29f, cl: "green-label", h: 0.6, centroid: [[this._map.x.min, k, this.gridBottomZ]] };

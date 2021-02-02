@@ -15,14 +15,14 @@ import { TextureLoader } from 'three/src/loaders/TextureLoader';
 export class DemLayer extends Layer {
 
     images = [{
-        "width": 904,
+        "width": 407, //904,
         "url": "https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/export",
-        "height": 509,
+        "height": 549, //509
         "bboxSR": 3034
     }, {
-        "width": 904,
+        "width": 407,
         "url": "https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export",
-        "height": 509,
+        "height": 549,
         "bboxSR": 3034
     }
     ];

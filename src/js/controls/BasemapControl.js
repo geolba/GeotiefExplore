@@ -12,23 +12,8 @@ export class BasemapControl extends Control {
 
     constructor(title, options) {
         super(title, options);
-
         util.setOptions(this, options);
-
-        // for (var i in baseLayers) {
-        // 	this._addLayer(baseLayers[i], i);
-        // }
-
-
-
-    }
-
-    // onAdd(map) {
-    //     super.onAdd(map);
-    //     let basemaps = this.basemaps = map.basemaps;
-
-    //     this._initBasemapHtml(basemaps.services);
-    // }
+    }  
 
     // onAdd(map) {
     //     this._mainMap = map;

@@ -5,7 +5,8 @@
 		}
 	],
 	"settings": {
-		"svg.preview.background": "custom"
+		"svg.preview.background": "custom",
+		"json.maxItemsComputed": 4000
 	},
 	"launch": {
 		"version": "0.2.0",
