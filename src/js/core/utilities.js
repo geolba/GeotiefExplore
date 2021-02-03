@@ -107,6 +107,25 @@ export function extend(dest) {
 	return dest;
 }
 
+export async function getMetadata(serviceUrl) {
+	// const BBOXURL = '//geusegdi01.geus.dk/meta3d/rpc/model_meta?modelid=' + modelid;    
+	const response = await fetch(serviceUrl, {
+		method: 'GET',
+		mode: 'cors',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	});
+
+	if (response.ok) {
+		return response.json();
+	} else {
+		throw new Error("HTTP error, status = " + response.status);
+	}
+
+	// return await response.json();        
+}
+
 // @function create(proto: Object, properties?: Object): Object
 // Compatibility polyfill for [Object.create](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
 export var create = Object.create || (function () {

@@ -3,6 +3,7 @@ import * as dom from './domUtil';
 import { HomeButton } from '../controls/HomeButton';
 import { ZoomControl } from '../controls/ZoomControl';
 import * as util from './utilities';
+import { TinLayer } from '../layer/TinLayer';
 
 class Map extends OrbitControls {
 
@@ -11,14 +12,22 @@ class Map extends OrbitControls {
     _controlCorners;
     _controlContainer;
     _controls;
+    camera;
+    length;
+    width;
+    height;
+    x; y; z;
+    title;
+    serviceUrl;
+    basemaps;
 
-    constructor(x, y, z, size, center, camera, scene, container, serviceUrl) {
+    constructor(x, y, z, size, center, camera, scene, container) {
         // call parent constructor of OrbitControls
         super(size, center, camera, scene, container);
 
         this.camera = camera;
         this.container = container;
-        this.length = x.max - x.min;      
+        this.length = x.max - x.min;
         this.width = y.max - y.min;
         this.height = z.max - z.min;
         this.x = x;
@@ -31,10 +40,11 @@ class Map extends OrbitControls {
             this._initControlPos();
         }
 
-         // to do: initialize map title via serviceUrl:
-        this.title = "Geological 3D model of Austria";
+        // to do: initialize map title via serviceUrl:
+        this.title = "Geological 3D model of Vienna";
 
         // to do: initialize layers via serviceUrl:
+        // this.serviceUrl = serviceUrl;
         this._layers = {};
         this.initControls();
 
@@ -47,8 +57,33 @@ class Map extends OrbitControls {
         };
     }
 
+    static async build(x, y, z, size, center, camera, scene, container, serviceUrl) {
+        const modelData = await util.getMetadata(serviceUrl);
+
+        // do your async stuff here
+        // now instantiate and return a class
+        let map = new Map(x, y, z, size, center, camera, scene, container);
+        map._initDataLayers(modelData.mappedfeatures);
+        return map;
+    }
+
     get layers() {
         return this._layers;
+    }
+
+    _initDataLayers(mappedFeatures) {
+        for (let i = 0; i < mappedFeatures.length; i++) {
+            let layerData = mappedFeatures[i];
+            let dxfLayer = new TinLayer({
+                featuregeom_id: layerData.featuregeom_id,
+                q: true,
+                type: "3dface",
+                name: layerData.legend_description,
+                description: "test",
+                color: layerData.color
+            });
+            this.addLayer(dxfLayer);
+        }
     }
 
     _initControlPos() {

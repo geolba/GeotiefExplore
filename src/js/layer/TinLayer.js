@@ -60,7 +60,7 @@ class TinLayer extends Layer {
 
         let geometry = new BufferGeometry();
         // let positions = new Float32BufferAttribute(this.vertices, 3);       
-        let posArray = await (this.points(this.geomId));
+        let posArray = await (this.points(this.featuregeom_id));
         // console.log(posArray);
         let positions = new Float32BufferAttribute(posArray, 3);
         geometry.setAttribute('position', positions);
@@ -69,7 +69,7 @@ class TinLayer extends Layer {
         //var indices = this.indices = new TypeArray(this.idx);
 
         // let indexArray = this.indices = new Uint16Array(this.idx);
-        let indexArray = await (this.edges(this.geomId));
+        let indexArray = await (this.edges(this.featuregeom_id));
         let indices = new Uint16BufferAttribute(indexArray, 1);//.setDynamic(true);
         geometry.setIndex(indices);
 

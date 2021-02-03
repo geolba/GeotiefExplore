@@ -4,7 +4,6 @@ import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Scene } from 'three/src/scenes/Scene';
 import { Vector3 } from 'three/src/math/Vector3';
-import { TinLayer } from './layer/TinLayer';
 import { GridLayer } from './layer/GridLayer';
 // import { BoxLayer } from './layer/BoxLayer';
 import { DemLayer } from './layer/DemLayer';
@@ -58,11 +57,15 @@ class Application {
         this.mapIcon = document.querySelector('#menu-map-icon');
 
 
-        this.createScene();
+        // this.createScene();
+        // this.addEventListeners();
+    }
+    async build() {
+        await this.createScene();
         this.addEventListeners();
     }
 
-    createScene() {
+    async createScene() {
 
         var dirNode = document.getElementsByTagName("body")[0];
         if (browser.touch == true) {
@@ -157,7 +160,9 @@ class Application {
         // this.camera.lookAt(new Vector3(0, 0, 0));
 
         // create map 
-        let map = this.map = new Map(x, y, z, size, center, this.camera, this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta?modelid=11');
+        // let map = this.map = new Map(x, y, z, size, center, this.camera, this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta?modelid=20');
+
+        let map = this.map = await Map.build(x, y, z, size, center, this.camera, this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta?modelid=20');
         this.mapTitle = document.querySelector('#map-title');
         this.mapTitle.innerHTML += map.title;
         // this.map.minDistance =  size*0.75;
@@ -206,48 +211,6 @@ class Application {
         });
         this.map.addLayer(demLayer);
         this.map.currentBasemap = demLayer;
-
-        let dxf170Layer = new TinLayer({
-            geomId: 170, q: true, type: "3dface", name: "DEM_EGDI", description: "test", color: "CE5364", "baseExtent": baseExtent
-        });
-        this.map.addLayer(dxf170Layer);
-        // this.map.currentBasemap = dxf170Layer;
-
-
-        let dxf171Layer = new TinLayer({
-            geomId: 171, q: true, type: "3dface", name: "Aderklaa_Untermiozän", description: "test", color: "4C9875"
-        });
-        this.map.addLayer(dxf171Layer);
-
-        let dxf172Layer = new TinLayer({
-            geomId: 172, q: true, type: "3dface", name: "Badenium", description: "test", color: "B288A4"
-        });
-        this.map.addLayer(dxf172Layer);
-
-        let dxf173Layer = new TinLayer({
-            geomId: 173, q: true, type: "3dface", name: "Frankenfels Lunz Decke", description: "test", color: "4C9875"
-        });
-        this.map.addLayer(dxf173Layer);
-
-        let dxf174Layer = new TinLayer({
-            geomId: 174, q: true, type: "3dface", name: "Göller Decke", description: "test", color: "B288A4"
-        });
-        this.map.addLayer(dxf174Layer);
-
-        let dxf175Layer = new TinLayer({
-            geomId: 175, q: true, type: "3dface", name: "Obere Gosau", description: "test", color: "4C9875"
-        });
-        this.map.addLayer(dxf175Layer);
-
-        let dxf176Layer = new TinLayer({
-            geomId: 176, q: true, type: "3dface", name: "Schneeberg Decke", description: "test", color: "B288A4"
-        });
-        this.map.addLayer(dxf176Layer);
-
-        let dxf177Layer = new TinLayer({
-            geomId: 177, q: true, type: "3dface", name: "Untere Gosau", description: "test", color: "FED012"
-        });
-        this.map.addLayer(dxf177Layer);
 
         this.gridlayer = new GridLayer({  center: center,  name: "coordinate grid", appWidth: this.width, appHeight: this.height });
         this.map.addLayer(this.gridlayer);
@@ -484,4 +447,5 @@ class Application {
 }
 
 let container = document.getElementById("webgl");
-new Application(container);
+let app = new Application(container);
+app.build();

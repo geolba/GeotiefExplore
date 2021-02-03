@@ -307,7 +307,7 @@ export class GridLayer extends Layer {
 
         //neu
         // app.labels = app.controls.gridlayer.labels;
-        let scaleFactor = this.scale;
+        // let scaleFactor = this.scale;       
 
         // make a list of [label index, distance to camera]
         let idx_dist = [];
@@ -345,9 +345,9 @@ export class GridLayer extends Layer {
 
                 let proj = this.toScreenPosition(label.obj, label.pt, camera);
                 // set label position
-                labelDiv.style.display = "block";
-                labelDiv.style.left = proj.x + 'px';
-                labelDiv.style.top = proj.y + 'px';
+                labelDiv.style.display = "block";                
+                labelDiv.style.left = (proj.x - (labelDiv.offsetWidth / 2)) + "px";
+                labelDiv.style.top = (proj.y - (labelDiv.offsetHeight / 2)) + "px";
                 labelDiv.style.zIndex = i + 1;
                 let minFontSize = 10;
                 // set font size
@@ -368,9 +368,13 @@ export class GridLayer extends Layer {
         let vector = new Vector3();
         // calculate label position
         vector.copy(pt);
+        let scaleFactor = parseFloat(this.labelConnectorGroup.scale.z);
+        if (scaleFactor > 1) {
+            vector.z = vector.z * scaleFactor;
+        }
 
         // TODO: need to update this when resize window   
-        let container = document.getElementById("webgl");
+        let container = this._map.container; //document.getElementById("webgl");
         let widthHalf = 0.5 * container.clientWidth;
         let heightHalf = 0.5 * container.clientHeight;
 
@@ -380,7 +384,7 @@ export class GridLayer extends Layer {
 
         vector.x = (vector.x * widthHalf) + widthHalf;
         vector.y = - (vector.y * heightHalf) + heightHalf;
-
+       
         return {
             x: vector.x,
             y: vector.y

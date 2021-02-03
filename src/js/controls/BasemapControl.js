@@ -43,9 +43,9 @@ export class BasemapControl extends Control {
     // }
 
     onAdd(map) {
-        this._initLayout(map);
+        let container = this._initLayout(map);
         this._map = map;
-        return this._container;
+        return container;
     }
 
     _initLayout() {
@@ -73,6 +73,7 @@ export class BasemapControl extends Control {
             this.dialog.show();
         }, this);
 
+        return container;
     }
 
 
@@ -103,8 +104,7 @@ export class BasemapControl extends Control {
                 domEvent.on(btnLink, 'click', function (e) {
                     e.preventDefault();
                     let name = e.currentTarget.getAttribute('data-name');
-                    this._setBasemap(name);
-                    // this.hide();                   
+                    this._setBasemap(name);                                  
                     return false;
                 }, this);
             }
@@ -119,6 +119,7 @@ export class BasemapControl extends Control {
                 if (this._map.currentBasemap) {
                     //this.map.removeLayer(this.map.currentBasemap);
                     this._map.currentBasemap.changeImage(i);
+                    this.dialog.hide();
                 }
                 //var curentBaseMap = this.map.currentBasemap = new esri.layers.ArcGISTiledMapServiceLayer(getBasemapUrl(basemaps.services[i]), {
                 //    id: 'basemap'
