@@ -8,6 +8,9 @@ import * as domEvent from '../core/domEvent';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { Scene } from 'three/src/scenes/Scene';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
+import { BoxGeometry } from 'three/src/geometries/BoxGeometry';
+import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial';
+import { Mesh } from 'three/src/objects/Mesh';
 
 import './NorthArrow.css';
 
@@ -50,55 +53,119 @@ export class NortArrow extends Control {
         container.appendChild(renderer.domElement);
 
         this._scene = new Scene();
-        this._camera = new PerspectiveCamera(60, 1, 0.1, 1000);
-        this._camera.position.copy(map.camera.position);
-        this._camera.up = map.camera.up;
-        let center = this._center = new Vector3(0, 0, 0);
-        this._camera.lookAt(center);
+        // this._camera = new PerspectiveCamera(60, 1, 0.1, 1000);
 
-        // this._camera = map.camera.clone();
+        this._camera = new PerspectiveCamera(30, this.options.width / this.options.height, 0.1, 10000);
+        // this._camera.position.copy(map.camera.position);
+        // this._camera.up = map.camera.up;       
+        this._camera.lookAt(map.center);
+      
+       
+        
+        const camDirection = new Vector3(-0.5, -Math.SQRT1_2, 0.5);
+        // const camDirection = new Vector3(0, 0, 1);
+        const camOffset = camDirection.multiplyScalar(map.size * 2);
+        this._camera.position.copy(map.center);        
+        this._camera.position.add(camOffset);       
+       
+        this._camera.far = map.size * 25;
+        this._camera.near =  map.size * 0.1;
+        // this._camera.far = 1000 * 25; 
+        // this._camera.near = 10;
+        this._camera.lookAt(map.center);
+        this._camera.updateProjectionMatrix();
+
+
+         var A = this._map.center;
+        var B = this._map.camera.position
+        var C = new Vector3();
+        this.oldLength = A.distanceTo(B);
+       
         this._createArrow(this._scene);
-        this._buildLabels();
+        // this._buildLabels();
+
+
+
+        this.geometry = new BoxGeometry(10000, 10000, 10000);
+        this.material = new MeshBasicMaterial({
+            color: 800080
+        });
+        this.materials = [];
+        this.materials.push(this.material);
+        this.mesh = new Mesh(this.geometry, this.material);
+        // this.mesh.position.x = 4282010;
+        // this.mesh.position.y = 2302070;
+        // this.mesh.position.z =  -13616.3;
+        this.mesh.position.set(map.center.x, map.center.y, map.center.z);
+        this._scene.add(this.mesh);
+
         return container;
     }
 
     animate() {
 
-        this._camera.position.copy(this._mainMap.camera.position);
-        this._camera.position.setLength(18);
-        // this._camera.lookAt(this.options.center);
-        // this._camera.lookAt(this._mainMap.target);
-        this._camera.lookAt(this._scene.position);
+        // this._camera.position.copy(this._map.camera.position);   
+        // this._camera.up = this._map.camera.up;  
+        // // // this._camera.lookAt(this._scene.position);
+        // this._camera.lookAt(this._map.center);
+
+
+
+        // var A = this._map.center;
+        // var B = this._map.camera.position
+        // var C = new Vector3();
+        // var oldLength = A.distanceTo(B);
+        // var newLength = 1000;// oldLength + 100;       
+        // if(oldLength > 0)
+        // {
+        //   C.x = A.x + (B.x - A.x) * newLength / oldLength;
+        //   C.y = A.y + (B.y - A.y) * newLength / oldLength;
+        // }
+
+       
+
+        this._camera.position.copy(this._map.camera.position);
+        // this._camera.position.normalize().multiplyScalar(100);
+        // this._camera.position.setLength(this.oldLength);
+        this._camera.up = this._map.camera.up; 
+        this._camera.lookAt(this._map.center);
+        // this._camera.lookAt(this._scene.position);
+            
+        // this._camera.near =10;
+        // this._camera.far = 1000 * 25;
+        // this._camera.lookAt(this._map.center);
+        // this._camera.updateProjectionMatrix();
 
         this.renderer.render(this._scene, this._camera);
-        this._updateInsetLabelPositions();
+        // this._updateInsetLabelPositions();
     }
 
     _createArrow(app_scene) {
-        let from = new Vector3(0, 0, 0);
-        let headLength = 1;//this.options.headLength;//1;
-        let headWidth = this.options.headWidth;//1;
+        let from = this._map.center;//new Vector3(0, 0, 0);
+        let headLength = this.options.headLength;//1;
+        let headWidth = 1;//this.options.headWidth;//1;
 
-        // let xTo = new Vector3(1, 0, 0);
-        let xTo = new Vector3(from.x + 1, from.y, from.z);
-        let xDirection = xTo.clone().sub(from);
-        this.objectGroup.add(new ArrowHelper(xDirection, from, 6, 0xf00000, headLength, headWidth)); // Red = x
+        let xTo = new Vector3(1, 0, 0);
+        // let xTo = new Vector3(from.x + 1, from.y, from.z);
+        // let xDirection = xTo.clone().sub(from);
+        this.objectGroup.add(new ArrowHelper(xTo, from, this._map.size* 0.5, 0xf00000, headLength, headWidth)); // Red = x
 
-        // let yTo = new Vector3(0, 1, 0);
-        let yTo = new Vector3(from.x, from.y + 1, from.z);
-        let yDirection = yTo.clone().sub(from);
-        this.objectGroup.add(new ArrowHelper(yDirection, from, 6, 0x7cfc00, headLength, headWidth)); // Green = y
+        let yTo = new Vector3(0, 1, 0);
+        // let yTo = new Vector3(from.x, from.y + 1, from.z);
+        // let yDirection = yTo.clone().sub(from);
+        this.objectGroup.add(new ArrowHelper(yTo, from, this._map.size * 0.5, 0x7cfc00, headLength, headWidth)); // Green = y
 
-        //let zTo = new Vector3(0, 0, 1);//blue z
-        let zTo = new Vector3(from.x, from.y, from.z + 1);
-        let zDirection = zTo.clone().sub(from);
-        this.objectGroup.add(new ArrowHelper(zDirection, from, 6, 0x00bfff, headLength, headWidth)); //8 is the length,  Blue = z; 20 and 10 are head length and width
+        let zTo = new Vector3(0, 0, 1);//blue z
+        // let zTo = new Vector3(from.x, from.y, from.z + 1);
+        // let zDirection = zTo.clone().sub(from);
+        this.objectGroup.add(new ArrowHelper(zTo, from,  this._map.size * 0.5, 0x00bfff, headLength, headWidth)); //8 is the length,  Blue = z; 20 and 10 are head length and width
 
         // let opt = { r: 200, c: 0x38eeff, o: 0.8 };
         // this._queryMarker = new Mesh(new SphereGeometry(opt.r),
         //     new MeshLambertMaterial({ color: opt.c, opacity: opt.o, transparent: false }));
         // this._queryMarker.visible = true;
         // this._queryMarker.position.set(0, 0, -1);
+        // this.objectGroup.position.set(this._map.center.x, this._map.center.y, this._map.center.z);
 
         if (app_scene) {
             app_scene.add(this.objectGroup);

@@ -25,6 +25,7 @@ class Map extends OrbitControls {
         // call parent constructor of OrbitControls
         super(size, center, camera, scene, container);
 
+        this.size = size;
         this.camera = camera;
         this.container = container;
         this.length = x.max - x.min;
