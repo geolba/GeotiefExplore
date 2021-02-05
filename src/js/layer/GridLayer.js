@@ -56,16 +56,11 @@ export class GridLayer extends Layer {
     onAdd(map) {
         let divisions = 5;
 
-        let gridXZ = this.build(map.length, divisions, map.y.max, map.width);
+        this.buildX(map.length, divisions, map.y.max, map.width);
         // gridXZ.position.set(this.center.x, this.center.y, this.center.z);
 
-        // size = map.width / 10;
-        // let gridYZ = this.build(0, size, map.length / 2, map.width);
-        // gridYZ.rotation.z = Math.PI / 2;
-        // gridYZ.position.set(this.center.x, this.center.y, this.center.z);
-
-        let gridBottomZ = this.gridBottomZ = -(map.width / 2);
-        this.buildY(map.width, divisions, gridBottomZ, map.width);
+        let gridBottomZ = this.gridBottomZ = this._map.z.min; //-(map.width / 2);
+        this.buildY(map.width, divisions, gridBottomZ);
 
         this.buildZ(map.height, divisions, map.y.max);
 
@@ -105,7 +100,7 @@ export class GridLayer extends Layer {
     }
 
     buildY(size, divisions, constant) {
-        let step =  this._round(size / divisions, 4);
+        let step = this._round(size / divisions, 4);
         let vertices = [];
 
         for (let k = this._map.y.min; k <= this._map.y.max; k = k + step) {
@@ -127,7 +122,7 @@ export class GridLayer extends Layer {
         return lineSegments;
     }
 
-    build(size, divisions, constant_position, height) {
+    buildX(size, divisions, constant_position, height) {
         let step = size / divisions;
         let vertices = [];
 
@@ -137,7 +132,7 @@ export class GridLayer extends Layer {
 
         // for (let k = - halfSize; k <= halfSize; k = k + step) {
         for (let k = this._map.x.min; k <= this._map.x.max; k = k + step) {
-            vertices.push(k, constant_position, height / 2, k, constant_position, -height / 2);//senkrecht
+            vertices.push(k, constant_position, this._map.z.max, k, constant_position, this._map.z.min);//senkrecht
             // vertices.push(-halfSize, constant_position, k, halfSize, constant_position, k);//waagrecht 
 
         }
@@ -180,16 +175,16 @@ export class GridLayer extends Layer {
 
         // for (let k = - halfSize; k <= halfSize; k = k + step) {
         for (let k = this._map.x.min; k <= this._map.x.max; k = k + step) {
-            let xCoordinate = (k % 1 != 0) ? this._round(k, 2) : k;
-            let info = { a: xCoordinate, size: step, axis: "x", color: 0xff0000, cl: "red-label", h: 0.6, centroid: [[k, this._map.y.max, this._map.width / 2]] };
+            let xCoordinate = (k % 1 != 0) ? Math.round(k) : k;
+            let info = { a: xCoordinate + ' m', size: step, axis: "x", color: 0xff0000, cl: "red-label", h: 0.6, centroid: [[k, this._map.y.max, this._map.z.max]] };
             labels.push(info);
         }
 
         let ySize = this._map.width;
-        let yStep =  this._round(ySize / divisions, 4);
+        let yStep = this._round(ySize / divisions, 4);
         for (let k = this._map.y.min; k <= this._map.y.max; k = k + yStep) {
-            let yCoordinate = (k % 1 != 0) ? this._round(k, 2) : k;
-            let info = { a: yCoordinate, size: yStep, axis: "y", color: 0x3ad29f, cl: "green-label", h: 0.6, centroid: [[this._map.x.min, k, this.gridBottomZ]] };
+            let yCoordinate = (k % 1 != 0) ? Math.round(k) : k;
+            let info = { a: yCoordinate + ' m', size: yStep, axis: "y", color: 0x3ad29f, cl: "green-label", h: 0.6, centroid: [[this._map.x.min, k, this.gridBottomZ]] };
             labels.push(info);
         }
 
@@ -197,12 +192,12 @@ export class GridLayer extends Layer {
         let zStep = zSize / divisions;
         for (let k = this._map.z.min; k <= this._map.z.max + 1; k = k + zStep) {
             // vertices.push(this._map.x.min, constant, k, this._map.x.max, constant, k);
-            let zCoordinate = (k % 1 != 0) ? this._round(k, 2) : k;
-            let info = { a: zCoordinate, size: yStep, axis: "z", color: 0x6b716f, cl: "grey-label", h: 0.6, centroid: [[this._map.x.min, this._map.y.max, k]] };
+            let zCoordinate = (k % 1 != 0) ? Math.round(k) : k;
+            let info = { a: zCoordinate + ' m', size: yStep, axis: "z", color: 0x6b716f, cl: "grey-label", h: 0.6, centroid: [[this._map.x.min, this._map.y.max, k]] };
             labels.push(info);
         }
 
-       
+
         var getCentroidFunc = function (f) { return f.centroid; };
 
         // Layer must belong to a project
@@ -345,7 +340,7 @@ export class GridLayer extends Layer {
 
                 let proj = this.toScreenPosition(label.obj, label.pt, camera);
                 // set label position
-                labelDiv.style.display = "block";                
+                labelDiv.style.display = "block";
                 labelDiv.style.left = (proj.x - (labelDiv.offsetWidth / 2)) + "px";
                 labelDiv.style.top = (proj.y - (labelDiv.offsetHeight / 2)) + "px";
                 labelDiv.style.zIndex = i + 1;
@@ -384,7 +379,7 @@ export class GridLayer extends Layer {
 
         vector.x = (vector.x * widthHalf) + widthHalf;
         vector.y = - (vector.y * heightHalf) + heightHalf;
-       
+
         return {
             x: vector.x,
             y: vector.y
