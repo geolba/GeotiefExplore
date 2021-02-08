@@ -3,9 +3,10 @@
     bottom: 0;
     left: 0;
     border: none;
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     z-index: 9999999;
+    margin-bottom: 0;
 }
 
 /* label */
@@ -40,8 +41,8 @@
     user-select: none;
 }
 
-.blue-label {  
-    color: #00bfff;
+.gray-label {  
+    color: #6b716f;
     padding: 2px;
     text-shadow: -1px -1px #FFF, 0 -1px #FFF, 1px -1px #FFF, -1px 0 #FFF, 1px 0 #FFF, -1px 1px #FFF, 0 1px #FFF, 1px 1px #FFF;
     position: absolute;

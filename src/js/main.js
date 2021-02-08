@@ -10,7 +10,7 @@ import { DemLayer } from './layer/DemLayer';
 import { Map } from './core/Map';
 import * as domEvent from './core/domEvent';
 import { Coordinates } from './controls/Coordinates';
-// import { NortArrow } from './controls/NorthArrow';
+import { NorthArrow } from './controls/NorthArrow';
 import { LayerControl } from './controls/LayerControl';
 import { BasemapControl } from './controls/BasemapControl';
 import { SliderControl } from './controls/SliderControl';
@@ -183,7 +183,7 @@ class Application {
             //     this.animate();
             // }, this);
         }
-        // this.northArrow = new NortArrow({ headLength: 1, headWidth: 1 }).addTo(this.map);
+        this.northArrow = new NorthArrow({ headLength: 1, headWidth: 1 }).addTo(this.map);
 
         let demLayer = new DemLayer({
             q: 0, shading: true, type: 'dem', name: 'DEM Layer', color: 16382457, "baseExtent": baseExtent,
@@ -313,7 +313,7 @@ class Application {
 
     animate() {
         this.renderer.render(this.scene, this.camera);
-        // this.northArrow.animate();
+        this.northArrow.animate();
         this.gridlayer.animate();
     }
 
