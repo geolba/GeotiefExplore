@@ -92,14 +92,36 @@ export class MobileDialog {
 
         // this.domNode.getElementsByClassName("popuptitle")[0].innerHTML = title || this.title;
 
-        // if (!isHelp) {
-        //     //document.getElementById("pageinfo").style.display = "none";
-        //     this.pageinfo.style.display = "none";
-        // }
-        // else {
-        //     //document.getElementById("pageinfo").style.display = "block";
-        //     this.pageinfo.style.display = "block";
-        // }
+        if (!isHelp) {
+            //document.getElementById("pageinfo").style.display = "none";
+            this.pageinfo.style.display = "none";
+        }
+        else {            
+            this.pageinfo.innerHTML = '<h1>About</h1>' +
+            '<div id="about">' +
+                                    "This project is using the following libraries, fonts & styles::" +
+                "<ul>" +
+
+                    '<li>three.js + OrbitControls.js <a href="https://threejs.org/" target="_blank">threejs.org</a>' +
+                    ' <a href="https://github.com/mrdoob/three.js/blob/dev/LICENSE" target="_blank" class="license">MIT LICENSE</a></li>' +
+
+                  
+
+                '<li id="lib_proj4js">Proj4js <a href="https://github.com/proj4js/proj4js" target="_blank">github.com/proj4js/proj4js</a>' +
+                ' <a href="https://github.com/proj4js/proj4js/blob/master/LICENSE.md" target="_blank" class="license">Proj4js -- Javascript reprojection library</a></li>' +
+
+                
+
+                 '<li id="lib_normalize">normalize.css <a href="https://github.com/necolas/normalize.css" target="_blank">github.com/necolas/normalize.css</a>' +
+                ' <a href="https://github.com/necolas/normalize.css/blob/master/LICENSE.md" target="_blank" class="license">MIT License</a></li>' +
+
+                   '<li id="lib_fontawesome">Font Awesome Free <a href="https://github.com/FortAwesome/Font-Awesome" target="_blank">github.com/FortAwesome/Font-Awesome</a>' +
+                ' <a href="https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt" target="_blank" class="license">Font: SIL OFL 1.1, CSS: MIT License, Icons: CC BY 4.0 License</a></li>' +
+
+                '</ul>' +
+            '</div>';
+            this.pageinfo.style.display = "block";
+        }
 
         this.dialogDiv.classList.add('show');
         this.dialogDiv.classList.remove('hide');
