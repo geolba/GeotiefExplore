@@ -20,12 +20,14 @@ class Map extends OrbitControls {
     title;
     serviceUrl;
     basemaps;
+    title;
 
-    constructor(x, y, z, size, center, camera, scene, container) {
+    constructor(x, y, z, center, camera, scene, container) {
+        let size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);
         // call parent constructor of OrbitControls
         super(size, center, camera, scene, container);
 
-        this.size = size;
+        this.size = size;        
         this.camera = camera;
         this.container = container;
         this.length = x.max - x.min;
@@ -42,7 +44,7 @@ class Map extends OrbitControls {
         }
 
         // to do: initialize map title via serviceUrl:
-        this.title = "Geological 3D model of Vienna";
+        // this.title = "Geological 3D model of Vienna";
 
         // to do: initialize layers via serviceUrl:
         // this.serviceUrl = serviceUrl;
@@ -58,13 +60,14 @@ class Map extends OrbitControls {
         };
     }
 
-    static async build(x, y, z, size, center, camera, scene, container, serviceUrl) {
+    static async build(x, y, z, center, camera, scene, container, serviceUrl) {
         const modelData = await util.getMetadata(serviceUrl);
 
         // do your async stuff here
         // now instantiate and return a class
-        let map = new Map(x, y, z, size, center, camera, scene, container);
+        let map = new Map(x, y, z, center, camera, scene, container);
         map._initDataLayers(modelData.mappedfeatures);
+        map.title = modelData.model.model_name;
         return map;
     }
 
@@ -79,9 +82,9 @@ class Map extends OrbitControls {
                 featuregeom_id: layerData.featuregeom_id,
                 q: true,
                 type: "3dface",
-                name: layerData.legend_description,
+                name: layerData.preview.legend_text, //layerData.legend_description,
                 description: "test",
-                color: layerData.color
+                color: layerData.preview.legend_color //layerData.color
             });
             this.addLayer(dxfLayer);
         }

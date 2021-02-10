@@ -64,13 +64,13 @@ export class BasemapControl extends Control {
         
 
         // let dialog = this.dialog = new MobileDialog();
-        this.dialog = new MobileDialog("Baselayer", { klass: "fm_basemap_list", parentDiv: 'basemap-control-parent' }).addTo(this._map);
+        this.dialog = new MobileDialog("Baselayer", this._map.container, { klass: "fm_basemap_list", parentDiv: 'basemap-control-parent' });//.addTo(this._map);
         let basemaps = this.basemaps =  this._map.basemaps;
-        this._initBasemapHtml(basemaps.services);
+        let html = this._initBasemapHtml(basemaps.services);
 
         // domEvent.on(link, 'click', this.expand, this);
         domEvent.on(link, 'click', () => {
-            this.dialog.show();
+            this.dialog.show(html);
         }, this);
 
         return container;
@@ -80,6 +80,7 @@ export class BasemapControl extends Control {
 
     _initBasemapHtml(basemapServices) {
 
+        let buttonDiv = dom.createDom('div');
         for (let i = 0; i < basemapServices.length; i++) {
             let basemap = basemapServices[i];
             if (basemap.type === 'MapServer') {
@@ -89,7 +90,7 @@ export class BasemapControl extends Control {
                 //+ "</a>"; 
                 var btnLink = dom.createDom('a', {
                     'class': 'gba_basemap_option'
-                }, this.dialog.popupcontent);
+                }, buttonDiv);
                 btnLink.dataset.name = basemap.name;
 
                 let image = dom.createDom('img', {
@@ -109,6 +110,7 @@ export class BasemapControl extends Control {
                 }, this);
             }
         }
+        return buttonDiv;
 
     }
 

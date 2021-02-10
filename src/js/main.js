@@ -20,8 +20,9 @@ import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
 import * as util from './core/utilities';
 import * as browser from './core/browser';
 import * as domUtil from './core/domUtil';
+import { MobileDialog } from "./controls/MobileDialog";
 
-import '../css/page.css'; /* style loader will import it */
+import '../css/page.scss'; /* style loader will import it */
 
 class Application {
 
@@ -54,7 +55,8 @@ class Application {
         this.navigation = document.getElementsByClassName('navigation')[0];
         // this.addEventListeners();
 
-        this.mapIcon = document.querySelector('#menu-map-icon');
+        this.dialog = new MobileDialog("Help", container, { klass: "fm_about" });
+        this.aboutIcon = document.querySelector('#menu-about-icon');
 
 
         // this.createScene();
@@ -68,7 +70,7 @@ class Application {
     async createScene() {
 
         var dirNode = document.getElementsByTagName("body")[0];
-        if (browser.touch == true) {
+        if (browser.touch == true && browser.mobile == true) {
             //dirNode.setAttribute("dir", "ltr");
             domUtil.addClass(dirNode, "touch");
         } else {
@@ -162,7 +164,7 @@ class Application {
         // create map 
         // let map = this.map = new Map(x, y, z, size, center, this.camera, this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta?modelid=20');
 
-        let map = this.map = await Map.build(x, y, z, size, center, this.camera, this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta?modelid=20');
+        let map = this.map = await Map.build(x, y, z, center, this.camera, this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta_all?modelid=20');
         this.mapTitle = document.querySelector('#map-title');
         this.mapTitle.innerHTML += map.title;
         // this.map.minDistance =  size*0.75;
@@ -332,6 +334,11 @@ class Application {
         // inputNodes.forEach(element => domEvent.on(element, 'change', this.createMeme, this));
 
         domEvent.on(this.downloadButton, 'click', this.downloadMapImage, this);
+
+        domEvent.on(this.aboutIcon, 'click', function (e) {
+            e.preventDefault();
+            this.dialog.show();
+        }, this);
 
         domEvent.on(this.menuIcon, 'click', function (e) {
             e.preventDefault();

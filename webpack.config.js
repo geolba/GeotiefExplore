@@ -4,7 +4,6 @@ const webpack = require('webpack'); //e.g. for iusing DefinePlugin
 // const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-// https://www.sitepoint.com/es6-babel-webpack/
 
 /**
  * flag Used to check if the environment is production or not
@@ -34,7 +33,7 @@ module.exports = {
                 loader: 'url-loader',
                 options: {
                     limit: 10000,
-                    name: 'fonts/[name].[ext]'
+                    name: 'webfonts/[name].[ext]'
                 }
             },
             // {
@@ -62,7 +61,7 @@ module.exports = {
             },
 
             {
-                test: /\.(less|css)$/,
+                test: /\.(scss|css)$/,
                 use: [
                     {
                         loader: (isProduction === true) ? MiniCssExtractPlugin.loader : 'style-loader',
@@ -72,14 +71,17 @@ module.exports = {
                         //     hmr: process.env.NODE_ENV === 'development',
                         // },
                     },
+                     // Translates CSS into CommonJS
                     {
                         loader: "css-loader",
                         options: {
                             sourceMap: true
                         }
                     },
+                    'resolve-url-loader',
+                      // Compiles Sass to CSS
                     {
-                        loader: "less-loader",
+                        loader: "sass-loader",
                         options: {
                             sourceMap: true
                         }
@@ -103,13 +105,13 @@ module.exports = {
                 // sourceMap: true, // Must be set to true if using source-maps in production
                 extractComments: true,
                 terserOptions: {
-                    
+
                     compress: {
                         directives: false,
-                    //     drop_console: true,
-                    //     drop_debugger: true,
-                    //     keep_classnames: false,
-                    //     keep_fnames: false,
+                        //     drop_console: true,
+                        //     drop_debugger: true,
+                        //     keep_classnames: false,
+                        //     keep_fnames: false,
                     },
                     mangle: true, // Note `mangle.properties` is `false` by default.
                     keep_classnames: false,
@@ -120,6 +122,7 @@ module.exports = {
     },
 
     plugins: [
+
        
         new webpack.DefinePlugin({ // Remove this plugin if you don't plan to define any global constants
             ENVIRONMENT: JSON.stringify(process.env.NODE_ENV),
@@ -140,6 +143,7 @@ module.exports = {
         //     paths: glob.sync(__dirname + '/*.html'),
         //     minimize: true,
         // }),
+
         // new webpack.HotModuleReplacementPlugin(),
     ],
 
