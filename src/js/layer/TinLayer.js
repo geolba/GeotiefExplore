@@ -6,6 +6,8 @@ import { DoubleSide } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Layer } from './Layer';
 import { BitStream } from '../lib/bitstream';
+import { Plane } from 'three/src/math/Plane';
+import { Vector3 } from 'three/src/math/Vector3';
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
@@ -78,13 +80,20 @@ class TinLayer extends Layer {
         geometry.computeVertexNormals();// computed vertex normals are orthogonal to the face f
         geometry.computeBoundingBox();
 
+        this.xLocalPlane = new Plane(new Vector3(-1, 0, 0), this._map.x.max);
+        //this.addObject(this.xLocalPlane, false);
+        this.yLocalPlane = new Plane(new Vector3(0, 1, 0), this._map.y.max);
+
         let color = parseInt(this.color, 16);
         this.material = new MeshStandardMaterial({
             color: color,
             metalness: 0.1,
             roughness: 0.75,
             flatShading: true,
-            side: DoubleSide
+            side: DoubleSide,
+            clippingPlanes: [this.xLocalPlane, this.yLocalPlane],
+            clipIntersection: false,
+            clipShadows: true,
         });
         this.materialsArray.push(this.material);
         let mesh = this.mainMesh = new Mesh(geometry, this.material);
@@ -94,6 +103,11 @@ class TinLayer extends Layer {
         if (app_scene) {
             app_scene.add(mesh);
         }
+    }
+
+    filterMaterial(filterX, filterY) {
+        this.xLocalPlane.constant = filterX;
+        this.yLocalPlane.constant = filterY;
     }
 
 

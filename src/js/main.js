@@ -14,6 +14,7 @@ import { NorthArrow } from './controls/NorthArrow';
 import { LayerControl } from './controls/LayerControl';
 import { BasemapControl } from './controls/BasemapControl';
 import { SliderControl } from './controls/SliderControl';
+// import { SlicerControl } from './controls/SlicerControl';
 import { Mesh } from 'three/src/objects/Mesh';
 import { SphereGeometry } from 'three/src/geometries/SphereGeometry';
 import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
@@ -88,22 +89,17 @@ class Application {
         // let bgcolor = 0xfdfdfd;
         this.renderer = new WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
-        // this.renderer.setSize(window.innerWidth, window.innerHeight);
-        // document.body.appendChild(this.renderer.domElement);
         this.renderer.setSize(this.width, this.height);
-        //this.renderer.setClearColor(bgcolor, 1); // second param is opacity, 0 => transparent  
-        this.renderer.setClearColor(0x000000, 0.0);
+        this.renderer.setClearColor(0x000000, 0.0); // second param is opacity, 0 => transparent 
 
+        // enable clipping
         // let Empty = Object.freeze([]);
         // this.renderer.clippingPlanes = Empty; // GUI sets it to globalPlanes
-        // this.renderer.localClippingEnabled = true;
+        this.renderer.localClippingEnabled = true;
         this.container.appendChild(this.renderer.domElement);
 
         /* Scene: that will hold all our elements such as objects, cameras and lights. */
         this.scene = new Scene();
-        //app.scene.add(new THREE.AmbientLight(0xeeeeee));
-        // const ambient = new AmbientLight( 0xffffff, 0.5 );
-        // this.scene.add(ambient);
         this._buildDefaultLights(this.scene);
         //app.scene.autoUpdate = false;
         //// show axes in the screen
@@ -128,15 +124,15 @@ class Application {
         // let y = { min: 2182271.6538, max: 2504028.3462 , avg: 2302070 };
         // let z = { min: -60066, max: 3574.94, avg: -13616.3 };
 
-        let x = { min: 4415940, max: 4508490, avg: 4463200 };  
+        let x = { min: 4415940, max: 4508490, avg: 4463200 };
         // let y = { min: 2351480, max: 2475820 , avg: 2412610 };
-        let y = { min: 2351229.9140, max: 2476070.0860 , avg: 2412610 };
+        let y = { min: 2351229.9140, max: 2476070.0860, avg: 2412610 };
         let z = { min: -8798.15, max: 1401.92, avg: -155.17 };
 
         const center = new Vector3((x.min + x.max) / 2, (y.min + y.max) / 2, 0);
         // const center = new Vector3(x.avg, y.avg, z.avg);
-        const size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);        
-        let baseExtent= {
+        const size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);
+        let baseExtent = {
             x: x,
             y: y
         };
@@ -144,8 +140,8 @@ class Application {
         const camDirection = new Vector3(-0.5, -Math.SQRT1_2, 0.5);
         // const camDirection = new Vector3(0, 0, 1);
         const camOffset = camDirection.multiplyScalar(size * 2);
-        this.camera.position.copy(center);        
-        this.camera.position.add(camOffset);       
+        this.camera.position.copy(center);
+        this.camera.position.add(camOffset);
         this.camera.near = size * 0.1;
         this.camera.far = size * 25;
         this.camera.updateProjectionMatrix();
@@ -167,8 +163,6 @@ class Application {
         let map = this.map = await Map.build(x, y, z, center, this.camera, this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta_all?modelid=20');
         this.mapTitle = document.querySelector('#map-title');
         this.mapTitle.innerHTML += map.title;
-        // this.map.minDistance =  size*0.75;
-        // this.map.maxDistance = size*15;
 
         // let boxLayer = new BoxLayer({ 
         //     width: 10000, height: 10000, depth: 10000, name: 'center-box', color: 800080 , center: center
@@ -193,9 +187,9 @@ class Application {
                 "i": 0,
                 "materialtypee": 0,
                 "ds": 1,
-                "bottomZ": 3000, 
+                "bottomZ": 3000,
             }]
-        });     
+        });
         demLayer.addBlock({
             "width": 173, //267,
             "plane": {
@@ -214,7 +208,7 @@ class Application {
         this.map.addLayer(demLayer);
         this.map.currentBasemap = demLayer;
 
-        this.gridlayer = new GridLayer({  center: center,  name: "coordinate grid", appWidth: this.width, appHeight: this.height });
+        this.gridlayer = new GridLayer({ center: center, name: "coordinate grid", appWidth: this.width, appHeight: this.height });
         this.map.addLayer(this.gridlayer);
 
         new LayerControl(this.map.layers, {
@@ -228,6 +222,9 @@ class Application {
 
         //slider for scaling z value
         this.slider = new SliderControl({ layers: this.map.layers }).addTo(this.map);
+
+        //slice on x and y axes:
+        // this.slicer = new SlicerControl({ parentDiv: 'slicer-control' }).addTo(this.map);
 
         // domEvent.on(window, 'resize', this.onWindowResize, this);
         // domEvent.on(window, 'keydown', this.keydown, this);

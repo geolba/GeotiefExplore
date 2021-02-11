@@ -11,7 +11,8 @@ import { DoubleSide, FlatShading, LinearFilter } from 'three/src/constants';
 import * as browser from '../core/browser';
 import { Texture } from 'three/src/textures/Texture';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
-
+import { Plane } from 'three/src/math/Plane';
+import { Vector3 } from 'three/src/math/Vector3';
 export class DemLayer extends Layer {
 
     images = [{
@@ -59,9 +60,9 @@ export class DemLayer extends Layer {
 
     async initMaterials() {
         if (this.materialParameter.length === 0) return;
-        // this.xLocalPlane = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 50);
-        // //this.addObject(this.xLocalPlane, false);
-        // this.yLocalPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 39);
+        this.xLocalPlane = new Plane(new Vector3(-1, 0, 0), this._map.x.max);
+        //this.addObject(this.xLocalPlane, false);
+        this.yLocalPlane = new Plane(new Vector3(0, 1, 0), this._map.y.max);
 
         let sum_opacity = 0;
         this.material;
@@ -96,10 +97,10 @@ export class DemLayer extends Layer {
             if (m.w) opt.wireframe = true;
             //opt.wireframe = true;
 
-            // // Clipping setup:
-            // opt.clippingPlanes = [this.xLocalPlane, this.yLocalPlane];
-            // opt.clipIntersection = false;
-            // opt.clipShadows = true;
+            // Clipping setup:
+            opt.clippingPlanes = [this.xLocalPlane, this.yLocalPlane];
+            opt.clipIntersection = false;
+            opt.clipShadows = true;
 
             let MaterialType = { MeshLambert: 0, MeshPhong: 1, LineBasic: 2, Sprite: 3, Unknown: -1 };
 
@@ -132,6 +133,12 @@ export class DemLayer extends Layer {
 
         // layer opacity is the average opacity of materials
         this.opacity = sum_opacity / this.materials.length;
+    }
+
+
+    filterMaterial(filterX, filterY) {
+        this.xLocalPlane.constant = filterX;
+        this.yLocalPlane.constant = filterY;
     }
 
     scaleZ(z) {
@@ -188,7 +195,7 @@ export class DemLayer extends Layer {
         const textureLoader = new TextureLoader();
         return new Promise((resolve, reject) => {
             textureLoader.load(
-                texturePath, 
+                texturePath,
                 (texture) => resolve(texture),
                 undefined,
                 err => reject(err)
