@@ -22,6 +22,9 @@ import * as util from './core/utilities';
 import * as browser from './core/browser';
 import * as domUtil from './core/domUtil';
 import { MobileDialog } from "./controls/MobileDialog";
+import { Picking } from './clip/Picking';
+
+import { Selection } from './clip/Selection';
 
 import '../css/page.scss'; /* style loader will import it */
 
@@ -33,7 +36,8 @@ class Application {
         this.wireframeMode = false;
         this.canvas;
         this._canvasImageUrl;
-        this.downloadButton
+        this.downloadButton;
+        this.showCaps = true;
 
         this.objects = [];
 
@@ -90,6 +94,7 @@ class Application {
         this.renderer = new WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(this.width, this.height);
+        this.renderer.autoClear = false;
         this.renderer.setClearColor(0x000000, 0.0); // second param is opacity, 0 => transparent 
 
         // enable clipping
@@ -100,6 +105,9 @@ class Application {
 
         /* Scene: that will hold all our elements such as objects, cameras and lights. */
         this.scene = new Scene();
+        this.capsScene = new Scene();
+        this.backStencil  = new Scene();
+		this.frontStencil = new Scene();
         this._buildDefaultLights(this.scene);
         //app.scene.autoUpdate = false;
         //// show axes in the screen
@@ -159,6 +167,14 @@ class Application {
 
         // create map 
         // let map = this.map = new Map(x, y, z, size, center, this.camera, this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta?modelid=20');
+
+        this.selection = new Selection(
+            // new Vector3(-7, -14, -14),
+            // new Vector3(14, 9, 3)
+            new Vector3(x.min, y.min, z.min),
+            new Vector3(x.max, y.max, z.max)
+        );
+        new Picking(size, center, this);
 
         let map = this.map = await Map.build(x, y, z, center, this.camera, this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta_all?modelid=20');
         this.mapTitle = document.querySelector('#map-title');
@@ -225,6 +241,16 @@ class Application {
 
         //slice on x and y axes:
         // this.slicer = new SlicerControl({ parentDiv: 'slicer-control' }).addTo(this.map);
+
+        // this.selection = new Selection(
+        //     // new Vector3(-7, -14, -14),
+        //     // new Vector3(14, 9, 3)
+        //     new Vector3(x.min, y.min, z.min),
+        //     new Vector3(x.max, y.max, z.max)
+        // );        
+        this.capsScene.add(this.selection.boxMesh);
+        this.scene.add(this.selection.displayMeshes);
+        this.scene.add(this.selection.touchMeshes);
 
         // domEvent.on(window, 'resize', this.onWindowResize, this);
         // domEvent.on(window, 'keydown', this.keydown, this);
@@ -311,6 +337,28 @@ class Application {
     }
 
     animate() {
+        this.renderer.clear();
+
+        let gl = this.renderer.context;
+        // if (this.showCaps) {
+
+        //     this.renderer.state.setStencilTest(true);
+
+        //     this.renderer.state.setStencilFunc(gl.ALWAYS, 1, 0xff);
+        //     this.renderer.state.setStencilOp(gl.KEEP, gl.KEEP, gl.INCR);
+        //     // this.renderer.render(this.backStencil, this.camera);
+
+        //     this.renderer.state.setStencilFunc(gl.ALWAYS, 1, 0xff);
+        //     this.renderer.state.setStencilOp(gl.KEEP, gl.KEEP, gl.DECR);
+        //     // this.renderer.render(this.frontStencil, this.camera);
+
+        //     this.renderer.state.setStencilFunc(gl.EQUAL, 1, 0xff);
+        //     this.renderer.state.setStencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+        //     this.renderer.render(this.capsScene, this.camera);
+
+        //     this.renderer.state.setStencilTest(false);
+
+        // }
         this.renderer.render(this.scene, this.camera);
         this.northArrow.animate();
         this.gridlayer.animate();
