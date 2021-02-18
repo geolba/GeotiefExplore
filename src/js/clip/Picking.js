@@ -43,12 +43,10 @@ export class Picking {
         simulation.scene.add(this.plane);
 
         this.domElement = simulation.renderer.domElement;
-
-        if (this.touchCapable) {
-            domEvent.on(this.domElement, 'mousemove', this.mouseMove, this);
+        domEvent.on(this.domElement, 'mousemove', this.mouseMove, this);
+        if (this.touchCapable == true) {
             domEvent.on(this.domElement, 'touchstart', this.beginDrag, this);
         } else {
-            domEvent.on(this.domElement, 'mousemove', this.mouseMove, this);
             domEvent.on(this.domElement, 'mousedown', this.beginDrag, this);
         }
     }
@@ -188,20 +186,25 @@ export class Picking {
             };
 
             let endDrag = function (event) {
+                event.preventDefault();
+                event.stopPropagation();
                 this.isDraging = false;
                 this.simulation.map.enabled = true;
                 this.simulation.renderer.domElement.style.cursor = 'pointer';
-                domEvent.off(this.domElement, "mousemove", continueDrag, this);
-                domEvent.off(this.domElement, "touchmove", continueDrag, this);
 
-                domEvent.off(this.domElement, "mouseup", endDrag, this);
-                domEvent.off(this.domElement, 'mouseleave', endDrag, this);
-                domEvent.off(this.domElement, 'touchend', endDrag, this);
-                domEvent.off(this.domElement, 'touchcancel', endDrag, this);
-                domEvent.off(this.domElement, 'touchleave', endDrag, this);
+                if (this.touchCapable == true) {
+                    domEvent.off(this.domElement, 'touchmove', continueDrag, this);
+                    domEvent.off(this.domElement, 'touchend', endDrag, this);
+                    domEvent.off(this.domElement, 'touchcancel', endDrag, this);
+                    domEvent.off(this.domElement, 'touchleave', endDrag, this);
+                } else {
+                    domEvent.off(this.domElement, 'mousemove', continueDrag, this);
+                    domEvent.off(this.domElement, 'mouseup', endDrag, this);
+                    domEvent.off(this.domElement, 'mouseleave', endDrag, this);
+                }
             };
 
-            if (this.touchCapable) {
+            if (this.touchCapable == true) {
                 domEvent.on(this.domElement, 'touchmove', continueDrag, this);
                 domEvent.on(this.domElement, 'touchend', endDrag, this);
                 domEvent.on(this.domElement, 'touchcancel', endDrag, this);
