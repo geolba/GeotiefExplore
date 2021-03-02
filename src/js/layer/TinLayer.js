@@ -8,6 +8,11 @@ import { Layer } from './Layer';
 import { BitStream } from '../lib/bitstream';
 import { Plane } from 'three/src/math/Plane';
 import { Vector3 } from 'three/src/math/Vector3';
+import * as material from '../clip/material';
+import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
+import { uniforms } from "../clip/uniforms";
+import { shader } from '../clip/shader';
+import { Color } from 'three/src/math/Color';
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
@@ -85,16 +90,33 @@ class TinLayer extends Layer {
         this.yLocalPlane = new Plane(new Vector3(0, 1, 0), this._map.y.max);
 
         let color = parseInt(this.color, 16);
-        this.material = new MeshStandardMaterial({
-            color: color,
-            metalness: 0.1,
-            roughness: 0.75,
-            flatShading: true,
-            side: DoubleSide,
-            clippingPlanes: [this.xLocalPlane, this.yLocalPlane],
-            clipIntersection: false,
-            clipShadows: true,
-        });
+        // this.material = new MeshStandardMaterial({
+        //     color: color,
+        //     metalness: 0.1,
+        //     roughness: 0.75,
+        //     flatShading: true,
+        //     side: DoubleSide,
+        //     clippingPlanes: [this.xLocalPlane, this.yLocalPlane],
+        //     clipIntersection: false,
+        //     clipShadows: true,
+        // });
+        // this.materialsArray.push(this.material);
+        let uniforms = this.uniforms = {
+
+            clipping: {
+                color: { type: "c", value: new Color(color) },
+                clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
+                clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) }
+            }        
+        };
+       
+        this.material = new ShaderMaterial( {
+            uniforms:      uniforms.clipping,
+            vertexShader:   shader.vertexClipping,
+            fragmentShader: shader.fragmentClippingFront,
+            // colorWrite: false,
+            // depthWrite: false,
+        } );
         this.materialsArray.push(this.material);
         let mesh = this.mainMesh = new Mesh(geometry, this.material);
         // mesh.userData.layerId = this.index;

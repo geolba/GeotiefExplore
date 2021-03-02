@@ -11,6 +11,14 @@ let capMaterial = new ShaderMaterial({
     fragmentShader: shader.fragment
 });
 
+let frontStencilMaterial = new ShaderMaterial( {
+    uniforms:      uniforms.clipping,
+    vertexShader:   shader.vertexClipping,
+    fragmentShader: shader.fragmentClippingFront,
+    // colorWrite: false,
+    // depthWrite: false,
+} );
+
 let BoxBackFace = new MeshBasicMaterial({ color: 0xEEDDCC, transparent: true });
 let BoxWireframe = new LineBasicMaterial({ color: 0x000000, linewidth: 2 });
 // yellow select color
@@ -24,6 +32,7 @@ let Invisible = new ShaderMaterial({
 
 export {
     capMaterial,
+    frontStencilMaterial,
     BoxBackFace,
     BoxWireframe,
     BoxWireActive,
