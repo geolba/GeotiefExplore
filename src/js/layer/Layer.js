@@ -16,7 +16,7 @@ class Layer extends EventEmitter {
         return this;
     }
 
-    _layerAdd(e) {
+    async _layerAdd(e) {
         var map = e;//.target;
 
         // check in case layer gets added and then removed before the map is ready
@@ -29,7 +29,7 @@ class Layer extends EventEmitter {
         //    map.on(this.getEvents(), this);
         //}
 
-        this.onAdd(map);
+        await this.onAdd(map);
 
         //if (this.getAttribution && this._map.attributionControl) {
         //    this._map.attributionControl.addAttribution(this.getAttribution());

@@ -106,8 +106,8 @@ class Application {
         /* Scene: that will hold all our elements such as objects, cameras and lights. */
         this.scene = new Scene();
         this.capsScene = new Scene();
-        this.backStencil  = new Scene();
-		this.frontStencil = new Scene();
+        // this.backStencil = new Scene();
+        // this.frontStencil = new Scene();
         this._buildDefaultLights(this.scene);
         //app.scene.autoUpdate = false;
         //// show axes in the screen
@@ -179,17 +179,21 @@ class Application {
         let map = this.map = await Map.build(x, y, z, center, this.camera, this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta_all?modelid=20');
         this.mapTitle = document.querySelector('#map-title');
         this.mapTitle.innerHTML += map.title;
+        map.on('ready', () => {
+          this.selection.setUniforms();
+        }, this);
 
         this.selection = new Selection(
             // new Vector3(-7, -14, -14),
             // new Vector3(14, 9, 3)
             new Vector3(x.min, y.min, z.min),
             new Vector3(x.max, y.max, z.max),
-            map            
+            map
         );
-        
+
         new Picking(size, center, this);
-        
+       
+
         // let boxLayer = new BoxLayer({ 
         //     width: 10000, height: 10000, depth: 10000, name: 'center-box', color: 800080 , center: center
         // });
@@ -261,7 +265,6 @@ class Application {
         this.capsScene.add(this.selection.boxMesh);
         this.scene.add(this.selection.displayMeshes);
         this.scene.add(this.selection.touchMeshes);
-        this.selection.setUniforms();
 
         // domEvent.on(window, 'resize', this.onWindowResize, this);
         // domEvent.on(window, 'keydown', this.keydown, this);

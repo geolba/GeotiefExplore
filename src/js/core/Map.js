@@ -75,7 +75,8 @@ class Map extends OrbitControls {
         return this._layers;
     }
 
-    _initDataLayers(mappedFeatures) {
+    async _initDataLayers(mappedFeatures) {
+        const callStack = [];
         for (let i = 0; i < mappedFeatures.length; i++) {
             let layerData = mappedFeatures[i];
             let dxfLayer = new TinLayer({
@@ -86,8 +87,10 @@ class Map extends OrbitControls {
                 description: "test",
                 color: layerData.preview.legend_color //layerData.color
             });
-            this.addLayer(dxfLayer);
+            callStack.push(this.addLayer(dxfLayer))
         }
+        await Promise.all(callStack);
+        this.emit("ready");
     }
 
     _initControlPos() {
@@ -122,7 +125,7 @@ class Map extends OrbitControls {
         zoomControl.addTo(this);
     }
 
-    addLayer(layer) {
+    async addLayer(layer) {
         var id = util.stamp(layer);
         if (this._layers[id]) {
             return this;
@@ -136,7 +139,7 @@ class Map extends OrbitControls {
         //    layer.beforeAdd(this);
         //}
         //this.whenReady(layer._layerAdd, layer);
-        layer._layerAdd(this);
+        await layer._layerAdd(this);
         this.emit("change");
         return this;
     }

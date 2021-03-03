@@ -116,6 +116,10 @@ export class Picking {
     }
 
     beginDrag(event) {
+        // exit drag method, if not left mouse button was clicked
+        if (this.touchCapable == false && event.which != 1) {
+            return;
+        }
         // this.mouse.setToNormalizedDeviceCoordinates(event, window);
         let point = this._getCanvasPoint(event);
         let width = this.simulation.renderer.domElement.clientWidth;

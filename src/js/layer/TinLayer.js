@@ -111,6 +111,9 @@ class TinLayer extends Layer {
         };
        
         this.material = new ShaderMaterial( {
+            clipIntersection: true,
+            clipShadows: true,
+            flatShading: true,
             uniforms:      uniforms.clipping,
             vertexShader:   shader.vertexClipping,
             fragmentShader: shader.fragmentClippingFront,

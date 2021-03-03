@@ -124,22 +124,16 @@ export class Selection {
     setUniforms() {
         let unif = uniforms.clipping;
         unif.clippingLow.value.copy(this.limitLow);
-        unif.clippingHigh.value.copy(this.limitHigh);   
-    //    let test =  this.map.layers[20];
-    
-      
+        unif.clippingHigh.value.copy(this.limitHigh);
 
-
-    if ( this.map.layers){
-       for (const [key, layer] of   Object.entries(this.map.layers)) {
-        if (layer.uniforms) {
-            layer.uniforms.clipping.clippingLow.value.copy(this.limitLow); 
-            layer.uniforms.clipping.clippingHigh.value.copy(this.limitHigh); 
-           }
-       }
-    }
-    
-       
+        if (this.map.layers) {
+            for (const [key, layer] of Object.entries(this.map.layers)) {
+                if (layer.uniforms) {
+                    layer.uniforms.clipping.clippingLow.value.copy(this.limitLow);
+                    layer.uniforms.clipping.clippingHigh.value.copy(this.limitHigh);
+                }
+            }
+        }
     }
 
     setValue(axis, value) {
