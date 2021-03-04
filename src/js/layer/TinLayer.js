@@ -1,21 +1,15 @@
 // import { Group } from 'three/src/objects/Group';
 import { BufferGeometry } from 'three/src/core/BufferGeometry';
 import { Float32BufferAttribute, Uint16BufferAttribute } from 'three/src/core/BufferAttribute';
-import { MeshStandardMaterial } from 'three/src/materials/MeshStandardMaterial';
 import { DoubleSide } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Layer } from './Layer';
 import { BitStream } from '../lib/bitstream';
 import { Plane } from 'three/src/math/Plane';
 import { Vector3 } from 'three/src/math/Vector3';
-import * as material from '../clip/material';
-import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
-import { uniforms } from "../clip/uniforms";
-import { shader } from '../clip/shader';
 import { Color } from 'three/src/math/Color';
-import { UniformsUtils } from 'three/src/renderers/shaders/UniformsUtils';
-import { ShaderLib } from 'three/src/renderers/shaders/ShaderLib';
 
+import { MyMeshStandardMaterial } from '../clip/MyMeshStandardMaterial';
 
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
@@ -105,50 +99,24 @@ class TinLayer extends Layer {
         //     clipShadows: true,
         // });
         // this.materialsArray.push(this.material);
-        let uniforms = this.uniforms = {
 
+        let uniforms = this.uniforms = {
             clipping: {
                 color: { type: "c", value: new Color(color) },
                 clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
-                clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) },
-                // cspec: { type: "v3", value: new Vector3() },
-                // cdiff: { type: "v3", value: new Vector3() },
-                // roughness: { type: "v3", value: new Vector3() },
-                // spotLightPosition: { type: "v3", value: new Vector3() },
-                // clight: { type: "v3", value: new Vector3() },
-                // metalness: { type: "v1", value: 0.1 },
+                clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) }
             }
         };
-
-        // https://jsfiddle.net/qgu17w5o/43/
-        // https://discourse.threejs.org/t/shadermaterial-created-from-meshstandardmaterials-shader-has-mirrored-reflection/3921
-        let standard = ShaderLib['standard'];
-        this.material = new ShaderMaterial({
-            lights: true,
-            clipIntersection: true,
-            clipShadows: true,
-            // uniforms: uniforms.clipping,
-            uniforms: UniformsUtils.clone(standard.uniforms),
-            vertexShader: shader.vertexClipping,
-            // vertexShader: standard.vertexShader,
+        this.material = new MyMeshStandardMaterial({
+            color: color,
+            metalness: 0.1,
+            roughness: 0.75,
+            flatShading: true,
             side: DoubleSide,
-            fragmentShader: shader.fragmentClippingFront,
-            // fragmentShader: standard.fragmentShader,          
-            // blending: AdditiveBlending,
-            // transparent: true,
-            // depthWrite: false,
-            clipping: true,
-            // colorWrite: false,
-
-        });
-        // this.material.uniforms.diffuseColor =  { type: "c", value: new Color(color) };
-        // this.material.uniforms.flatShading= true,
-        // this.material.uniforms.roughness.value = 0.75;
-        // this.material.uniforms.metalness.value = 1;
-        // this.material.uniforms.clippingLow= { type: "v3", value: new Vector3(0, 0, 0) };
-        // this.material.uniforms.clippingHigh= { type: "v3", value: new Vector3(0, 0, 0) };
-        // this.material.needsUpdate = true;
-
+            clippingPlanes: [this.xLocalPlane, this.yLocalPlane],
+            clipIntersection: false,
+            clipShadows: true,
+        }, uniforms.clipping);   
         this.materialsArray.push(this.material);
         let mesh = this.mainMesh = new Mesh(geometry, this.material);
         // mesh.userData.layerId = this.index;
