@@ -6,8 +6,9 @@ import { Object3D } from 'three/src/core/Object3D';
 import { uniforms } from "./uniforms";
 import { SelectionBoxFace } from './SelectionBoxFace';
 import { SelectionBoxLine } from './SelectionBoxLine';
+import { Layer } from '../layer/Layer';
 
-export class Selection {
+export class Selection extends Layer {
     limitLow;
     limitHigh;
     box;
@@ -16,9 +17,16 @@ export class Selection {
     touchMeshes; displayMeshes; meshGeometries; selectables;
     faces;
     map;
+    scale;
 
-    constructor(low, high, map) {
-        this.map = map;
+    constructor(parameters, low, high) {
+        super();
+        this.type = 'Selection';
+        this.visible = true;
+        this.opacity = 1;
+        for (var k in parameters) {
+            this[k] = parameters[k];
+        }
         this.limitLow = low;
         this.limitHigh = high;
         this.limit = {
@@ -27,6 +35,7 @@ export class Selection {
             x2: high.x,
             y2: high.y
         }
+        this.scale = 1;
 
         this.box = new BoxGeometry(1, 1, 1);
         this.boxMesh = new Mesh(this.box, material.capMaterial);
@@ -71,8 +80,39 @@ export class Selection {
         this.boxLines.push(new SelectionBoxLine(v[6], v[7], f[4], f[5], this));
 
         this.setBox();
-        this.setUniforms();
+        // this.setUniforms();
+    }
 
+    onAdd(map) {
+        this.map = map;
+        this.build(this.getScene());
+        //this.update();
+        this.emit('add');
+    }
+
+    build(app_scene) {
+        // app_scene.add(this.boxMesh);
+        app_scene.add(this.displayMeshes);
+        app_scene.add(this.touchMeshes);
+    }
+
+    setWireframeMode(wireframe) {
+        return;
+    }
+
+    setVisible(visible) {
+        this.visible = visible;
+        this.boxMesh.visible = visible;
+        this.displayMeshes.visible = visible;
+        this.touchMeshes.visible = visible;
+        this.emit('visibility-change');
+    }
+
+    scaleZ(z) {
+        this.scale = z;
+        // this.boxMesh.scale.z = z;
+        // this.displayMeshes.scale.z = z;
+        // this.touchMeshes.scale.z = z;
     }
 
     updateVertices() {
@@ -115,8 +155,7 @@ export class Selection {
     setBox() {
         let width = new Vector3();
         width.subVectors(this.limitHigh, this.limitLow);
-
-        this.boxMesh.scale.copy(width);
+        this.boxMesh.scale.copy(width);           
         width.multiplyScalar(0.5).add(this.limitLow);
         this.boxMesh.position.copy(width);
     }
@@ -164,7 +203,4 @@ export class Selection {
         this.updateVertices();
         this.updateGeometries();
     }
-
-
-
 }

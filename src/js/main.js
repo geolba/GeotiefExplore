@@ -187,10 +187,11 @@ class Application {
         this.selection = new Selection(
             // new Vector3(-7, -14, -14),
             // new Vector3(14, 9, 3)
+            { name: 'Slicing Box'},
             new Vector3(x.min, y.min, z.min),
-            new Vector3(x.max, y.max, z.max),
-            map
+            new Vector3(x.max, y.max, z.max)           
         );
+        this.map.addLayer(this.selection);
 
         new Picking(size, center, this);
        
@@ -263,9 +264,9 @@ class Application {
         //     new Vector3(x.min, y.min, z.min),
         //     new Vector3(x.max, y.max, z.max)
         // );        
-        this.capsScene.add(this.selection.boxMesh);
-        this.scene.add(this.selection.displayMeshes);
-        this.scene.add(this.selection.touchMeshes);
+        // this.capsScene.add(this.selection.boxMesh);
+        // this.scene.add(this.selection.displayMeshes);
+        // this.scene.add(this.selection.touchMeshes);
 
         // domEvent.on(window, 'resize', this.onWindowResize, this);
         // domEvent.on(window, 'keydown', this.keydown, this);

@@ -1,4 +1,3 @@
-// import { Group } from 'three/src/objects/Group';
 import { BufferGeometry } from 'three/src/core/BufferGeometry';
 import { Float32BufferAttribute, Uint16BufferAttribute } from 'three/src/core/BufferAttribute';
 import { DoubleSide } from 'three/src/constants';
@@ -8,7 +7,6 @@ import { BitStream } from '../lib/bitstream';
 import { Plane } from 'three/src/math/Plane';
 import { Vector3 } from 'three/src/math/Vector3';
 import { Color } from 'three/src/math/Color';
-
 import { MyMeshStandardMaterial } from '../clip/MyMeshStandardMaterial';
 
 
@@ -16,8 +14,6 @@ const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
 
 class TinLayer extends Layer {
-
-
 
     constructor(params) {
         super();
@@ -31,7 +27,6 @@ class TinLayer extends Layer {
             this[k] = params[k];
         }
 
-        // this.objectGroup = new Group();
         this.queryableObjects = [];
         this.borderVisible = false;
     }
@@ -52,7 +47,6 @@ class TinLayer extends Layer {
 
     scaleZ(z) {
         this.mainMesh.scale.z = z;
-        //this.objectGroup.scale.z = z;
     }
 
     async onAdd(map) {
@@ -60,7 +54,6 @@ class TinLayer extends Layer {
         map.update();
     }
 
-    //build BufferGeometry with Index
     async build(app_scene) {
 
         let geometry = new BufferGeometry();
@@ -119,9 +112,7 @@ class TinLayer extends Layer {
         }, uniforms.clipping);   
         this.materialsArray.push(this.material);
         let mesh = this.mainMesh = new Mesh(geometry, this.material);
-        // mesh.userData.layerId = this.index;
-        // this.addObject(mesh, true);
-        //this.mainMesh = mesh;
+        // mesh.userData.layerId = this.index;        
         if (app_scene) {
             app_scene.add(mesh);
         }
@@ -131,7 +122,6 @@ class TinLayer extends Layer {
         this.xLocalPlane.constant = filterX;
         this.yLocalPlane.constant = filterY;
     }
-
 
     async points(geomId) {
         const url = POINTURL + geomId;
@@ -214,10 +204,6 @@ class TinLayer extends Layer {
         return sigbits;
     }
 
-
-
-
 }
-
 
 export { TinLayer };

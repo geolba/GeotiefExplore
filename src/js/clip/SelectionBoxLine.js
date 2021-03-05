@@ -1,11 +1,8 @@
 import { LineSegments } from 'three/src/objects/LineSegments';
-// import { Float32BufferAttribute } from 'three/src/core/BufferAttribute';
 import * as material from './material';
 import { BufferGeometry } from 'three/src/core/BufferGeometry';
 
 export class SelectionBoxLine {
-
-    // material;
 
     constructor(v0, v1, f0, f1, selection) {
         // var lineGeometry = new THREE.Geometry();

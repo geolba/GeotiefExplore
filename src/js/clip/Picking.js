@@ -78,7 +78,7 @@ export class Picking {
     }
 
     mouseMove(event) {
-        if (this.isDraging == true) {
+        if (this.isDraging == true || this.simulation.selection.visible == false) {
             return;
         }
         let point = this._getCanvasPoint(event);
@@ -116,6 +116,9 @@ export class Picking {
     }
 
     beginDrag(event) {
+        if (this.simulation.selection.visible == false) {
+            return;
+        }
         // exit drag method, if not left mouse button was clicked
         if (this.touchCapable == false && event.which != 1) {
             return;
