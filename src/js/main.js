@@ -25,6 +25,7 @@ import { MobileDialog } from "./controls/MobileDialog";
 import { Picking } from './clip/Picking';
 
 import { Selection } from './clip/Selection';
+import _ from "lodash";
 
 import '../css/page.scss'; /* style loader will import it */
 
@@ -351,6 +352,8 @@ class Application {
         this.map.addListener('change', this.animate, this); // add this only if there is no animation loop (requestAnimationFrame)
         this.animate();
     }
+
+    deferringThrottle = _.throttle(this.animate, 40);
 
     animate() {
         this.renderer.clear();

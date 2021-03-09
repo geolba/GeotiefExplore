@@ -7,6 +7,7 @@ import { uniforms } from "./uniforms";
 import { SelectionBoxFace } from './SelectionBoxFace';
 import { SelectionBoxLine } from './SelectionBoxLine';
 import { Layer } from '../layer/Layer';
+import { Group } from 'three/src/objects/Group';
 
 export class Selection extends Layer {
     limitLow;
@@ -33,7 +34,9 @@ export class Selection extends Layer {
             x1: low.x,
             y1: low.y,
             x2: high.x,
-            y2: high.y
+            y2: high.y,
+            z1: low.z - 5000,
+            z2: high.z + 5000
         }
         this.scale = 1;
 
@@ -50,8 +53,8 @@ export class Selection extends Layer {
 
         let v = this.vertices;
 
-        this.touchMeshes = new Object3D();
-        this.displayMeshes = new Object3D();
+        this.touchMeshes = new Group(); //Object3D();
+        this.displayMeshes = new Group(); // Object3D();
         this.meshGeometries = [];
         this.lineGeometries = [];
         this.selectables = [];
@@ -93,7 +96,7 @@ export class Selection extends Layer {
     build(app_scene) {
         // app_scene.add(this.boxMesh);
         app_scene.add(this.displayMeshes);
-        app_scene.add(this.touchMeshes);
+        // app_scene.add(this.touchMeshes);
     }
 
     setWireframeMode(wireframe) {
@@ -112,6 +115,7 @@ export class Selection extends Layer {
         this.scale = z;
         // this.boxMesh.scale.z = z;
         // this.displayMeshes.scale.z = z;
+        this.displayMeshes.scale.set(1, 1, z);
         // this.touchMeshes.scale.z = z;
     }
 
@@ -155,7 +159,7 @@ export class Selection extends Layer {
     setBox() {
         let width = new Vector3();
         width.subVectors(this.limitHigh, this.limitLow);
-        this.boxMesh.scale.copy(width);           
+        this.boxMesh.scale.copy(width);
         width.multiplyScalar(0.5).add(this.limitLow);
         this.boxMesh.position.copy(width);
     }
@@ -177,7 +181,7 @@ export class Selection extends Layer {
 
     setValue(axis, value) {
         let buffer = 1000;
-        let limit = 14000;
+        // let limit = 14000;
 
         if (axis === 'x1') {
             // this.limitLow.x = Math.max(-limit, Math.min(this.limitHigh.x - buffer, value));            
@@ -192,9 +196,11 @@ export class Selection extends Layer {
             // this.limitHigh.y = Math.max(this.limitLow.y + buffer, Math.min(limit, value));          
             this.limitHigh.y = Math.max(this.limitLow.y + buffer, Math.min(this.limit.y2, value));
         } else if (axis === 'z1') {
-            this.limitLow.z = Math.max(-limit, Math.min(this.limitHigh.z - buffer, value));
+            // this.limitLow.z = Math.max(-limit, Math.min(this.limitHigh.z - buffer, value));
+            this.limitLow.z = Math.max(this.limit.z1, Math.min(this.limitHigh.z - buffer, value));
         } else if (axis === 'z2') {
-            this.limitHigh.z = Math.max(this.limitLow.z + buffer, Math.min(limit, value));
+            // this.limitHigh.z = Math.max(this.limitLow.z + buffer, Math.min(limit, value));
+            this.limitHigh.z = Math.max(this.limitLow.z + buffer, Math.min(this.limit.z2, value));
         }
 
         this.setBox();

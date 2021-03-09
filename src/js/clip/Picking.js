@@ -98,11 +98,12 @@ export class Picking {
                 if (this.intersected !== null) {
                     this.intersected.guardian.rayOut();
                 }
+                // select yellow color
                 candidate.guardian.rayOver();
                 this.intersected = candidate;
                 this.simulation.renderer.domElement.style.cursor = 'pointer';
                 // this.simulation.throttledRender();
-                this.simulation.animate();
+                this.simulation.deferringThrottle();
             }
 
         } else if (this.intersected !== null) {
@@ -111,7 +112,7 @@ export class Picking {
             this.intersected = null;
             this.simulation.renderer.domElement.style.cursor = 'auto';
             // this.simulation.throttledRender();
-            this.simulation.animate();
+            this.simulation.deferringThrottle();
         }
     }
 
@@ -160,7 +161,7 @@ export class Picking {
             this.plane.lookAt(newNormal.add(intersectionPoint));
             this.simulation.renderer.domElement.style.cursor = 'grab';
             // simulation.throttledRender();
-            this.simulation.animate();
+            this.simulation.deferringThrottle();
 
             let continueDrag = function (event) {
                 event.preventDefault();
@@ -187,7 +188,7 @@ export class Picking {
                     this.simulation.selection.setValue(axis, value);
                     // this.simulation.selection.setValue('x1', 4452960);
                     // this.simulation.throttledRender();
-                    this.simulation.animate();
+                    this.simulation.deferringThrottle();
                 }
 
             };
