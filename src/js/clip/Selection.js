@@ -38,7 +38,7 @@ export class Selection extends Layer {
             z1: low.z - 5000,
             z2: high.z + 5000
         }
-        this.scale = 1;
+        this.scale = 1.0;
 
         this.box = new BoxGeometry(1, 1, 1);
         this.boxMesh = new Mesh(this.box, material.capMaterial);
@@ -113,10 +113,10 @@ export class Selection extends Layer {
 
     scaleZ(z) {
         this.scale = z;
-        // this.boxMesh.scale.z = z;
-        // this.displayMeshes.scale.z = z;
-        this.displayMeshes.scale.set(1, 1, z);
-        // this.touchMeshes.scale.z = z;
+        this.boxMesh.scale.z = z;
+        this.displayMeshes.scale.z = z;      
+        this.touchMeshes.scale.z = z;
+        this.setUniforms();
     }
 
     updateVertices() {
@@ -172,8 +172,11 @@ export class Selection extends Layer {
         if (this.map.layers) {
             for (const [key, layer] of Object.entries(this.map.layers)) {
                 if (layer.uniforms) {
+                    let scale = Number(this.scale);
                     layer.uniforms.clipping.clippingLow.value.copy(this.limitLow);
                     layer.uniforms.clipping.clippingHigh.value.copy(this.limitHigh);
+                    layer.uniforms.clipping.clippingScale.value = scale;                       
+                    
                 }
             }
         }

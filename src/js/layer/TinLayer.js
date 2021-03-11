@@ -8,6 +8,7 @@ import { Plane } from 'three/src/math/Plane';
 import { Vector3 } from 'three/src/math/Vector3';
 import { Color } from 'three/src/math/Color';
 import { MyMeshStandardMaterial } from '../clip/MyMeshStandardMaterial';
+import { Object3D } from 'three/src/core/Object3D';
 
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
@@ -29,6 +30,7 @@ class TinLayer extends Layer {
 
         this.queryableObjects = [];
         this.borderVisible = false;
+        this.scale = 1;
     }
 
     setWireframeMode(wireframe) {
@@ -46,7 +48,17 @@ class TinLayer extends Layer {
     }
 
     scaleZ(z) {
+        this.scale = z;
         this.mainMesh.scale.z = z;
+    //     let highObject = new Object3D();
+    //     highObject.position.copy(this.uniforms.clipping.clippingHigh.value);
+    //     let lowObject = new Object3D();
+    //     lowObject.position.copy(this.uniforms.clipping.clippingLow.value);
+    //    highObject.scale.z =z;
+    //    lowObject.scale.z = z;
+    //     this.uniforms.clipping.clippingHigh.value.z = highObject.position.z;
+    //     this.uniforms.clipping.clippingLow.value.z = lowObject.position.z;
+        // this.uniforms.clipping.scale.value = z;
     }
 
     async onAdd(map) {
@@ -95,6 +107,7 @@ class TinLayer extends Layer {
 
         let uniforms = this.uniforms = {
             clipping: {
+                clippingScale: { type: "f", value: 1.0 },
                 color: { type: "c", value: new Color(color) },
                 clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
                 clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) }
@@ -103,7 +116,7 @@ class TinLayer extends Layer {
         this.material = new MyMeshStandardMaterial({
             color: color,
             metalness: 0.1,
-            roughness: 0.75,
+            roughness: 0.75,          
             flatShading: true,
             side: DoubleSide,
             clippingPlanes: [this.xLocalPlane, this.yLocalPlane],

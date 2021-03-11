@@ -12,6 +12,7 @@ export class MyMeshStandardMaterial extends MeshStandardMaterial {
 
     m_shader.uniforms.clippingLow = this.uniforms.clippingLow; // { type: "v3", value: new Vector3(0, 0, 0) };
     m_shader.uniforms.clippingHigh = this.uniforms.clippingHigh; // { type: "v3", value: new Vector3(0, 0, 0) };
+    m_shader.uniforms.clippingScale = this.uniforms.clippingScale; // { type: "f", value: 1.0 };
 
 
 

@@ -131,10 +131,11 @@ let shader = {
 
 	vertexMeshStandard: `
 		#define STANDARD
-		
+		uniform float scale;
 		varying vec3 vViewPosition;		
 		varying vec4 worldPosition;
 		
+				
 		#include <common>
 		#include <uv_pars_vertex>
 		#include <uv2_pars_vertex>
@@ -170,14 +171,20 @@ let shader = {
 			#include <clipping_planes_vertex>
 		
 			vViewPosition = - mvPosition.xyz;
-			worldPosition = modelMatrix * vec4( position, 1.0 );
+			// position.z = position.z * scale;
 			
+			worldPosition = modelMatrix * vec4( position, 1.0 );
+					
 			#include <worldpos_vertex>
 			#include <shadowmap_vertex>
 			#include <fog_vertex>
 		}`,
 
 	fragmentClippingMeshStandard: `
+		#ifdef GL_ES
+		precision highp float;
+		#endif
+
 		#define STANDARD
 
 		uniform vec3 diffuse;
@@ -186,9 +193,11 @@ let shader = {
 		uniform float metalness;
 		uniform float opacity;
 		
+		
 		varying vec3 vViewPosition;
 		uniform vec3 clippingLow;
-        uniform vec3 clippingHigh;
+        uniform vec3 clippingHigh;		
+		uniform float clippingScale;
         varying vec4 worldPosition;
 				
 		#include <common>
@@ -266,8 +275,8 @@ let shader = {
 			 || worldPosition.x > clippingHigh.x 
 			 || worldPosition.y < clippingLow.y  
 			 || worldPosition.y > clippingHigh.y
-			 || worldPosition.z < clippingLow.z  
-			 || worldPosition.z > clippingHigh.z 
+			 || (worldPosition.z) < (clippingLow.z * clippingScale)
+			 || (worldPosition.z) > (clippingHigh.z * clippingScale)
 		 ) {			
 			discard;			
 		} else {			
