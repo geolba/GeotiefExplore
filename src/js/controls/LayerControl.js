@@ -3,7 +3,8 @@ import { Group } from 'three/src/objects/Group';
 import * as util from '../core/utilities';
 import * as dom from '../core/domUtil';
 import * as domEvent from '../core/domEvent';
-
+import { DemLayer } from "../layer/DemLayer";
+import { TinLayer } from "../layer/TinLayer";
 import './LayerControl.css';
 
 export class LayerControl extends Control {
@@ -36,7 +37,10 @@ export class LayerControl extends Control {
         util.setOptions(this, options);
 
         for (let i in overlayLayers) {
-            this._addLayer(overlayLayers[i], overlayLayers[i].name, true);
+            let overlayLayer = overlayLayers[i];
+            if (overlayLayer instanceof DemLayer || overlayLayer instanceof TinLayer) {
+                this._addLayer(overlayLayers[i], overlayLayers[i].name, true);
+            }
         }
     }
 

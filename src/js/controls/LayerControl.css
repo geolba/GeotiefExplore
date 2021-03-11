@@ -74,7 +74,7 @@ height: 31py;
 
 vertical-align: super;
 }
-input[type=checkbox] {
+.gba-controllayers input[type=checkbox] {
      position: absolute; 
    overflow: hidden; 
    clip: rect(0 0 0 0); 

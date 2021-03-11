@@ -49,6 +49,18 @@ export class GridLayer extends Layer {
         this.emit('visibility-change');
     }
 
+    toggle () {
+        this.visible = visible;
+        var visible = !this.objectGroup.visible;
+        this.objectGroup.visible = visible;
+        //this._map.update();
+        if (this.labels.length != 0) {
+            this.labelConnectorGroup.visible = visible;
+            this.labelParentElement.style.display = (this.objectGroup.visible == true) ? "block" : "none";
+        }
+        this._map.update();
+    }
+
     onRemove(map) {
         this.getScene().remove(this.objectGroup);
     }
@@ -133,6 +145,7 @@ export class GridLayer extends Layer {
         // for (let k = - halfSize; k <= halfSize; k = k + step) {
         for (let k = this._map.x.min; k <= this._map.x.max; k = k + step) {
             vertices.push(k, constant_position, this._map.z.max, k, constant_position, this._map.z.min);//senkrecht
+            vertices.push(k, this._map.y.min, this._map.z.min, k, this._map.y.max, this._map.z.min);
             // vertices.push(-halfSize, constant_position, k, halfSize, constant_position, k);//waagrecht 
 
         }
@@ -176,8 +189,10 @@ export class GridLayer extends Layer {
         // for (let k = - halfSize; k <= halfSize; k = k + step) {
         for (let k = this._map.x.min; k <= this._map.x.max; k = k + step) {
             let xCoordinate = (k % 1 != 0) ? Math.round(k) : k;
-            let info = { a: xCoordinate + ' m', size: step, axis: "x", color: 0xff0000, cl: "red-label", h: 0.6, centroid: [[k, this._map.y.max, this._map.z.max]] };
+            let info = { a: xCoordinate + ' m', dir: 'vertical', size: step, axis: "x", color: 0xff0000, cl: "red-label", h: 0.6, centroid: [[k, this._map.y.max, this._map.z.max]] };
             labels.push(info);
+            let info2 = { a: xCoordinate + ' m', dir: 'horizontal', size: step, axis: "x", color: 0xff0000, cl: "red-label", h: 0.6, centroid: [[k, this._map.y.min, this._map.z.min]] };
+            labels.push(info2);
         }
 
         let ySize = this._map.width;
@@ -248,7 +263,11 @@ export class GridLayer extends Layer {
                 let pt0, pt1;
                 if (f.axis == "x") {
                     pt0 = new Vector3(pt[0], pt[1], pt[2]);    // bottom
-                    pt1 = new Vector3(pt[0] + horizontalShiftLabel, pt[1], pt[2] + f.size / 2);    // top    
+                    if (f.dir == 'vertical') {
+                        pt1 = new Vector3(pt[0] + horizontalShiftLabel, pt[1], pt[2] + f.size / 2);    // top    
+                    } else if (f.dir == 'horizontal') {
+                        pt1 = new Vector3(pt[0] + horizontalShiftLabel, pt[1] - f.size, pt[2]);    // low   
+                    }                    
                 }
                 else if (f.axis == "y") {
                     pt0 = new Vector3(pt[0], pt[1], pt[2]);

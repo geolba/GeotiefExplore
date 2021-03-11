@@ -259,18 +259,11 @@ class Application {
         //slice on x and y axes:
         // this.slicer = new SlicerControl({ parentDiv: 'slicer-control' }).addTo(this.map);
 
-        // this.selection = new Selection(
-        //     // new Vector3(-7, -14, -14),
-        //     // new Vector3(14, 9, 3)
-        //     new Vector3(x.min, y.min, z.min),
-        //     new Vector3(x.max, y.max, z.max)
-        // );        
+       
         // this.capsScene.add(this.selection.boxMesh);
         // this.scene.add(this.selection.displayMeshes);
         // this.scene.add(this.selection.touchMeshes);
 
-        // domEvent.on(window, 'resize', this.onWindowResize, this);
-        // domEvent.on(window, 'keydown', this.keydown, this);
         this.start();
     }
 
@@ -419,7 +412,13 @@ class Application {
                 document.querySelector('.tab-pane.active').classList.remove('active');
                 document.querySelector(button.getAttribute('name')).classList.add('active');
             })
-        })
+        });
+
+        //toggle GridLayer
+        let chkGrid = document.getElementById("chkGrid");
+        domEvent.on(chkGrid, 'click', function (e) {
+            this.gridlayer.toggle();
+        }, app);
 
     }
 
