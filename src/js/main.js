@@ -21,7 +21,7 @@ import * as util from './core/utilities';
 import * as browser from './core/browser';
 import * as domUtil from './core/domUtil';
 import { Picking } from './clip/Picking';
-import Modal from './components/ShowModal';
+import { ShowModal } from './components/ShowModal';
 
 import { Selection } from './clip/Selection';
 import _ from "lodash";
@@ -60,7 +60,7 @@ class Application {
         this.navigation = document.getElementsByClassName('navigation')[0];
         // this.addEventListeners();
 
-        this.dialog = new Modal("Help", container, { klass: "fm_about" });
+        this.dialog = new ShowModal("Help", container, { klass: "fm_about" });
 
         // this.dialog = new MobileDialog("Help", container, { klass: "fm_about" });
         this.aboutIcon = document.querySelector('#menu-about-icon');

@@ -85,7 +85,9 @@ class Map extends OrbitControls {
                 type: "3dface",
                 name: layerData.preview.legend_text, //layerData.legend_description,
                 description: "test",
-                color: layerData.preview.legend_color //layerData.color
+                color: layerData.preview.legend_color, //layerData.color
+                citation: layerData.characteristics !== null ? layerData.characteristics.citation : null,
+                feature_type: layerData.characteristics !== null ? layerData.characteristics.feature_type : null,
             });
             callStack.push(this.addLayer(dxfLayer))
         }

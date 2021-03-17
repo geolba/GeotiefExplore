@@ -5,6 +5,7 @@ import * as dom from '../core/domUtil';
 import * as domEvent from '../core/domEvent';
 import { DemLayer } from "../layer/DemLayer";
 import { TinLayer } from "../layer/TinLayer";
+import { ShowModal } from "../components/ShowModal";
 import './LayerControl.css';
 
 export class LayerControl extends Control {
@@ -27,6 +28,7 @@ export class LayerControl extends Control {
     _overlaysList
     _layers;
     _handlingClick;
+    _dialog;
 
     constructor(overlayLayers, options) {
         super(options);
@@ -42,10 +44,12 @@ export class LayerControl extends Control {
                 this._addLayer(overlayLayers[i], overlayLayers[i].name, true);
             }
         }
+
     }
 
     onAdd(map) {
         this._mainMap = map;
+        this._dialog = new ShowModal("Layer Info", map.container, { klass: "fm_about" });
 
         let className = "gba-controllayers";
         let container;
@@ -90,7 +94,7 @@ export class LayerControl extends Control {
 
         this._updateLayerList();
 
-       
+
 
         if (toggleable == true) {
             return container;
@@ -153,21 +157,49 @@ export class LayerControl extends Control {
         dom.createDom("label", { for: util.stamp(obj.layer) }, chkDataCell);
 
         dom.createDom("span", { innerHTML: " " + obj.name + "&nbsp;" }, lblDataCell);
-        //legend entry label
-        // var _table = dom.createDom("table", { width: "95%", dir: "ltr" }, lblDataCell);
-        // var _tbody = dom.createDom("tbody", {}, _table);
-        // var _tr = dom.createDom("tr", {}, _tbody);
-        // var _td = dom.createDom("td", { innerHTML: obj.name, align: this.alignRight ? "right" : "left" }, _tr);
+      
+        // thesaurus direct link link
+        // let layerInfo = dom.createDom(
+        //     "a",
+        //     { href: obj.layer.citation, target: '_blank', title: 'Layers', innerHTML: '<i class="fas fa-info-circle"></i>' },
+        //     lblDataCell
+        // );
+        // domEvent.on(layerInfo, 'click', (e) => {
+        //     e.preventDefault();
+        //     e.stopPropagation();          
+        //     window.open(
+        //         layerInfo.href,
+        //         '_blank' // <- This is what makes it open in a new window.
+        //       );
+        // }, this);
 
-        dom.createDom("i", { class: "fas fa-info-circle" }, lblDataCell);
-
-
-
-
-
-
+        // or thesaurus link in popup:
+        if ( obj.layer.citation) {
+            let layerInfo = dom.createDom(
+                "i",
+                { class: "fas fa-info-circle" },
+                lblDataCell
+            );
+            domEvent.on(layerInfo, 'click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                let popupDiv = dom.createDom("div", {});
+                dom.createDom(
+                    "span",
+                    { href: obj.layer.citation, target: '_blank', title: 'Layers', innerHTML:  "feature type: " + obj.layer.feature_type +  "<br>"},
+                    popupDiv
+                );
+              dom.createDom(
+                    "a",
+                    { href: obj.layer.citation, target: '_blank', title: 'Layers', innerHTML:  obj.layer.citation},
+                    popupDiv
+                );
+    
+                this._dialog.show(popupDiv);
+            }, this);
+        }
+        
         return legendEntryRow;
-
     }
 
     _onInputClick(layerId) {

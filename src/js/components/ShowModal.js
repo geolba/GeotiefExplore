@@ -6,10 +6,12 @@ import * as util from "../core/utilities";
 import "./ShowModal.css";
 
 // @Component({})
-export default class Modal {
+export class ShowModal {
     defaultTitle = "3DViewer";
     declaredClass = "MobileDialog";
     options = {};
+    title;
+    description;
 
     constructor(title, parentContainer, options = {}) {
         // super(options);
@@ -49,19 +51,16 @@ export default class Modal {
                 ${this.title}
                     <button
                     type="button"
-                    class="btn-close"
-                    id="btn-close"
-                    v-on:click="close"
+                    class="btn-close"                   
                     aria-label="Close modal"
                     >
                     x
                     </button>
                 </slot>
                 </header>
-                <section class="modal-body" id="modalDescription">
-                <slot name="body">I'm the default body!</slot>
+                <section class="modal-body modalDescription">
                 </section>
-                <section class="modal-body" id="additionalDescription">               
+                <section class="modal-body additionalDescription">               
                 </section>
                 <footer class="modal-footer">
                 <slot name="footer">                 
@@ -74,10 +73,10 @@ export default class Modal {
 
         this.domNode = dom.createDom("div", { class: "popup" }, container);
         this.dialogDiv = dom.createDom("div", { class: this.options.klass + " fm_overlay hide", innerHTML: dialogHtml }, container);
-        this.popupcontent = dom.byId("modalDescription");
+        this.popupcontent =  this.dialogDiv.querySelector(".modalDescription");
         //additional info div
-        this.pageinfo = dom.byId("additionalDescription");
-        let popup_close = dom.byId("btn-close");
+        this.pageinfo = this.dialogDiv.querySelector(".additionalDescription");
+        let popup_close = this.dialogDiv.querySelector(".btn-close");
 
         domEvent.on(popup_close, 'click', domEvent.preventDefault);
         domEvent.on(popup_close, 'click', domEvent.stopPropagation);
@@ -99,9 +98,12 @@ export default class Modal {
         if (html instanceof HTMLElement) {
             this.popupcontent.innerHTML = "";
             this.popupcontent.appendChild(html);
+            // this.description = html;
         }
         else {
+            this.popupcontent.innerHTML = "";
             this.popupcontent.innerHTML = html;
+            // this.description = html;
         }
 
         // this.domNode.getElementsByClassName("popuptitle")[0].innerHTML = title || this.title;
