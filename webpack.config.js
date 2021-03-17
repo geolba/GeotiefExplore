@@ -4,6 +4,7 @@ const webpack = require('webpack'); //e.g. for iusing DefinePlugin
 // const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+// const { VueLoaderPlugin } = require('vue-loader');
 
 /**
  * flag Used to check if the environment is production or not
@@ -26,6 +27,12 @@ module.exports = {
         //filename: fileNamePrefix + '[name].js',
         publicPath: '/dist/',
     },
+    // resolve: {
+    //     alias: {
+    //         'vue$': 'vue/dist/vue.esm.js'
+    //     },
+    //     extensions: ['*', '.js', '.vue', '.json']
+    // },
     module: {
         rules: [
             {
@@ -49,6 +56,10 @@ module.exports = {
             //         'img-loader'
             //     ],
             // },
+            // {
+            //     test: /\.vue$/,
+            //     loader: 'vue-loader'
+            //   },
             {
                 test: /\.js$/,
                 exclude: /(node_modules|bower_components)/,
@@ -71,6 +82,12 @@ module.exports = {
                         //     hmr: process.env.NODE_ENV === 'development',
                         // },
                     },
+                    // {
+                    //     loader: "vue-style-loader",
+                    //     options: {
+                    //         sourceMap: true
+                    //     }
+                    // },
                      // Translates CSS into CommonJS
                     {
                         loader: "css-loader",
@@ -122,8 +139,8 @@ module.exports = {
     },
 
     plugins: [
+        // new VueLoaderPlugin(),
 
-       
         new webpack.DefinePlugin({ // Remove this plugin if you don't plan to define any global constants
             ENVIRONMENT: JSON.stringify(process.env.NODE_ENV),
             CONSTANT_VALUE: JSON.stringify(process.env.CONSTANT_VALUE),

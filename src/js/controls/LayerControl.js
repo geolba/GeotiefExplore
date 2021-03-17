@@ -54,19 +54,20 @@ export class LayerControl extends Control {
         if (this.options.parentDiv) {
             container = this._container = document.getElementById(this.options.parentDiv);
             dom.addClass(container, className);
-            toggleable  = false;
+            toggleable = false;
         } else {
             container = this._container = dom.createDom("div", { "class": className });
             toggleable = true;
         }
 
-       
+
 
 
 
         domEvent.on(container, 'click', domEvent.stopPropagation);
 
-        let layerContainer = this._layerContainer =  dom.createDom('div', { "class": className + '-container' }, container);
+
+        let layerContainer = this._layerContainer = dom.createDom('div', { "class": className + '-container' }, container);
 
         if (this.options.collapsed && toggleable == true) {
             domEvent.on(container, 'mouseenter', this._expand, this);
@@ -89,6 +90,8 @@ export class LayerControl extends Control {
 
         this._updateLayerList();
 
+       
+
         if (toggleable == true) {
             return container;
         }
@@ -102,7 +105,7 @@ export class LayerControl extends Control {
             name: name,
             overlay: overlay
         };
-        layer.addListener('visibility-change', this._updateLayerList, this);     
+        layer.addListener('visibility-change', this._updateLayerList, this);
     }
 
     _updateLayerList() {
@@ -115,7 +118,7 @@ export class LayerControl extends Control {
 
         let baseLayersPresent = false;
         let overlaysPresent = false;
-       
+
 
         for (let i in this._layers) {
             let obj = this._layers[i];
@@ -127,7 +130,7 @@ export class LayerControl extends Control {
         this._separator.style.display = overlaysPresent && baseLayersPresent ? '' : 'none';
     }
 
-    _addLegendEntry (obj) {
+    _addLegendEntry(obj) {
         var checked = obj.layer.visible;//this._map.hasLayer(obj.layer);
         var container = obj.overlay ? this._overlaysList : this._baseLayersList;
         //container.appendChild(legendEntryRow);
@@ -135,13 +138,13 @@ export class LayerControl extends Control {
         var legendEntryRow = dom.createDom("tr", { style: "display: row-table; height: 20px;" }, container);
         //domStyle.set(legendEntryRow, 'display', rowVisibility);
         //dom.setProperties(legendEntryRow, { style: "display: row-table;" });
-        
-        var legendDataCell = dom.createDom("td", { "style": "width:25px;vertical-align: top;"}, legendEntryRow);
-        let legendDiv = dom.createDom("div", { "style": "width:20px; height:20px;"}, legendDataCell);
+
+        var legendDataCell = dom.createDom("td", { "style": "width:25px;vertical-align: top;" }, legendEntryRow);
+        let legendDiv = dom.createDom("div", { "style": "width:20px; height:20px;" }, legendDataCell);
         legendDiv.style.backgroundColor = "#" + obj.layer.color;
 
         var chkDataCell = dom.createDom("td", { "class": "checkboxFive" }, legendEntryRow);
-        var lblDataCell = dom.createDom("td", {"style": "vertical-align: top;"}, legendEntryRow);
+        var lblDataCell = dom.createDom("td", { "style": "vertical-align: top;" }, legendEntryRow);
 
 
         var input = dom.createDom("input", { type: 'checkbox', checked: checked, id: util.stamp(obj.layer) }, chkDataCell);
@@ -149,12 +152,16 @@ export class LayerControl extends Control {
         domEvent.on(input, 'click', function () { this._onInputClick(util.stamp(obj.layer)); }, this);
         dom.createDom("label", { for: util.stamp(obj.layer) }, chkDataCell);
 
-        dom.createDom("span", { innerHTML: " " + obj.name }, lblDataCell);
+        dom.createDom("span", { innerHTML: " " + obj.name + "&nbsp;" }, lblDataCell);
         //legend entry label
         // var _table = dom.createDom("table", { width: "95%", dir: "ltr" }, lblDataCell);
         // var _tbody = dom.createDom("tbody", {}, _table);
         // var _tr = dom.createDom("tr", {}, _tbody);
         // var _td = dom.createDom("td", { innerHTML: obj.name, align: this.alignRight ? "right" : "left" }, _tr);
+
+        dom.createDom("i", { class: "fas fa-info-circle" }, lblDataCell);
+
+
 
 
 
@@ -163,11 +170,11 @@ export class LayerControl extends Control {
 
     }
 
-    _onInputClick (layerId) {
-        let inputs = this._layerContainer.getElementsByTagName('input');  
+    _onInputClick(layerId) {
+        let inputs = this._layerContainer.getElementsByTagName('input');
         this._handlingClick = true;
 
-        for (let i = 0; i <  inputs.length; i++) {
+        for (let i = 0; i < inputs.length; i++) {
             let input = inputs[i];
             if (input.type == 'checkbox' && layerId === input.layerId) {
                 let obj = this._layers[input.layerId];

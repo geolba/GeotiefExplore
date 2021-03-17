@@ -5,7 +5,6 @@ import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Scene } from 'three/src/scenes/Scene';
 import { Vector3 } from 'three/src/math/Vector3';
 import { GridLayer } from './layer/GridLayer';
-// import { BoxLayer } from './layer/BoxLayer';
 import { DemLayer } from './layer/DemLayer';
 import { Map } from './core/Map';
 import * as domEvent from './core/domEvent';
@@ -21,8 +20,8 @@ import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
 import * as util from './core/utilities';
 import * as browser from './core/browser';
 import * as domUtil from './core/domUtil';
-import { MobileDialog } from "./controls/MobileDialog";
 import { Picking } from './clip/Picking';
+import Modal from './components/ShowModal';
 
 import { Selection } from './clip/Selection';
 import _ from "lodash";
@@ -61,7 +60,9 @@ class Application {
         this.navigation = document.getElementsByClassName('navigation')[0];
         // this.addEventListeners();
 
-        this.dialog = new MobileDialog("Help", container, { klass: "fm_about" });
+        this.dialog = new Modal("Help", container, { klass: "fm_about" });
+
+        // this.dialog = new MobileDialog("Help", container, { klass: "fm_about" });
         this.aboutIcon = document.querySelector('#menu-about-icon');
 
 
@@ -181,21 +182,21 @@ class Application {
         this.mapTitle = document.querySelector('#map-title');
         this.mapTitle.innerHTML += map.title;
         map.on('ready', () => {
-          this.selection.setUniforms();
-          this.animate();
+            this.selection.setUniforms();
+            this.animate();
         }, this);
 
         this.selection = new Selection(
             // new Vector3(-7, -14, -14),
             // new Vector3(14, 9, 3)
-            { name: 'Slicing Box'},
+            { name: 'Slicing Box' },
             new Vector3(x.min, y.min, z.min),
-            new Vector3(x.max, y.max, z.max)           
+            new Vector3(x.max, y.max, z.max)
         );
         this.map.addLayer(this.selection);
 
         new Picking(size, center, this);
-       
+
 
         // let boxLayer = new BoxLayer({ 
         //     width: 10000, height: 10000, depth: 10000, name: 'center-box', color: 800080 , center: center
@@ -259,7 +260,7 @@ class Application {
         //slice on x and y axes:
         // this.slicer = new SlicerControl({ parentDiv: 'slicer-control' }).addTo(this.map);
 
-       
+
         // this.capsScene.add(this.selection.boxMesh);
         // this.scene.add(this.selection.displayMeshes);
         // this.scene.add(this.selection.touchMeshes);
@@ -418,7 +419,7 @@ class Application {
         let chkGrid = document.getElementById("chkGrid");
         domEvent.on(chkGrid, 'click', function (e) {
             this.gridlayer.toggle();
-        }, app);
+        }, this);
 
     }
 
@@ -519,3 +520,26 @@ class Application {
 let container = document.getElementById("webgl");
 let app = new Application(container);
 app.build();
+
+// new Vue({
+//     el: '#app',
+//     components: { Modal },
+//     data() {
+//         return {
+//             isModalVisible: false,
+//         }
+//     },
+//     mounted() {
+//         let container = document.getElementById("webgl");
+//         let app = new Application(container);
+//         app.build();
+//     },
+//     methods: {
+//         showModal() {
+//             this.isModalVisible = true;
+//         },
+//         closeModal() {
+//             this.isModalVisible = false;
+//         },
+//     }
+// });

@@ -78,9 +78,25 @@
     </header>
 
 
-    <section class='main u-full-width'>
+    <section id="app" class='main u-full-width'>
 
-
+        <!-- <Modal v-if="isModalVisible" @close="closeModal">
+            <template slot="header">
+                Test
+            </template>
+            <template slot="body">
+                Mit dem Setzen des Hakens bestätige ich hiermit
+                <ol type="1">
+                    <li>
+                        die Data Policy von Tethys RDR sowie die Terms & Conditions von Tethys
+                        gelesen und verstanden zu haben 
+                    </li>
+                    <li>das Einverständnis aller Co-Autoren über die bevorstehende Datenpublikation schriftlich
+                        eingeholt zu haben</li>
+                    <li>sowohl mit der Data Policy als auch mit den Terms & Conditions einverstanden zu sein</li>
+                </ol>
+            </template>
+        </Modal> -->
 
         <div class="canvas-area eight columns">
             <div id="div-map">
@@ -135,6 +151,7 @@
                                     <input type="checkbox" id="chkGrid" autocomplete="off" checked>
                                     <span class="label-body">set visibility of coordinate grid</span>
                                 </label>
+                                <i class="fas fa-info-circle" @click="showModal" style="font-size:24px"></i>
                             </div>
 
                         </div>
