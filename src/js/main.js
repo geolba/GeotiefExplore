@@ -26,7 +26,7 @@ import { ShowModal } from './components/ShowModal';
 import { Selection } from './clip/Selection';
 import _ from "lodash";
 
-import '../css/page.scss'; /* style loader will import it */
+import '../css/page_bulma.scss'; /* style loader will import it */
 
 class Application {
 
@@ -398,17 +398,36 @@ class Application {
             this.dialog.show();
         }, this);
 
-        domEvent.on(this.menuIcon, 'click', function (e) {
-            e.preventDefault();
-            this.navigation.classList.toggle("active");
-        }, this);
+        // domEvent.on(this.menuIcon, 'click', function (e) {
+        //     e.preventDefault();
+        //     this.navigation.classList.toggle("active");
+    // }, this);
+            
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+        // Check if there are any navbar burgers
+        if ($navbarBurgers.length > 0) {
+                // Add a click event on each of them
+          $navbarBurgers.forEach( el => {
+            el.addEventListener('click', () => {
+      
+              // Get the target from the "data-target" attribute
+              const target = el.dataset.target;
+              const $target = document.getElementById(target);
+      
+              // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+              el.classList.toggle('is-active');
+              $target.classList.toggle('is-active');
+      
+            });
+          });
+        }
 
-        var tabButtons = [].slice.call(document.querySelectorAll('ul.tab-nav li span.button'));
+        var tabButtons = [].slice.call(document.querySelectorAll('ul.tab-nav li'));
 
         tabButtons.map(function (button) {
             button.addEventListener('click', function () {
-                document.querySelector('li span.active.button').classList.remove('active');
-                button.classList.add('active');
+                document.querySelector('li.is-active').classList.remove('is-active');
+                button.classList.add('is-active');
 
                 document.querySelector('.tab-pane.active').classList.remove('active');
                 document.querySelector(button.getAttribute('name')).classList.add('active');

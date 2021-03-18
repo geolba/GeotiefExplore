@@ -1,0 +1,172 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+    <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>GeotiefExplore</title>
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" /> -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- <link href="content/img/favicon.ico" rel="shortcut icon" type="image/x-icon" /> -->
+    <meta name="description" content="3D viewer Geological Survey of Austria">
+    <meta name="author" content="Arno Kaimbacher">
+
+    <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- FONT
+–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+    <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <!-- <link type="text/css" rel="stylesheet" href="normalize.css" /> -->
+    <!-- <link rel="stylesheet" href="src/css/page.css?v=1.0"> -->
+    <link rel="stylesheet" type="text/css" href="dist/main.css" />
+
+    <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="images/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="images/favicon/site.webmanifest">
+
+</head>
+
+<body>
+
+
+    <header class="header">
+        <nav class="navigation" role="navigation">
+            <a href="#" id="menu-icon" class="menu-icon active">
+                <i class="fa fa-bars"></i>
+            </a>
+            <div class="row">
+                <div class="logo two columns">
+                    <a class="navbar-brand" href="http://www.europe-geology.eu/onshore-geology/geological-map/"
+                        target="_blank">
+                        <img src="images/egdi_logo.svg" height="51">
+                    </a>
+                </div>
+                <div id='map-title' class="four columns">
+                </div>
+                <ul class="menu main-navigation six columns">
+                    <!-- <li><a id="menu-map-icon" href="#map">Map</a></li> -->
+                    <!-- <li>
+                        <a href="http://www.europe-geology.eu/onshore-geology/geological-map/" target="_blank"
+                            class='home_button gba_button'>
+                            <span class='fm_icon fa fa-home'></span>
+                            <span class='fm_icon_text text_show'>EGDI</span>
+                        </a>
+                    </li> -->
+                    <li>
+                        <a id="menu-about-icon" href='#' class='gba_button about_button'>
+                            <i class="fm_icon fa fa-question"></i>
+                            <span class='fm_icon_text text_show'>About</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+
+    <section id="app" class='main u-full-width'>
+
+        <!-- <Modal v-if="isModalVisible" @close="closeModal">
+            <template slot="header">
+                Test
+            </template>
+            <template slot="body">
+                Mit dem Setzen des Hakens bestätige ich hiermit
+                <ol type="1">
+                    <li>
+                        die Data Policy von Tethys RDR sowie die Terms & Conditions von Tethys
+                        gelesen und verstanden zu haben 
+                    </li>
+                    <li>das Einverständnis aller Co-Autoren über die bevorstehende Datenpublikation schriftlich
+                        eingeholt zu haben</li>
+                    <li>sowohl mit der Data Policy als auch mit den Terms & Conditions einverstanden zu sein</li>
+                </ol>
+            </template>
+        </Modal> -->
+
+        <div class="canvas-area eight columns">
+            <div id="div-map">
+                <div id="webgl" class="mapDesktop">
+                    <!-- <canvas id="imgCanvas" class="img-canvas">
+                        Canvas Not supported in your browser... Sorry!
+                      </canvas> -->
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area four columns">
+
+            <div class="row">
+                <div class="twelve columns">
+
+                    <ul class="tab-nav">
+                        <li class="metadata-link">
+                            <span class="remove-check button active" name="#one">GEOLOGY</span>
+                        </li>
+                        <li class="file-link">
+                            <span class="remove-check button" name="#two">ANALYSIS</span>
+                        </li>
+                    </ul>
+
+                    <!-- HTML markup for tab content: Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane content-metadata active" id="one">
+                            <div id="layer-control-parent-id"></div>
+                        </div>
+                        <div class="tab-pane content-file" id="two">
+                            <h5 class="section-heading">Download Map Image</h5>
+                            <!-- <label for="topText">Top Text:</label>
+                            <input type="text" id="topText" class="form-control">
+
+                            <label for="bottomText">Bottom Text:</label>
+                            <input type="text" id="bottomText" class="form-control"> -->
+
+
+                            <a class="button button-primary" type="submit" id="btnDownloadCanvasImage"
+                                download="file.png">Download</a>
+
+                            <div class="panel-section section-view">
+                                <div class="feature-wrapper feature-slicer inline-block">
+                                    <div id="slicer-control"></div>
+                                </div>
+                            </div>
+
+                            <div class="panel-section section-functions">
+                                <h5>Functions</h5>
+                                <label>
+                                    <input type="checkbox" id="chkGrid" autocomplete="off" checked>
+                                    <span class="label-body">set visibility of coordinate grid</span>
+                                </label>
+                                <i class="fas fa-info-circle" @click="showModal" style="font-size:24px"></i>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- End of HTML markup for tab content: Tab panes -->
+
+            </div>
+        </div>
+
+
+
+    </section>
+
+    <script src="dist/main.js"></script>
+</body>
+
+</html>

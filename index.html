@@ -41,130 +41,145 @@
 </head>
 
 <body>
-
-
-    <header class="header">
-        <nav class="navigation" role="navigation">
-            <a href="#" id="menu-icon" class="menu-icon active">
-                <i class="fa fa-bars"></i>
+    <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="" href="http://www.europe-geology.eu/onshore-geology/geological-map/" target="_blank">
+                <!-- <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28"> -->
+                <img src="images/egdi_logo.svg" height="51">
             </a>
-            <div class="row">
-                <div class="logo two columns">
-                    <a class="navbar-brand" href="http://www.europe-geology.eu/onshore-geology/geological-map/"
-                        target="_blank">
-                        <img src="images/egdi_logo.svg" height="51">
+            <a role="button" id="menu-icon" class="navbar-burger" aria-label="menu" aria-expanded="false"
+                data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+                <span id='map-title' class="navbar-item">
+                </span>
+                <a class="navbar-item">
+                    Documentation
+                </a>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        More
                     </a>
-                </div>
-                <div id='map-title' class="four columns">
-                </div>
-                <ul class="menu main-navigation six columns">
-                    <!-- <li><a id="menu-map-icon" href="#map">Map</a></li> -->
-                    <!-- <li>
-                        <a href="http://www.europe-geology.eu/onshore-geology/geological-map/" target="_blank"
-                            class='home_button gba_button'>
-                            <span class='fm_icon fa fa-home'></span>
-                            <span class='fm_icon_text text_show'>EGDI</span>
+                    <div class="navbar-dropdown">
+                        <a id="menu-about-icon" class="navbar-item">
+                            About
                         </a>
-                    </li> -->
-                    <li>
-                        <a id="menu-about-icon" href='#' class='gba_button about_button'>
-                            <i class="fm_icon fa fa-question"></i>
-                            <span class='fm_icon_text text_show'>About</span>
+                        <a class="navbar-item">
+                            Contact
                         </a>
-                    </li>
-                </ul>
+                        <hr class="navbar-divider">
+                        <a class="navbar-item">
+                            Report an issue
+                        </a>
+                    </div>
+                </div>
             </div>
-        </nav>
-    </header>
 
-
-    <section id="app" class='main u-full-width'>
-
-        <!-- <Modal v-if="isModalVisible" @close="closeModal">
-            <template slot="header">
-                Test
-            </template>
-            <template slot="body">
-                Mit dem Setzen des Hakens bestätige ich hiermit
-                <ol type="1">
-                    <li>
-                        die Data Policy von Tethys RDR sowie die Terms & Conditions von Tethys
-                        gelesen und verstanden zu haben 
-                    </li>
-                    <li>das Einverständnis aller Co-Autoren über die bevorstehende Datenpublikation schriftlich
-                        eingeholt zu haben</li>
-                    <li>sowohl mit der Data Policy als auch mit den Terms & Conditions einverstanden zu sein</li>
-                </ol>
-            </template>
-        </Modal> -->
-
-        <div class="canvas-area eight columns">
-            <div id="div-map">
-                <div id="webgl" class="mapDesktop">
-                    <!-- <canvas id="imgCanvas" class="img-canvas">
-                        Canvas Not supported in your browser... Sorry!
-                      </canvas> -->
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <!-- <a class="button is-primary">
+                            <strong>Sign up</strong>
+                        </a> -->
+                        <a class="button is-light">
+                            Log in
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
+    </nav>
 
-        <div class="input-area four columns">
+    <section id="app" class="hero">
+        <div class="hero-body">
+            <!-- <div class="container is-fluid"> -->
 
-            <div class="row">
-                <div class="twelve columns">
+            <div class="main columns">
 
-                    <ul class="tab-nav">
-                        <li class="metadata-link">
-                            <span class="remove-check button active" name="#one">GEOLOGY</span>
-                        </li>
-                        <li class="file-link">
-                            <span class="remove-check button" name="#two">ANALYSIS</span>
-                        </li>
-                    </ul>
-
-                    <!-- HTML markup for tab content: Tab panes -->
-                    <div class="tab-content">
-                        <div class="tab-pane content-metadata active" id="one">
-                            <div id="layer-control-parent-id"></div>
-                        </div>
-                        <div class="tab-pane content-file" id="two">
-                            <h5 class="section-heading">Download Map Image</h5>
-                            <!-- <label for="topText">Top Text:</label>
-                            <input type="text" id="topText" class="form-control">
-
-                            <label for="bottomText">Bottom Text:</label>
-                            <input type="text" id="bottomText" class="form-control"> -->
-
-
-                            <a class="button button-primary" type="submit" id="btnDownloadCanvasImage"
-                                download="file.png">Download</a>
-
-                            <div class="panel-section section-view">
-                                <div class="feature-wrapper feature-slicer inline-block">
-                                    <div id="slicer-control"></div>
-                                </div>
-                            </div>
-
-                            <div class="panel-section section-functions">
-                                <h5>Functions</h5>
-                                <label>
-                                    <input type="checkbox" id="chkGrid" autocomplete="off" checked>
-                                    <span class="label-body">set visibility of coordinate grid</span>
-                                </label>
-                                <i class="fas fa-info-circle" @click="showModal" style="font-size:24px"></i>
-                            </div>
-
+                <div class="canvas-area is-8 column">
+                    <div id="div-map">
+                        <div id="webgl" class="mapDesktop">
+                            <!-- <canvas id="imgCanvas" class="img-canvas">
+                        Canvas Not supported in your browser... Sorry!
+                      </canvas> -->
                         </div>
                     </div>
                 </div>
-                <!-- End of HTML markup for tab content: Tab panes -->
 
+                <div class="input-area is-4 column">
+
+
+                    <div class="columns">
+                        <div id="div-tabs" class="column">
+
+                            <div class="tabs">
+                                <ul class="tab-nav">
+                                    <li class="metadata-link is-active"  name="#one">
+                                        <a>                                            
+                                            <span class="icon is-small">
+                                                <i class="fas fa-image" aria-hidden="true"></i>
+                                            </span>
+                                            <span>Geology</span>
+                                        </a>
+                                    </li>
+                                    <li class="file-link" name="#two">
+                                        <a>
+                                            <span class="icon is-small">
+                                                <i class="fa fa-tasks" aria-hidden="true"></i>
+                                            </span>
+                                            <span>Analysis</span>
+                                        </a>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div class="tab-pane content-metadata active" id="one">
+                                        <div id="layer-control-parent-id"></div>
+                                    </div>
+                                    <div class="tab-pane content-file" id="two">
+                                        <h5 class="section-heading">Download Map Image</h5>
+
+
+                                        <a class="button is-light" type="submit" id="btnDownloadCanvasImage"
+                                            download="file.png">Download</a>
+
+                                        <div class="panel-section section-view">
+                                            <div class="feature-wrapper feature-slicer inline-block">
+                                                <div id="slicer-control"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="panel-section section-functions">
+                                            <h5>Functions</h5>
+                                            <label>
+                                                <input type="checkbox" id="chkGrid" autocomplete="off" checked>
+                                                <span class="label-body">set visibility of coordinate grid</span>
+                                            </label>                                           
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+
+
+                </div>
             </div>
+
+            <!-- </div> -->
         </div>
-
-
-
     </section>
+
+
 
     <script src="dist/main.js"></script>
 </body>
