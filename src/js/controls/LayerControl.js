@@ -147,16 +147,30 @@ export class LayerControl extends Control {
         let legendDiv = dom.createDom("div", { "style": "width:20px; height:20px;" }, legendDataCell);
         legendDiv.style.backgroundColor = "#" + obj.layer.color;
 
-        var chkDataCell = dom.createDom("td", { "class": "checkboxFive" }, legendEntryRow);
-        var lblDataCell = dom.createDom("td", { "style": "vertical-align: top;" }, legendEntryRow);
+        let chkDataCell = dom.createDom("td", { }, legendEntryRow);
+        let lblDataCell = dom.createDom("td", { "style": "vertical-align: top;" }, legendEntryRow);
 
 
-        var input = dom.createDom("input", { type: 'checkbox', checked: checked, id: util.stamp(obj.layer) }, chkDataCell);
-        input.layerId = util.stamp(obj.layer);
-        domEvent.on(input, 'click', function () { this._onInputClick(util.stamp(obj.layer)); }, this);
-        dom.createDom("label", { for: util.stamp(obj.layer) }, chkDataCell);
-
-        dom.createDom("span", { innerHTML: " " + obj.name + "&nbsp;" }, lblDataCell);
+        // var input = dom.createDom("input", { type: 'checkbox', checked: checked, id: util.stamp(obj.layer) }, chkDataCell);
+        // input.layerId = util.stamp(obj.layer);
+        // domEvent.on(input, 'click', function () { this._onInputClick(util.stamp(obj.layer)); }, this);
+        // dom.createDom("label", { for: util.stamp(obj.layer), class:"is-checkbox" }, chkDataCell);
+        // dom.createDom("span", { innerHTML: " " + obj.name + "&nbsp;" }, lblDataCell);
+        
+        let id = util.stamp(obj.layer);
+        let chkLayerHtml = `        
+        <label class="checkbox">
+            <input id='${id}' checked="checked" type="checkbox">              
+            <span>${obj.name}</span>
+        </label>         
+        `;
+        // <span  class="icon checkmark">
+        //     <i class="fa fa-check"></i>
+        //     </span>  
+        let chkLayer = dom.createDom("span", { class: 'control', innerHTML: chkLayerHtml }, chkDataCell);
+        let input =  chkLayer.querySelector('input');
+        input.layerId = id;
+        domEvent.on(input, 'click', function () { this._onInputClick(id); }, this);
       
         // thesaurus direct link link
         // let layerInfo = dom.createDom(

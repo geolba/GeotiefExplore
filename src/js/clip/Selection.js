@@ -96,7 +96,7 @@ export class Selection extends Layer {
     build(app_scene) {
         // app_scene.add(this.boxMesh);
         app_scene.add(this.displayMeshes);
-        // app_scene.add(this.touchMeshes);
+        app_scene.add(this.touchMeshes);
     }
 
     setWireframeMode(wireframe) {

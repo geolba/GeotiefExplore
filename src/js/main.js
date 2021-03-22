@@ -60,7 +60,8 @@ class Application {
         this.navigation = document.getElementsByClassName('navigation')[0];
         // this.addEventListeners();
 
-        this.dialog = new ShowModal("Help", container, { klass: "fm_about" });
+        let parentContainer = document.getElementById("app");
+        this.dialog = new ShowModal("Help", parentContainer, { klass: "fm_about" });
 
         // this.dialog = new MobileDialog("Help", container, { klass: "fm_about" });
         this.aboutIcon = document.querySelector('#menu-about-icon');
@@ -261,7 +262,7 @@ class Application {
         // this.slicer = new SlicerControl({ parentDiv: 'slicer-control' }).addTo(this.map);
 
 
-        // this.capsScene.add(this.selection.boxMesh);
+        this.capsScene.add(this.selection.boxMesh);
         // this.scene.add(this.selection.displayMeshes);
         // this.scene.add(this.selection.touchMeshes);
 
@@ -352,26 +353,36 @@ class Application {
     animate() {
         this.renderer.clear();
 
+        // The HTML5 Canvas's 'webgl' context obtained from the canvas where the renderer will draw.
         let gl = this.renderer.context;
-        // if (this.showCaps) {
 
-        //     this.renderer.state.setStencilTest(true);
+        if (this.showCaps && gl != undefined) {
 
-        //     this.renderer.state.setStencilFunc(gl.ALWAYS, 1, 0xff);
-        //     this.renderer.state.setStencilOp(gl.KEEP, gl.KEEP, gl.INCR);
-        //     // this.renderer.render(this.backStencil, this.camera);
+            // enable stencil test
+            gl.enable(gl.STENCIL_TEST);
+            // gl.stencilFunc( gl.ALWAYS, 1, 0xff );
+            // gl.stencilOp( gl.REPLACE, gl.REPLACE, gl.REPLACE );
 
-        //     this.renderer.state.setStencilFunc(gl.ALWAYS, 1, 0xff);
-        //     this.renderer.state.setStencilOp(gl.KEEP, gl.KEEP, gl.DECR);
-        //     // this.renderer.render(this.frontStencil, this.camera);
+            this.renderer.state.setStencilTest(true);
 
-        //     this.renderer.state.setStencilFunc(gl.EQUAL, 1, 0xff);
-        //     this.renderer.state.setStencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-        //     this.renderer.render(this.capsScene, this.camera);
+            gl.StencilFunc(gl.ALWAYS, 1, 0xff);
+            gl.StencilOp(gl.KEEP, gl.KEEP, gl.INCR);
+            // this.renderer.render(this.backStencil, this.camera);
 
-        //     this.renderer.state.setStencilTest(false);
+            gl.stencilFunc(gl.ALWAYS, 1, 0xff);
+            gl.StencilOp(gl.KEEP, gl.KEEP, gl.DECR);
+            // this.renderer.render(this.frontStencil, this.camera);
 
-        // }
+            gl.StencilFunc(gl.EQUAL, 1, 0xff);
+            gl.StencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+            this.renderer.render(this.capsScene, this.camera);
+
+            this.renderer.state.setStencilTest(false);
+
+            // disable stencil test
+            gl.disable(gl.STENCIL_TEST);
+        }
+
         this.renderer.render(this.scene, this.camera);
         this.northArrow.animate();
         this.gridlayer.animate();
@@ -401,25 +412,25 @@ class Application {
         // domEvent.on(this.menuIcon, 'click', function (e) {
         //     e.preventDefault();
         //     this.navigation.classList.toggle("active");
-    // }, this);
-            
+        // }, this);
+
         const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
         // Check if there are any navbar burgers
         if ($navbarBurgers.length > 0) {
-                // Add a click event on each of them
-          $navbarBurgers.forEach( el => {
-            el.addEventListener('click', () => {
-      
-              // Get the target from the "data-target" attribute
-              const target = el.dataset.target;
-              const $target = document.getElementById(target);
-      
-              // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
-              el.classList.toggle('is-active');
-              $target.classList.toggle('is-active');
-      
+            // Add a click event on each of them
+            $navbarBurgers.forEach(el => {
+                el.addEventListener('click', () => {
+
+                    // Get the target from the "data-target" attribute
+                    const target = el.dataset.target;
+                    const $target = document.getElementById(target);
+
+                    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                    el.classList.toggle('is-active');
+                    $target.classList.toggle('is-active');
+
+                });
             });
-          });
         }
 
         var tabButtons = [].slice.call(document.querySelectorAll('ul.tab-nav li'));

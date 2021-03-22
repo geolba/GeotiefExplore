@@ -3,7 +3,7 @@ import * as dom from "../core/domUtil";
 import * as domEvent from "../core/domEvent";
 import * as util from "../core/utilities";
 
-import "./ShowModal.css";
+// import "./ShowModal.css";
 
 // @Component({})
 export class ShowModal {
@@ -39,40 +39,56 @@ export class ShowModal {
 
         }       
         let dialogHtml = `
-        <div class="modal-backdrop">
-            <div
-                class="modal"
-                role="dialog"
-                aria-labelledby="modalTitle"
-                aria-describedby="modalDescription"
-            >
-                <header class="modal-header" id="modalTitle">               
-                <slot name="header">
-                ${this.title}
-                    <button
-                    type="button"
-                    class="btn-close"                   
-                    aria-label="Close modal"
-                    >
-                    x
-                    </button>
-                </slot>
-                </header>
-                <section class="modal-body modalDescription">
-                </section>
-                <section class="modal-body additionalDescription">               
-                </section>
-                <footer class="modal-footer">
-                <slot name="footer">                 
-                </slot>
-                </footer>
-            </div>
+        <div
+            class="modal"
+            role="dialog"
+            aria-labelledby="modalTitle"
+            aria-describedby="modalDescription"
+        >
+            <div class="modal-background"></div>
+            <header class="modal-header" id="modalTitle">  
+            ${this.title}
+                <button
+                type="button"
+                class="modal-close btn-close"                   
+                aria-label="Close modal"
+                >
+                x
+                </button>           
+            </header>
+           
+            <div class="modal-content">
+                <div class="box">
+                <article class="media">
+                   
+                    <div class="media-content ">
+                        <div class="modalDescription">
+                            <p>
+                            <strong>Modal</strong> <small>Basic Demo</small> 
+                            <br>
+                            The content for the modal comes here. You may use text, images, buttons etc. here.
+                            </p>
+                        </div>
+                        <div class="additionalDescription">
+                    </div>
+                    </div>
+                    
+                </article>
+                </div>
+            </div>   
+           
         </div>
         `;
-
+    //     <div class="media-left">
+    //     <figure class="image is-64x64">
+    //         <img src="https://bulma.io/images/placeholders/128x128.png" alt="Image">
+    //     </figure>
+    // </div>
+       
 
         this.domNode = dom.createDom("div", { class: "popup" }, container);
-        this.dialogDiv = dom.createDom("div", { class: this.options.klass + " fm_overlay hide", innerHTML: dialogHtml }, container);
+        this.dialogDiv = dom.createDom("div", { class: this.options.klass + " fm_overlay", innerHTML: dialogHtml }, container);
+        this.modal =  this.dialogDiv.querySelector(".modal");
         this.popupcontent =  this.dialogDiv.querySelector(".modalDescription");
         //additional info div
         this.pageinfo = this.dialogDiv.querySelector(".additionalDescription");
@@ -84,8 +100,9 @@ export class ShowModal {
     }
 
     hide(e) {
-        this.dialogDiv.classList.add('hide');
-        this.dialogDiv.classList.remove('show');
+        // this.dialogDiv.classList.add('hide');
+        // this.dialogDiv.classList.remove('show');
+        this.modal.classList.remove("is-active");  
     }
 
     show(html) {
@@ -127,7 +144,7 @@ export class ShowModal {
                 <li id="lib_normalize">normalize.css <a href="https://github.com/necolas/normalize.css" target="_blank">github.com/necolas/normalize.css</a>
                 <a href="https://github.com/necolas/normalize.css/blob/master/LICENSE.md" target="_blank" class="license">MIT License</a></li>
 
-                <li id="lib_fontawesome">Font Awesome Free <a href="https://github.com/FortAwesome/Font-Awesome" target="_blank">github.com/FortAwesome/Font-Awesome</a>
+                <li id="lib_fontawesome">Font Awesome Free <a href="https://github.com/FortAwesome/Font-Awesome" target="_blank">github.com/FortAwesome</a>
                 <a href="https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt" target="_blank" class="license">Font: SIL OFL 1.1, CSS: MIT License, Icons: CC BY 4.0 License</a></li>
 
                 </ul>
@@ -135,8 +152,9 @@ export class ShowModal {
             this.pageinfo.style.display = "block";
         }
 
-        this.dialogDiv.classList.add('show');
-        this.dialogDiv.classList.remove('hide');
+        // this.dialogDiv.classList.add('show');
+        // this.dialogDiv.classList.remove('hide');
+        this.modal.classList.add("is-active");
     }
 
     _help() {

@@ -9,9 +9,16 @@
 // Import a Google Font
 @import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
 
-// Set your brand colors
-$purple: #8A4D76;
+// 1. Import the initial variables
+@import "../../node_modules/bulma/sass/utilities/_all.sass";
+
+// 2. Set your own initial (brand) variables
+// Update the blue shade, used for links
+$blue: #06bcef;
+// Add pink and its invert
 $pink: #FA7C91;
+$pink-invert: #fff;
+$purple: #8A4D76;
 $brown: #757763;
 $beige-light: #D0D1CD;
 $beige-lighter: #EFF0EB;
@@ -19,7 +26,10 @@ $mouse-grey: #6c6e6b;
 $select-green: #03a678;
 
 // Update Bulma's global variables
+// Update the sans-serif font family
 $family-sans-serif: "Nunito", sans-serif;
+
+// 3. Set the derived variables
 $grey-dark: $brown;
 // $grey-light: $beige-light;
 // $primary: $purple;
@@ -267,7 +277,6 @@ ul {
     display: none;
     /* visibility: hidden; */
 }
-
 .tab-content .tab-pane.active {
     display: block;
     /* visibility: visible; */
@@ -276,10 +285,11 @@ ul {
     padding:1em;
   }
 
-// Import only what you need from Bulma
-@import "../../node_modules/bulma/sass/utilities/_all.sass";
+// 4. Import the rest of bulma, only what you need from Bulma
+// @import "../../node_modules/bulma/sass/utilities/_all.sass";
 @import "../../node_modules/bulma/sass/grid/_all.sass";
 @import "../../node_modules/bulma/sass/base/_all.sass";
+@import "../../node_modules/bulma/sass/elements/box.sass";
 @import "../../node_modules/bulma/sass/elements/button.sass";
 @import "../../node_modules/bulma/sass/elements/container.sass";
 @import "../../node_modules/bulma/sass/elements/title.sass";
@@ -287,6 +297,8 @@ ul {
 @import "../../node_modules/bulma/sass/form/_all.sass";
 @import "../../node_modules/bulma/sass/components/navbar.sass";
 @import "../../node_modules/bulma/sass/components/tabs.sass";
+@import "../../node_modules/bulma/sass/components/media.sass";
+@import "../../node_modules/bulma/sass/components/modal.sass";
 
 @import "../../node_modules/bulma/sass/layout/hero.sass";
 @import "../../node_modules/bulma/sass/layout/section.sass";

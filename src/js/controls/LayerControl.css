@@ -74,15 +74,13 @@ height: 31py;
 
 vertical-align: super;
 }
-.gba-controllayers input[type=checkbox] {
+/* .gba-controllayers input[type=checkbox] {
      position: absolute; 
    overflow: hidden; 
    clip: rect(0 0 0 0); 
-   /* height:1px; 
-   width:1px;    */
    padding:0;
    border:0;
-}
+} */
 
 
 /**Create the box for the checkbox*/ 
@@ -97,7 +95,6 @@ left: 0;
 right: 0;
 text-align: center;
    background: #eee;
-   /* border: 1px solid #ddd; */
 }
 /* Display the tick inside the checkbox */
 .checkboxFive label:after {
