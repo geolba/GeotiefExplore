@@ -113,12 +113,12 @@ export class BaseEditor {
         this._processDrawingClick(e);
     }
 
-    _processDrawingClick (e) {
+    _processDrawingClick(e) {
         this.fireAndForward('editable:drawing:clicked', e);
         this._commitDrawing(e);
     }
 
-    _commitDrawing (e) {
+    _commitDrawing(e) {
         this._onCommitDrawing(e);
     }
 
@@ -134,11 +134,11 @@ export class BaseEditor {
         this._endDrawing();
     }
 
-    _onCancelDrawing () {
+    _onCancelDrawing() {
         this.fireAndForward('editable:drawing:cancel');
     }
 
-    _endDrawing () {
+    _endDrawing() {
         this._drawing = false;
         this.mapTool.unregisterForDrawing(this);
         this._onEndDrawing();

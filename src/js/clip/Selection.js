@@ -2,7 +2,6 @@ import { BoxGeometry } from 'three/src/geometries/BoxGeometry';
 import { Mesh } from 'three/src/objects/Mesh';
 import * as material from './material';
 import { Vector3 } from 'three/src/math/Vector3';
-import { Object3D } from 'three/src/core/Object3D';
 import { uniforms } from "./uniforms";
 import { SelectionBoxFace } from './SelectionBoxFace';
 import { SelectionBoxLine } from './SelectionBoxLine';
