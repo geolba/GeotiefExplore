@@ -86,6 +86,17 @@ export function setProperties(element, properties) {
     }
 }
 
+
+// @function hasClass(el: HTMLElement, name: String): Boolean
+// Returns `true` if the element's class attribute contains `name`.
+export function hasClass(el, name) {
+	if (el.classList !== undefined) {
+		return el.classList.contains(name);
+	}
+	var className = getClass(el);
+	return className.length > 0 && new RegExp('(^|\\s)' + name + '(\\s|$)').test(className);
+}
+
 // @function addClass(el: HTMLElement, name: String)
 // Adds `name` to the element's class attribute.
 export function addClass(el, name) {

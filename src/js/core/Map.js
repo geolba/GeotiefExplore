@@ -2,6 +2,7 @@ import { OrbitControls } from '../lib/OrbitControls';
 import * as dom from './domUtil';
 import { HomeButton } from '../controls/HomeButton';
 import { ZoomControl } from '../controls/ZoomControl';
+import { BoreholeControl } from '../controls/BoreholeControl';
 import * as util from './utilities';
 import { TinLayer } from '../layer/TinLayer';
 
@@ -125,6 +126,8 @@ class Map extends OrbitControls {
 
         let zoomControl = this._controls.zoomControl = new ZoomControl();
         zoomControl.addTo(this);
+
+        this._controls.maptoolControl = new BoreholeControl().addTo(this);
     }
 
     async addLayer(layer) {
@@ -148,6 +151,10 @@ class Map extends OrbitControls {
 
     hasLayer(layer) {
         return !!layer && (util.stamp(layer) in this._layers);
+    }
+
+    getCenter () { // (Boolean) -> LatLng      
+        return this.target;
     }
 
 }

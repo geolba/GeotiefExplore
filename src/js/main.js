@@ -13,7 +13,6 @@ import { NorthArrow } from './controls/NorthArrow';
 import { LayerControl } from './controls/LayerControl';
 import { BasemapControl } from './controls/BasemapControl';
 import { SliderControl } from './controls/SliderControl';
-// import { SlicerControl } from './controls/SlicerControl';
 import { Mesh } from 'three/src/objects/Mesh';
 import { SphereGeometry } from 'three/src/geometries/SphereGeometry';
 import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
@@ -196,7 +195,7 @@ class Application {
         );
         this.map.addLayer(this.selection);
 
-        new Picking(size, center, this);
+        this.map.picking = new Picking(size, center, this);
 
 
         // let boxLayer = new BoxLayer({ 

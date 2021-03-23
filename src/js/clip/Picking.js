@@ -17,6 +17,8 @@ export class Picking {
     plane;
     touchCapable = false;
     isDraging = false;
+    enabled = true;
+    defaultMapCursor;
 
     constructor(size, center, simulation) {
         this.size = size;
@@ -43,6 +45,7 @@ export class Picking {
         simulation.scene.add(this.plane);
 
         this.domElement = simulation.renderer.domElement;
+        this.defaultMapCursor = this.domElement.style.cursor;
         domEvent.on(this.domElement, 'mousemove', this.mouseMove, this);
         if (this.touchCapable == true) {
             domEvent.on(this.domElement, 'touchstart', this.beginDrag, this);
@@ -78,7 +81,7 @@ export class Picking {
     }
 
     mouseMove(event) {
-        if (this.isDraging == true || this.simulation.selection.visible == false) {
+        if (this.isDraging == true || this.simulation.selection.visible == false || this.enabled == false) {
             return;
         }
         let point = this._getCanvasPoint(event);
@@ -110,14 +113,14 @@ export class Picking {
             // cursor is not selecting the box
             this.intersected.guardian.rayOut();
             this.intersected = null;
-            this.simulation.renderer.domElement.style.cursor = 'auto';
+            this.simulation.renderer.domElement.style.cursor = this.defaultMapCursor;
             // this.simulation.throttledRender();
             this.simulation.deferringThrottle();
         }
     }
 
     beginDrag(event) {
-        if (this.simulation.selection.visible == false) {
+        if (this.simulation.selection.visible == false && this.enabled == false) {
             return;
         }
         // exit drag method, if not left mouse button was clicked
@@ -223,6 +226,26 @@ export class Picking {
                 domEvent.on(this.domElement, 'mouseleave', endDrag, this);
             }
         }
+    }
+
+    disable () {
+        domEvent.off(this.domElement, 'mousemove', this.mouseMove, this);
+        if (this.touchCapable == true) {
+            domEvent.off(this.domElement, 'touchstart', this.beginDrag, this);
+        } else {
+            domEvent.off(this.domElement, 'mousedown', this.beginDrag, this);
+        }
+        this.enabled = false;
+    }
+
+    enable() {
+        domEvent.on(this.domElement, 'mousemove', this.mouseMove, this);
+        if (this.touchCapable == true) {
+            domEvent.on(this.domElement, 'touchstart', this.beginDrag, this);
+        } else {
+            domEvent.on(this.domElement, 'mousedown', this.beginDrag, this);
+        }
+        this.enabled = true;
     }
 
 

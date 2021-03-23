@@ -1,0 +1,51 @@
+.gba-maptool-control {   
+    border-radius: 4px;
+    border: 1px solid #bbb;
+    box-shadow: none;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+}
+.gba-maptool-control a {    
+    background-position: 50% 50%;
+      margin: 0;
+    background-repeat: no-repeat;
+    display: block;
+    height: 30px;
+    width: 30px;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAdCAAAAACYz4PQAAAAAnRSTlMA/1uRIrUAAAAJcEhZcwAAFxIAABcSAWef0lIAAACLSURBVCjPzZExGQUxCINjoB5qAge1UBvdKgIN3c8ELjqjAQu89W4g8+tG/4+QAPL9zMw+H3gXd5mtKLGfTK3x/XPsDLskyR3SyFr2wKi7cwCLiAPPqcUDhwbbmfxi2thaDjpxPoFZ4+gYSjCEOpdg2DVdmPPojcxWATlodrRNgz27np029RLx9PjWPwOEKTMp8DmSAAAAAElFTkSuQmCC') /*img/drill2.png*/;
+   float: left;
+}
+.measure-enabled .gba-maptool-control a{
+    background-color:skyblue;
+}
+#radio{
+    float: left;
+}
+
+.gba-maptool-toggle {
+    display: inline-block;
+    vertical-align: middle;
+}
+.gba-maptool-control input:checked + label:before {
+    content: '✓';
+    padding-left: -2em;
+}
+.gba-maptool-control input[type=radio] {
+    display: none;
+}
+.gba-maptool-control input[type=radio] + label {
+    display: none;  
+     line-height: 30px;
+    height: 30px;
+    width: 30px;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;  
+}
+.measure-enabled .gba-maptool-control input[type=radio] + label {
+    display: inline-block;
+}
