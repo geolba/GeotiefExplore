@@ -8,13 +8,18 @@ import { Plane } from 'three/src/math/Plane';
 import { Vector3 } from 'three/src/math/Vector3';
 import { Color } from 'three/src/math/Color';
 import { MyMeshStandardMaterial } from '../clip/MyMeshStandardMaterial';
-import { Object3D } from 'three/src/core/Object3D';
+import { Group } from 'three/src/objects/Group';
 
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
 
 class TinLayer extends Layer {
+
+    queryableObjects;
+    borderVisible;
+    scale;
+    objectGroup;
 
     constructor(params) {
         super();
@@ -31,6 +36,7 @@ class TinLayer extends Layer {
         this.queryableObjects = [];
         this.borderVisible = false;
         this.scale = 1;
+        this.objectGroup = new Group();
     }
 
     setWireframeMode(wireframe) {
@@ -43,22 +49,30 @@ class TinLayer extends Layer {
 
     setVisible(visible) {
         this.visible = visible;
-        this.mainMesh.visible = visible;
+        this.objectGroup.visible = visible;
         this.emit('visibility-change');
+    }
+
+    addObject (object, queryable) {
+        if (queryable === undefined) {
+            queryable = this.q;
+        }
+        this.objectGroup.add(object);
+        if (queryable) {
+            this._addQueryableObject(object);
+        }
+    }
+
+    _addQueryableObject (object) {
+        this.queryableObjects.push(object);
+        //for (var i = 0, l = object.children.length; i < l; i++) {
+        //    this._addQueryableObject(object.children[i]);
+        //}
     }
 
     scaleZ(z) {
         this.scale = z;
-        this.mainMesh.scale.z = z;
-    //     let highObject = new Object3D();
-    //     highObject.position.copy(this.uniforms.clipping.clippingHigh.value);
-    //     let lowObject = new Object3D();
-    //     lowObject.position.copy(this.uniforms.clipping.clippingLow.value);
-    //    highObject.scale.z =z;
-    //    lowObject.scale.z = z;
-    //     this.uniforms.clipping.clippingHigh.value.z = highObject.position.z;
-    //     this.uniforms.clipping.clippingLow.value.z = lowObject.position.z;
-        // this.uniforms.clipping.scale.value = z;
+        this.objectGroup.scale.z = z;
     }
 
     async onAdd(map) {
@@ -125,9 +139,10 @@ class TinLayer extends Layer {
         }, uniforms.clipping);   
         this.materialsArray.push(this.material);
         let mesh = this.mainMesh = new Mesh(geometry, this.material);
-        // mesh.userData.layerId = this.index;        
+        mesh.userData.layerId = this.index;
+        this.addObject(mesh, true);              
         if (app_scene) {
-            app_scene.add(mesh);
+            app_scene.add(this.objectGroup);
         }
     }
 

@@ -1,4 +1,5 @@
 import { EventEmitter } from '../core/EventEmitter';
+import { BoreholePopup } from '../controls/BoreholePopup';
 
 class Layer extends EventEmitter {
 
@@ -36,6 +37,10 @@ class Layer extends EventEmitter {
         //}
         //this.fire('add');
         //map.fire('layeradd', { layer: this });
+    }
+
+    setWireframeMode(wireframe) {
+        return;
     }
 
     getScene() {

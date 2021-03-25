@@ -24,7 +24,7 @@ export class BaseEditor {
         //this.editLayer = new LayerGroup();
         this.mapTool = map.mapTool; //this.options.editTools || map.mapTool;
 
-        // this.marker.bindPopup(map._controls.boreholePopup);
+        this.marker.bindPopup(map._controls.boreholePopup);
     }
 
     enable() {
@@ -101,17 +101,47 @@ export class BaseEditor {
         if (e._cancelled) return;
         //if (!this.isConnected()) {
         //    this.connect(e);
-        //}
-        var dxfIdentifyParams = {};
-        dxfIdentifyParams.clientX = e.clientX;
-        dxfIdentifyParams.clientY = e.clientY;
+        //}        
+        let eventX = (e.clientX !== undefined) ? e.clientX : (e.touches && e.touches[0].clientX);
+        let eventY = (e.clientY !== undefined) ? e.clientY : (e.touches && e.touches[0].clientY);
+        let dxfIdentifyParams = {};
+        dxfIdentifyParams.clientX = eventX;
+        dxfIdentifyParams.clientY = eventY;
         dxfIdentifyParams.width = this.map.container.clientWidth;
         dxfIdentifyParams.height = this.map.container.clientHeight;
-        // var deferred = this.mapTool.drillTask.execute(dxfIdentifyParams);
-        // deferred.then(this.handleQueryResults3.bind(this));
+        let deferred = this.mapTool.drillTask.execute(dxfIdentifyParams);
+        deferred.then(this.handleQueryResults.bind(this));
 
         this._processDrawingClick(e);
     }
+
+    handleQueryResults() {
+        let results = arguments;
+        //var content = [];
+        let features = results[0].features;
+        let aufschlag = results[0].aufschlag;
+        if (!this.isConnected()) {
+            this.connect(aufschlag);
+        }
+        else {
+            this.marker.setLatLng(aufschlag);
+        }
+        this.marker.setPopupChartData("test");
+        this.marker.openPopup();
+
+    }
+
+    connect(e) {
+        // On touch, the latlng has not been updated because there is
+        // no mousemove.
+        if (e) this.marker._latlng = { x: e.x, y: e.y, z: e.z }; //e.latlng;
+        //this.marker.update();
+
+        //L.Editable.BaseEditor.prototype.connect.call(this, e);
+        this.mapTool.connectCreatedToMap(this.marker);
+        //this.mapTool.editLayer.addLayer(this.editLayer);
+    }
+
 
     _processDrawingClick(e) {
         this.fireAndForward('editable:drawing:clicked', e);

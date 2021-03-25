@@ -3,6 +3,7 @@ import * as dom from './domUtil';
 import { HomeButton } from '../controls/HomeButton';
 import { ZoomControl } from '../controls/ZoomControl';
 import { BoreholeControl } from '../controls/BoreholeControl';
+import { BoreholePopup } from '../controls/BoreholePopup';
 import * as util from './utilities';
 import { TinLayer } from '../layer/TinLayer';
 
@@ -28,7 +29,7 @@ class Map extends OrbitControls {
         // call parent constructor of OrbitControls
         super(size, center, camera, scene, container);
 
-        this.size = size;        
+        this.size = size;
         this.camera = camera;
         this.container = container;
         this.length = x.max - x.min;
@@ -50,7 +51,6 @@ class Map extends OrbitControls {
         // to do: initialize layers via serviceUrl:
         // this.serviceUrl = serviceUrl;
         this._layers = {};
-        this.initControls();
 
         this.basemaps = {
             "currentVersion": 10.01,
@@ -68,6 +68,8 @@ class Map extends OrbitControls {
         // now instantiate and return a class
         let map = new Map(x, y, z, center, camera, scene, container);
         map._initDataLayers(modelData.mappedfeatures);
+        map._initControls();
+
         map.title = modelData.model.model_name;
         return map;
     }
@@ -118,7 +120,7 @@ class Map extends OrbitControls {
         createCorner('bottom', 'right');
     }
 
-    initControls() {
+    _initControls() {
         this._controls = this._controls || {};
         // this._controls.homeControl = (new HomeButton()).addTo(this);
         let homeControl = this._controls.homeControl = new HomeButton();
@@ -128,6 +130,8 @@ class Map extends OrbitControls {
         zoomControl.addTo(this);
 
         this._controls.maptoolControl = new BoreholeControl().addTo(this);
+        this._controls.boreholePopup = new BoreholePopup({});
+        this._controls.boreholePopup.addTo(this);
     }
 
     async addLayer(layer) {
@@ -149,11 +153,42 @@ class Map extends OrbitControls {
         return this;
     }
 
+    removeLayer(layer) {
+        let id = util.stamp(layer);
+
+        if (!this._layers[id]) { return this; }
+
+        //if (this._loaded) {
+        //    layer.onRemove(this);
+        //}
+        layer.onRemove(this);
+        this.emit("change");
+        //if (layer.getAttribution && this.attributionControl) {
+        //    this.attributionControl.removeAttribution(layer.getAttribution());
+
+        //}
+
+        //if (layer.getEvents) {
+        //    this.off(layer.getEvents(), layer);
+        //}
+
+        delete this._layers[id];
+
+        //if (this._loaded) {
+        //    this.emit('layerremove', { layer: layer });
+        //    layer.emit('remove');
+        //}
+
+        layer._map = layer._mapToAdd = null;
+
+        return this;
+    }
+
     hasLayer(layer) {
         return !!layer && (util.stamp(layer) in this._layers);
     }
 
-    getCenter () { // (Boolean) -> LatLng      
+    getCenter() { // (Boolean) -> LatLng      
         return this.target;
     }
 

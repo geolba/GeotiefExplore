@@ -1,8 +1,19 @@
 import { Layer } from './Layer';
 import * as util from '../core/utilities';
 import { BaseEditor } from '../core/BaseEditor';
+import { CylinderGeometry } from 'three/src/geometries/CylinderGeometry';
+import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
+import { MathUtils } from 'three/src/math/MathUtils';
+import { Mesh } from 'three/src/objects/Mesh';
 
 export class MarkerLayer extends Layer {
+
+    constructor(latlng, options) {
+        super();
+        util.setOptions(this, options);
+        this._latlng = latlng;
+
+    }
 
     createEditor(map) {
         map = map || this._map;
@@ -29,16 +40,11 @@ export class MarkerLayer extends Layer {
         clickable: true,
     };
 
-    constructor(latlng, options) {
-        super();
-        util.setOptions(this, options);
-        this._latlng = latlng;
 
-    }
 
     onAdd(map) {
         //this._zoomAnimated = this._zoomAnimated && map.options.markerZoomAnimation;
-
+        this.map = map;
         this._initIcon();
         this.update();
         this.emit('add');
@@ -71,13 +77,13 @@ export class MarkerLayer extends Layer {
 
     _initIcon() {
         //create default icon
-        var opt = { r: 0.25, c: 0xffff00, o: 0.8 };
-        var icon = new THREE.Mesh(new THREE.CylinderGeometry(0, 0.5, 2),
-            new THREE.MeshLambertMaterial({ color: 0x38eeff, opacity: opt.o, transparent: (opt.o < 1) }));
-        icon.rotation.x = THREE.Math.degToRad(-90);
+        let options = { r: 0.25, c: 0xffff00, o: 0.8 };
+        let icon = new Mesh(new CylinderGeometry(0, 500, 1500),
+            new MeshLambertMaterial({ color: 0x38eeff, opacity: options.o, transparent: (options.o < 1) }));
+        icon.rotation.x = MathUtils.degToRad(-90);
         icon.visible = true;
         //app.scene.add(app.boreholeMarker);
-        var addIcon = false;
+        let addIcon = false;
 
         // if we're not reusing the icon, remove the old one and init new one
         if (icon !== this._icon) {
@@ -98,8 +104,13 @@ export class MarkerLayer extends Layer {
         //this._initInteraction();
 
         if (addIcon === true) {
-            this.getPane().add(this._icon);
+            this.getScene().add(this._icon);
         }
+    }
+
+    scaleZ(z) {
+        // this._icon.scale.z = z;    
+        return;    
     }
 
     _removeIcon() {
@@ -111,7 +122,7 @@ export class MarkerLayer extends Layer {
         //}
 
         //L.DomUtil.remove(this._icon);
-        this.getPane().remove(this._icon);
+        this.getScene().remove(this._icon);
         //this.removeInteractiveTarget(this._icon);
 
         this._icon = null;

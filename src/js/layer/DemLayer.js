@@ -28,6 +28,9 @@ export class DemLayer extends Layer {
     }
     ];
 
+    queryableObjects;
+    borderVisible;
+
     constructor(params) {
         super();
 

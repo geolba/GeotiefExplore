@@ -4,6 +4,10 @@ import * as domEvent from '../core/domEvent';
 import { MarkerLayer } from '../layer/MarkerLayer';
 import * as dom from '../core/domUtil';
 import * as util from '../core/utilities';
+import { BoreholeIdentify } from '../tasks/BoreholeIdentify';
+import { TinLayer } from '../layer/TinLayer';
+import { DemLayer } from '../layer/DemLayer';
+import { LayerGroup } from '../layer/LayerGroup';
 
 export class BoreholeTool extends EventEmitter {
 
@@ -31,6 +35,21 @@ export class BoreholeTool extends EventEmitter {
 
         let highlightMaterial = new MeshLambertMaterial({ emissive: 0x999900, transparent: true, opacity: 0.5 });
         this.defaultMapCursor = this.map.domElement.style.cursor;
+        this.featuresLayer = this._createFeaturesLayer();
+
+        let dataLayer = [];
+        Object.values(this.map.layers).forEach(layer => {
+            //if (layer.visible && layer.queryableObjects.length) {
+            if (layer instanceof DemLayer || layer instanceof TinLayer) {
+                dataLayer.push(layer);
+            }
+        });
+        this.drillTask = new BoreholeIdentify({
+            camera: this.map.object,
+            domElement: this.map.domElement, //layer: layer,
+            highlightMaterial: highlightMaterial,
+            layers: dataLayer
+        });
     }
 
     // _createFeaturesLayer () {
@@ -60,7 +79,7 @@ export class BoreholeTool extends EventEmitter {
     disable() {
         //if (this.map.mapTool) this.map.mapTool.off('editable:drawing:start', this.disable.bind(this));
         dom.removeClass(this.map.container, 'measure-enabled');
-        // this.featuresLayer.clearLayers();
+        this.featuresLayer.clearLayers();
         //this.fireAndForward('hidemeasure');
         if (this._drawingEditor) {
             this._drawingEditor.cancelDrawing();
@@ -72,6 +91,14 @@ export class BoreholeTool extends EventEmitter {
         e.mapTool = this;
         this.emit(type, e);
         this.map.emit(type, e);
+    }
+
+    connectCreatedToMap(layer) {
+        return this.featuresLayer.addLayer(layer);
+    }
+
+    _createFeaturesLayer() {
+        return new LayerGroup().addTo(this.map);
     }
 
     _startMarker(latlng, options) {
@@ -165,8 +192,8 @@ export class BoreholeTool extends EventEmitter {
         //var xClickedOnCanvas = e.clientX - canvasOffset.left;
         //var yClickedonCanvas = e.clientY - canvasOffset.top;
         //var event = { x: xClickedOnCanvas, y: yClickedonCanvas };
-        this.mapTool._mouseDown = e;
-        this.mapTool._drawingEditor.onDrawingMouseDown(e);
+        this.mapTool._mouseDown = e[0];
+        this.mapTool._drawingEditor.onDrawingMouseDown(e[0]);
     }
 
     _onMouseup(e) {

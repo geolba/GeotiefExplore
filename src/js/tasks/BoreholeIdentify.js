@@ -20,10 +20,25 @@ export class BoreholeIdentify {
         this.layers = defaults.layers;
     }
 
+    _getOffset(element) {
+        if (!element.getClientRects().length) {
+            return { top: 0, left: 0 };
+        }
+
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return (
+            {
+                top: rect.top + win.pageYOffset,
+                left: rect.left + win.pageXOffset
+            });
+    }
+
     execute(params) {
-        let canvasOffset = $(this.domElement).offset();
+        // let canvasOffset = $(this.domElement).offset();
+        let canvasOffset = this._getOffset(this.domElement);
         let xClickedOnCanvas = params.clientX - canvasOffset.left;
-        let yClickedonCanvas = params.clientY - canvasOffset.top;
+        let yClickedonCanvas = params.clientY - canvasOffset.top;       
         //this.camera = params.camera;
 
         let eventsResponse = this._intersectObjects(xClickedOnCanvas, yClickedonCanvas, params.width, params.height);
@@ -47,7 +62,7 @@ export class BoreholeIdentify {
                     // calculate mouse position in normalized device coordinates                  
                     let mouseXForRay = (offsetX / width) * 2 - 1;
                     let mouseYForRay = -(offsetY / height) * 2 + 1;
-                    let z = 0.5;
+                    let z = 0;
 
                     let vector = new Vector3(mouseXForRay, mouseYForRay, z);
                     vector.unproject(this.camera);
@@ -60,17 +75,17 @@ export class BoreholeIdentify {
                     //raycaster.set(vector, direction);
 
                     //raycaster.setFromCamera(mouse, this.camera);
-                    let a = this._getQueryableObjects();//nur die sichtbar sind
-                    let b = this._getQueryableObjects2();//alle
+                    let visibleMehses = this._getQueryableObjects();//nur die sichtbar sind
+                    let allMeshes = this._getQueryableObjects2();//alle
                     let intersects = [];
-                    let intersects1 = raycaster.intersectObjects(a, true);
+                    let intersects1 = raycaster.intersectObjects(visibleMehses, true);
                     if (intersects1.length > 0) {
                         this.start = intersects1[0].point.clone();
                         let startPosition = intersects1[0].point;
-                        startPosition.z = 60;// += 0.5;
+                        startPosition.z += 0.5;
                         let direction = new Vector3(0, 0, -1);
                         let raycaster = new Raycaster(startPosition, direction);
-                        intersects = raycaster.intersectObjects(b, false);
+                        intersects = raycaster.intersectObjects(allMeshes, false);
                     }
 
                     let resultObjects = [];
@@ -85,7 +100,7 @@ export class BoreholeIdentify {
                         let layer = obj.object;
                         let layerId = layer.userData.layerId;
                         let objectGroup = layer.parent;
-                        let featureId = obj.index;// obj.faceIndex;
+                        let featureId = obj.faceIndex;// obj.faceIndex;
                         let scaleFactor = parseFloat(objectGroup.scale.z);
 
                         if (scaleFactor > 1) {
@@ -154,7 +169,8 @@ export class BoreholeIdentify {
 
     _getQueryableObjects() {
         let _queryableObjects = [];
-        this.layers.forEach(function (layer) {
+        // this.layers.forEach(function (layer) {
+            Object.values(this.layers).forEach(layer => {
             if (layer.visible && layer.queryableObjects.length) {
                 _queryableObjects = _queryableObjects.concat(layer.queryableObjects);
             }
@@ -164,7 +180,8 @@ export class BoreholeIdentify {
 
     _getQueryableObjects2() {
         let _queryableObjects = [];
-        this.layers.forEach(function (layer) {
+        // this.layers.forEach(function (layer) {
+        Object.values(this.layers).forEach(layer => {
             //if (layer.visible && layer.queryableObjects.length) {
             if (layer.queryableObjects.length) {
                 _queryableObjects = _queryableObjects.concat(layer.queryableObjects);
