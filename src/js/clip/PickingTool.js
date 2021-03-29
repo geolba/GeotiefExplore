@@ -3,11 +3,11 @@ import { Vector3 } from 'three/src/math/Vector3';
 import { Raycaster } from 'three/src/core/Raycaster';
 import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry';
 import { Mesh } from 'three/src/objects/Mesh';
-import * as material from '../clip/material';
+import * as material from './material';
 import * as domEvent from '../core/domEvent';
 import * as browser from '../core/browser';
 
-export class Picking {
+export class PickingTool {
 
     simulation;
     intersected;
@@ -91,7 +91,7 @@ export class Picking {
         let y = -(point.y / height) * 2 + 1;
         this.mouse.set(x, y);
 
-        this.ray.setFromCamera(this.mouse, this.simulation.camera);
+        this.ray.setFromCamera(this.mouse, this.simulation.map.camera);
         let intersects = this.ray.intersectObjects(this.simulation.selection.selectables);
 
         if (intersects.length > 0) {
@@ -135,7 +135,7 @@ export class Picking {
         let y = -(point.y / height) * 2 + 1;
         this.mouse.set(x, y);
 
-        this.ray.setFromCamera(this.mouse, this.simulation.camera);
+        this.ray.setFromCamera(this.mouse, this.simulation.map.camera);
         let intersects = this.ray.intersectObjects(this.simulation.selection.selectables);
 
         if (intersects.length > 0) {
@@ -158,8 +158,8 @@ export class Picking {
             }
             this.plane.position.copy(intersectionPoint);
 
-            let newNormal = this.simulation.camera.position.clone().sub(
-                this.simulation.camera.position.clone().projectOnVector(this.normals[axis])
+            let newNormal = this.simulation.map.camera.position.clone().sub(
+                this.simulation.map.camera.position.clone().projectOnVector(this.normals[axis])
             );
             this.plane.lookAt(newNormal.add(intersectionPoint));
             this.simulation.renderer.domElement.style.cursor = 'grab';
@@ -177,7 +177,7 @@ export class Picking {
                 let y = -(point.y / height) * 2 + 1;
                 this.mouse.set(x, y);
 
-                this.ray.setFromCamera(this.mouse, this.simulation.camera);
+                this.ray.setFromCamera(this.mouse, this.simulation.map.camera);
                 let intersects = this.ray.intersectObject(this.plane);
                 if (intersects.length > 0) {
                     let value;

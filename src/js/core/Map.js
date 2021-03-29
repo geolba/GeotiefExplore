@@ -6,6 +6,8 @@ import { BoreholeControl } from '../controls/BoreholeControl';
 import { BoreholePopup } from '../controls/BoreholePopup';
 import * as util from './utilities';
 import { TinLayer } from '../layer/TinLayer';
+import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
+import { Vector3 } from 'three/src/math/Vector3';
 
 class Map extends OrbitControls {
 
@@ -24,8 +26,29 @@ class Map extends OrbitControls {
     basemaps;
     title;
 
-    constructor(x, y, z, center, camera, scene, container) {
+    constructor(x, y, z, scene, container) {
+        
         let size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);
+        let center = new Vector3((x.min + x.max) / 2, (y.min + y.max) / 2, 0);
+        let width, height;
+        if (container.clientWidth && container.clientHeight) {
+            width = container.clientWidth;
+            height = container.clientHeight;           
+        } else {
+            width = window.innerWidth;
+            height = window.innerHeight;            
+        }
+
+        let camera = new PerspectiveCamera(30, width / height, 100, 100000);
+        const camDirection = new Vector3(-0.5, -Math.SQRT1_2, 0.5);
+        // const camDirection = new Vector3(0, 0, 1);
+        const camOffset = camDirection.multiplyScalar(size * 2);
+        camera.position.copy(center);
+        camera.position.add(camOffset);
+        camera.near = size * 0.1;
+        camera.far = size * 25;
+        camera.updateProjectionMatrix();
+
         // call parent constructor of OrbitControls
         super(size, center, camera, scene, container);
 
@@ -39,6 +62,10 @@ class Map extends OrbitControls {
         this.y = y;
         this.z = z;
         this.center = center;
+        this.baseExtent = {
+            x: x,
+            y: y
+        };
 
         //init the control corners
         if (this._initControlPos) {
@@ -61,12 +88,18 @@ class Map extends OrbitControls {
         };
     }
 
-    static async build(x, y, z, center, camera, scene, container, serviceUrl) {
+    static async build(scene, container, serviceUrl) {
         const modelData = await util.getMetadata(serviceUrl);
+        let modelarea = modelData.modelarea;
+
+        
+     
+       
+
 
         // do your async stuff here
         // now instantiate and return a class
-        let map = new Map(x, y, z, center, camera, scene, container);
+        let map = new Map(modelarea.x, modelarea.y, modelarea.z, scene, container);
         map._initDataLayers(modelData.mappedfeatures);
         map._initControls();
 
