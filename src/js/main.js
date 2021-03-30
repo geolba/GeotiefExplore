@@ -1,7 +1,6 @@
 import { DirectionalLight } from 'three/src/lights/DirectionalLight';
 import { AmbientLight } from 'three/src/lights/AmbientLight';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
-// import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Scene } from 'three/src/scenes/Scene';
 import { Vector3 } from 'three/src/math/Vector3';
 import { GridLayer } from './layer/GridLayer';
@@ -199,7 +198,7 @@ class Application {
                 "materialtypee": 0,
                 "ds": 1,
                 "bottomZ": 3000,
-                "o": 0.8
+                "o": 0.7
             }]
         });
         demLayer.addBlock({

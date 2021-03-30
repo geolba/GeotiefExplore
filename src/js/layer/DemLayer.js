@@ -13,18 +13,24 @@ import { Texture } from 'three/src/textures/Texture';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Plane } from 'three/src/math/Plane';
 import { Vector3 } from 'three/src/math/Vector3';
+import proj4 from 'proj4/dist/proj4';
+
 export class DemLayer extends Layer {
 
     images = [{
-        "width": 407, //904,
-        "url": "https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/export",
-        "height": 549, //509
-        "bboxSR": 3034
-    }, {
-        "width": 407,
-        "url": "https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export",
-        "height": 549,
-        "bboxSR": 3034
+        width: 405,
+        // "url": "https://sdi.noe.gv.at/at.gv.noe.geoserver/OGD/wms",
+        url: " https://ows.terrestris.de/osm/service",
+        height: 549,
+        bboxSR: 3857,
+        type: "wms"
+    },
+    {
+        width: 405,
+        url: "https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/export",
+        height: 549, //509
+        bboxSR: 3034,
+        type: "esri"
     }
     ];
 
@@ -84,10 +90,15 @@ export class DemLayer extends Layer {
                         image.texture = THREE.ImageUtils._loadTexture(image.src);
                     }
                     else {
-                        // image.texture = this._loadTextureData(image.data);
-                        let data = await this.requestImage(image.url, image);
-                        // image.texture = await new TextureLoader().load(data.href);
-                        image.texture = await this.loadTexture(data.href);
+                        if (image.type == "esri") {
+                            // image.texture = this._loadTextureData(image.data);
+                            let data = await this.requestImage(image.url, image);
+
+                            // image.texture = await new TextureLoader().load(data.href);
+                            image.texture = await this.loadTexture(data.href);
+                        } else if (image.type == "wms") {
+                            image.texture = await this.loadTextureWms(image.url, image);
+                        }
                     }
                 }
                 opt.map = image.texture;
@@ -145,14 +156,12 @@ export class DemLayer extends Layer {
     }
 
     scaleZ(z) {
-        // this.mainMesh.scale.z = z;
         this.objectGroup.scale.z = z;
     }
 
     setVisible(visible) {
         this.visible = visible;
         this.objectGroup.visible = visible;
-        // this.mainMesh.visible = visible;
         //Q3D.application.queryObjNeedsUpdate = true;
         this.emit('visibility-change');
     }
@@ -177,12 +186,15 @@ export class DemLayer extends Layer {
         //this.mainMesh.material.map = THREE.ImageUtils.loadTexture(src);
         let image = this.images[i];
         if (image.texture === undefined) {
-            // image.texture = this._loadTextureData(image.data);
+            if (image.type == "esri") {
+                // image.texture = this._loadTextureData(image.data);
+                let data = await this.requestImage(image.url, image);
 
-            //image.texture = await this.loadTextureData(image.data);
-            let data = await this.requestImage(image.url, image);
-            // image.texture = new TextureLoader().load(data.href);           
-            image.texture = await this.loadTexture(data.href);
+                // image.texture = await new TextureLoader().load(data.href);
+                image.texture = await this.loadTexture(data.href);
+            } else if (image.type == "wms") {
+                image.texture = await this.loadTextureWms(image.url, image);
+            }
         }
         //configure the material now that we have all of the data
         this.mainMesh.material.map = image.texture;
@@ -195,6 +207,51 @@ export class DemLayer extends Layer {
 
     //helper function to load in the texture
     async loadTexture(texturePath) {
+        const textureLoader = new TextureLoader();
+        return new Promise((resolve, reject) => {
+            textureLoader.load(
+                texturePath,
+                (texture) => resolve(texture),
+                undefined,
+                err => reject(err)
+            );
+        });
+    }
+
+    async loadTextureWms(url, imageParameter) {
+        let dest = new proj4.Proj("EPSG:3857");
+        let source = new proj4.Proj("EPSG:3034");
+        let p1 = new proj4.toPoint([this.baseExtent.x.min, this.baseExtent.y.min]);
+        let p2 = new proj4.toPoint([this.baseExtent.x.max, this.baseExtent.y.max]);
+
+        proj4.transform(source, dest, p1);
+        proj4.transform(source, dest, p2);
+
+        // let bbox = this.baseExtent.x.min + "," + this.baseExtent.y.min + "," + this.baseExtent.x.max + "," + this.baseExtent.y.max;
+        let bbox = p1.x + "," + p1.y + "," + p2.x + "," + p2.y;
+
+        let params = {
+            version: "1.3.0",
+            service: "WMS",
+            request: "GetMap",
+            "width": imageParameter.width,
+            "height": imageParameter.height,
+            // "size": imageParameter.width + "," + imageParameter.height,
+            "crs": "EPSG:3857", //  + imageParameter.bboxSR,
+            // "bboxSR": imageParameter.bboxSR,
+            // "bbox": "3955850,2183470.1545778836,4527300,2502829.8454221168",
+            "bbox": bbox,
+            "styles": "",
+            // "format": "png",
+            "format": "image/png",
+            "layers": "OSM-WMS"
+            // "f": "pjson"
+        };
+        let query = Object.keys(params)
+            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+            .join('&');
+        let texturePath = url + '?' + query;
+
         const textureLoader = new TextureLoader();
         return new Promise((resolve, reject) => {
             textureLoader.load(
@@ -291,12 +348,22 @@ export class DemLayer extends Layer {
     }
 
     async requestImage(url, imageParameter) {
-        let bbox = this.baseExtent.x.min + "," + this.baseExtent.y.min + "," + this.baseExtent.x.max + "," + this.baseExtent.y.max;
+        let dest = new proj4.Proj("EPSG:3857");
+        let source = new proj4.Proj("EPSG:3034");
+        let p1 = new proj4.toPoint([this.baseExtent.x.min, this.baseExtent.y.min]);
+        let p2 = new proj4.toPoint([this.baseExtent.x.max, this.baseExtent.y.max]);
+
+        proj4.transform(source, dest, p1);
+        proj4.transform(source, dest, p2);
+
+        // let bbox = this.baseExtent.x.min + "," + this.baseExtent.y.min + "," + this.baseExtent.x.max + "," + this.baseExtent.y.max;
+        let bbox = p1.x + "," + p1.y + "," + p2.x + "," + p2.y;
+
         let params = {
             // "width": imageParameter.width,
             // "height": imageParameter.height,
             "size": imageParameter.width + "," + imageParameter.height,
-            "bboxSR": imageParameter.bboxSR,
+            "bboxSR": "3857", // imageParameter.bboxSR,
             // "bbox": "3955850,2183470.1545778836,4527300,2502829.8454221168",
             "bbox": bbox,
             "format": "png",

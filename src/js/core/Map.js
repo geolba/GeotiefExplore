@@ -16,7 +16,9 @@ class Map extends OrbitControls {
     _controlCorners;
     _controlContainer;
     _controls;
+    size;
     camera;
+    container;
     length;
     width;
     height;
@@ -81,9 +83,10 @@ class Map extends OrbitControls {
 
         this.basemaps = {
             "currentVersion": 10.01,
-            "services": [
-                { "name": "esri:topograhy", "type": "MapServer", 'image': 'background_esri_world_topography.png', 'title': 'ESRI Topograhy' },
-                { "name": "esri:imagery", "type": "MapServer", 'image': 'background_esri_world_imagery.png', 'title': 'ESRI Imagery' },
+            "services": [               
+                { "name": "osm:wms", "type": "MapServer", 'image': 'background_osm_world_topography.png', 'title': 'OSM WMS' },
+                { "name": "esri:topograhy", "type": "MapServer", 'image': 'background_esri_world_topography.png', 'title': 'ESRI Topography' },
+               
             ]
         };
     }
@@ -168,7 +171,7 @@ class Map extends OrbitControls {
     }
 
     async addLayer(layer) {
-        var id = util.stamp(layer);
+        let id = util.stamp(layer);
         if (this._layers[id]) {
             return this;
         }
