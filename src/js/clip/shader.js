@@ -25,8 +25,10 @@ let shader = {
 		varying vec3 camPosition;
 		varying vec3 vNormal;
 		varying vec3 vPosition;
+		varying vec2 vUv;
 		
 		void main() {
+			vUv = uv;
 			vec4 vPos = modelViewMatrix * vec4( position, 1.0 );
 			vPosition = vPos.xyz;
 
@@ -86,13 +88,17 @@ let shader = {
 		}`,
 
 	fragmentClippingFront: `
+		uniform sampler2D map;
 		uniform vec3 color;
 		uniform vec3 clippingLow;
 		uniform vec3 clippingHigh;
+		uniform float clippingScale;
+		uniform float percent;
 		
 		varying vec3 pixelNormal;
 		varying vec4 worldPosition;
 		varying vec3 camPosition;
+		varying vec2 vUv;
 		
 		void main( void ) {
 			
@@ -115,15 +121,17 @@ let shader = {
 				 || worldPosition.x > clippingHigh.x 
 				 || worldPosition.y < clippingLow.y  
 				 || worldPosition.y > clippingHigh.y
-				 || worldPosition.z < clippingLow.z  
-				 || worldPosition.z > clippingHigh.z 
+				 || worldPosition.z < (clippingLow.z * clippingScale)
+				 || worldPosition.z >  (clippingHigh.z * clippingScale)
 			 ) {
 				
 				discard;
 				
 			} else {
 				
-				gl_FragColor = vec4( color * shade, 1.0 );
+				//gl_FragColor = vec4( color * shade, 1.0 );
+				gl_FragColor = texture2D(map, vUv);
+				gl_FragColor.a = percent;
 				
 			}
 			

@@ -13,8 +13,14 @@
     display: block;
     height: 30px;
     width: 30px;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAdCAAAAACYz4PQAAAAAnRSTlMA/1uRIrUAAAAJcEhZcwAAFxIAABcSAWef0lIAAACLSURBVCjPzZExGQUxCINjoB5qAge1UBvdKgIN3c8ELjqjAQu89W4g8+tG/4+QAPL9zMw+H3gXd5mtKLGfTK3x/XPsDLskyR3SyFr2wKi7cwCLiAPPqcUDhwbbmfxi2thaDjpxPoFZ4+gYSjCEOpdg2DVdmPPojcxWATlodrRNgz27np029RLx9PjWPwOEKTMp8DmSAAAAAElFTkSuQmCC') /*img/drill2.png*/;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAdCAAAAACYz4PQAAAAAnRSTlMA/1uRIrUAAAAJcEhZcwAAFxIAABcSAWef0lIAAACLSURBVCjPzZExGQUxCINjoB5qAge1UBvdKgIN3c8ELjqjAQu89W4g8+tG/4+QAPL9zMw+H3gXd5mtKLGfTK3x/XPsDLskyR3SyFr2wKi7cwCLiAPPqcUDhwbbmfxi2thaDjpxPoFZ4+gYSjCEOpdg2DVdmPPojcxWATlodrRNgz27np029RLx9PjWPwOEKTMp8DmSAAAAAElFTkSuQmCC');
+     /* img/drill2.png; */
    float: left;
+}
+
+.fas
+{
+   vertical-align: middle;
 }
 .measure-enabled .gba-maptool-control a{
     background-color:skyblue;

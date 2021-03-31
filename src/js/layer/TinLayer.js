@@ -133,9 +133,9 @@ class TinLayer extends Layer {
             roughness: 0.75,          
             flatShading: true,
             side: DoubleSide,
-            clippingPlanes: [this.xLocalPlane, this.yLocalPlane],
-            clipIntersection: false,
-            clipShadows: true,
+            // clippingPlanes: [this.xLocalPlane, this.yLocalPlane],
+            // clipIntersection: false,
+            // clipShadows: true,
         }, uniforms.clipping);   
         this.materialsArray.push(this.material);
         let mesh = this.mainMesh = new Mesh(geometry, this.material);

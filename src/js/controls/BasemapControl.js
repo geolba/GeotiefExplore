@@ -54,7 +54,7 @@ export class BasemapControl extends Control {
         // makes this work on IE touch devices by stopping it from firing a mouseout event when the touch is released
         container.setAttribute('aria-haspopup', true);
 
-        let link = this._layersLink = dom.createDom('a', { "class": className + '-toggle' }, container);
+        let link = this._layersLink = dom.createDom('a', { "class": className + '-toggle', innerHTML: '<i class="fas fa-map-marked"></i>' }, container);
         link.href = '#';
         link.title = 'Base Layers';
 

@@ -1,19 +1,18 @@
 import { Group } from 'three/src/objects/Group';
-// import { BufferGeometry } from 'three/src/core/BufferGeometry';
-// import { Float32BufferAttribute, Uint16BufferAttribute } from 'three/src/core/BufferAttribute';
-// import { MeshStandardMaterial } from 'three/src/materials/MeshStandardMaterial';
-// import { Mesh } from 'three/src/objects/Mesh';
 import { Layer } from './Layer';
 import { DemBlock } from './DemBlock';
-import { MeshStandardMaterial } from 'three/src/materials/MeshStandardMaterial';
-import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
+// import { MeshStandardMaterial } from 'three/src/materials/MeshStandardMaterial';
+// import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
 import { DoubleSide, FlatShading, LinearFilter } from 'three/src/constants';
 import * as browser from '../core/browser';
 import { Texture } from 'three/src/textures/Texture';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Plane } from 'three/src/math/Plane';
 import { Vector3 } from 'three/src/math/Vector3';
+import { Color } from 'three/src/math/Color';
 import proj4 from 'proj4/dist/proj4';
+import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
+import { shader } from '../clip/shader';
 
 export class DemLayer extends Layer {
 
@@ -36,11 +35,10 @@ export class DemLayer extends Layer {
 
     queryableObjects;
     borderVisible;
+    uniforms;
 
     constructor(params) {
         super();
-
-        //this.features = [];        
         this.visible = true;
         this.opacity = 1;
         this.material;
@@ -69,9 +67,8 @@ export class DemLayer extends Layer {
 
     async initMaterials() {
         if (this.materialParameter.length === 0) return;
-        this.xLocalPlane = new Plane(new Vector3(-1, 0, 0), this._map.x.max);
-        //this.addObject(this.xLocalPlane, false);
-        this.yLocalPlane = new Plane(new Vector3(0, 1, 0), this._map.y.max);
+        // this.xMaxLocalPlane = new Plane(new Vector3(-1, 0, 0), this._map.x.max);
+        // this.yMaxLocalPlane = new Plane(new Vector3(0, -1, 0), this._map.y.max);
 
         let sum_opacity = 0;
         this.material;
@@ -83,8 +80,9 @@ export class DemLayer extends Layer {
             if (m.ds && !browser.ie) opt.side = DoubleSide;
             if (m.flat) opt.shading = FlatShading;
             //m.i = 1;
+            let image;
             if (m.i !== undefined) {
-                let image = this.images[m.i];
+                image = this.images[m.i];
                 if (image.texture === undefined) {
                     if (image.src !== undefined) {
                         image.texture = THREE.ImageUtils._loadTexture(image.src);
@@ -101,7 +99,7 @@ export class DemLayer extends Layer {
                         }
                     }
                 }
-                opt.map = image.texture;
+                // opt.map = image.texture;
             }
             if (m.o !== undefined && m.o < 1) {
                 opt.opacity = m.o;
@@ -111,10 +109,22 @@ export class DemLayer extends Layer {
             if (m.w) opt.wireframe = true;
             //opt.wireframe = true;
 
-            // Clipping setup:
-            opt.clippingPlanes = [this.xLocalPlane, this.yLocalPlane];
-            opt.clipIntersection = false;
-            opt.clipShadows = true;
+            // // Clipping setup:
+            // opt.clippingPlanes = this.clippingPlanes = [this.xMinLocalPlane, this.xMaxLocalPlane, this.yMaxLocalPlane];
+            // opt.clipIntersection = false;
+            // opt.clipShadows = true;
+
+            // let color =  parseInt("ffffff", 16);
+            // // opt.color = color;
+            let uniforms = this.uniforms = {
+                clipping: {
+                    clippingScale: { type: "f", value: 1.0 },                    
+                    clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
+                    clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) },
+                    map: { type: 't', value: image.texture },
+                    percent: { type: "f", value: 0.7 },
+                }
+            };
 
             let MaterialType = { MeshLambert: 0, MeshPhong: 1, LineBasic: 2, Sprite: 3, Unknown: -1 };
 
@@ -122,7 +132,11 @@ export class DemLayer extends Layer {
                 //if (m.color !== undefined) opt.color = opt.ambient = m.color;
                 if (m.color !== undefined) opt.color = m.color;
                 //opt.skinning = true;
-                this.material = new MeshLambertMaterial(opt);
+                opt.uniforms = this.uniforms.clipping;
+                opt.vertexShader = shader.vertexClipping;
+                opt.fragmentShader = shader.fragmentClippingFront;
+                this.material = new ShaderMaterial(opt);
+                // this.material = new MeshStandardMaterial(opt);                 
             }
             // else if (m.materialtype === MaterialType.MeshPhong) {
             //     if (m.color !== undefined) opt.color = opt.ambient = m.color;
@@ -150,10 +164,11 @@ export class DemLayer extends Layer {
     }
 
 
-    filterMaterial(filterX, filterY) {
-        this.xLocalPlane.constant = filterX;
-        this.yLocalPlane.constant = filterY;
-    }
+    // filterMaterial(filterXMin, filterXMax, filterYMax) {
+    //     this.xMinLocalPlane.constant = filterXMin;
+    //     this.xMaxLocalPlane.constant = filterXMax;
+    //     this.yMaxLocalPlane.constant = filterYMax;
+    // }
 
     scaleZ(z) {
         this.objectGroup.scale.z = z;
@@ -198,6 +213,7 @@ export class DemLayer extends Layer {
         }
         //configure the material now that we have all of the data
         this.mainMesh.material.map = image.texture;
+        this.uniforms.clipping.map.value = image.texture;
         this.mainMesh.material.needsUpdate = true;
         if (this.visible === false) {
             this.setVisible(true);
@@ -263,10 +279,8 @@ export class DemLayer extends Layer {
         });
     }
 
-
     async onAdd(map) {
         //this._zoomAnimated = this._zoomAnimated && map.options.markerZoomAnimation;
-
         await this.initMaterials();
         this.build(this.getScene());
         map.update();
@@ -397,7 +411,6 @@ export class DemLayer extends Layer {
             elem.src = imageData;
         });
     }
-
 
     _loadTextureData(imageData) {
         let texture;

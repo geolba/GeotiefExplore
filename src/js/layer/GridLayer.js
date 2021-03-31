@@ -34,11 +34,12 @@ export class GridLayer extends Layer {
     }
 
     setWireframeMode(wireframe) {
-        this.materials.forEach(function (mat) {
-            //if (m.w) return;
-            //m.mat.wireframe = wireframe;
-            mat.wireframe = wireframe;
-        });
+        // this.materials.forEach(function (mat) {
+        //     //if (m.w) return;
+        //     //m.mat.wireframe = wireframe;
+        //     mat.wireframe = wireframe;
+        // });
+        return;
     }
 
     setVisible(visible) {

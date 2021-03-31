@@ -170,12 +170,11 @@ export class Selection extends Layer {
 
         if (this.map.layers) {
             for (const [key, layer] of Object.entries(this.map.layers)) {
-                if (layer.uniforms) {
+                if (layer.uniforms ) {
                     let scale = Number(this.scale);
                     layer.uniforms.clipping.clippingLow.value.copy(this.limitLow);
                     layer.uniforms.clipping.clippingHigh.value.copy(this.limitHigh);
-                    layer.uniforms.clipping.clippingScale.value = scale;                       
-                    
+                    layer.uniforms.clipping.clippingScale.value = scale;
                 }
             }
         }
