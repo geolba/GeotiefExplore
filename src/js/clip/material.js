@@ -19,8 +19,13 @@ let frontStencilMaterial = new ShaderMaterial( {
     // depthWrite: false,
 } );
 
-let BoxBackFace = new MeshBasicMaterial({ color: 0xEEDDCC, transparent: true });
-let BoxWireframe = new LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+// beige:
+// let BoxBackFace = new MeshBasicMaterial({ color: 0xEEDDCC, transparent: true });
+let BoxBackFace = new MeshBasicMaterial({ color: 0xf8f8ff, transparent: true, opacity: 0.5 });
+// black box grid:
+// let BoxWireframe = new LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+let BoxWireframe = new LineBasicMaterial({ color: 0x6f6f6f, linewidth: 3 });
+
 // yellow select color
 let BoxWireActive = new LineBasicMaterial({ color: 0xffff00, linewidth: 4, side: DoubleSide });
 

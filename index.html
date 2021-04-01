@@ -149,6 +149,7 @@
                                     <div class="tab-pane content-metadata active" id="one">
                                         <div id="layer-control-parent-id"></div>
                                     </div>
+
                                     <div class="tab-pane content-file" id="two">
                                         <h5 class="section-heading">Download Map Image</h5>
 
@@ -162,15 +163,35 @@
                                             </div>
                                         </div>
 
-                                        <div class="panel-section section-functions">
+                                        <section class="panel-section section-functions section">
                                             <h5>Functions</h5>
-                                            <label>
-                                                <input type="checkbox" id="chkGrid" autocomplete="off" checked>
-                                                <span class="label-body">set visibility of coordinate grid</span>
-                                            </label>
-                                        </div>
-
+                                            <div class="columns is-multiline">
+                                                <div class="column is-12">
+                                                    <div class="field">
+                                                        <div class="control">
+                                                            <label class="checkbox">
+                                                                <input type="checkbox" id="chkGrid" autocomplete="off"
+                                                                    checked>
+                                                                coordinate grid
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="column is-12">
+                                                    <div class="field">
+                                                        <div class="control">
+                                                            <label class="checkbox">
+                                                                <input type="checkbox" id="chkSlicingBox"
+                                                                    autocomplete="off" checked>
+                                                                slicing box
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
                                     </div>
+
                                     <div class="tab-pane content-data" id="three">
                                         <div class="panel-section">
                                             ...coming soon

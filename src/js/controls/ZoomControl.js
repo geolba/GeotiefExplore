@@ -30,13 +30,13 @@ class ZoomControl extends Control {
         this._map = map;
         // don't use options.zoomInText because of predefined png
         this._zoomInButton = this._createButton(
-            "", this.options.zoomInTitle,
+            "<i class='fas fa-search-plus'></i>", this.options.zoomInTitle,
             // "", b.zoomInTitle,
             className + '-in', container, this._zoomIn, this);
 
           // don't use options.zoomOutText because of predefined png    
         this._zoomOutButton = this._createButton(
-            "", this.options.zoomOutTitle,
+            "<i class='fas fa-search-minus'></i>", this.options.zoomOutTitle,
             // "", b.zoomOutTitle,
             className + '-out', container, this._zoomOut, this);
 
@@ -56,7 +56,7 @@ class ZoomControl extends Control {
     }
 
     _createButton(html, title, className, container, fn, context) {
-        let link = dom.createDom("span", { "class": className, innerHTML: html, title: title }, container);
+        let link = dom.createDom("a", { "class": className, innerHTML: html, title: title }, container);
 
         // let stop = domEvent.stopPropagation;
         domEvent
@@ -68,14 +68,10 @@ class ZoomControl extends Control {
         return link;
     }
 
-    _updateDisabled () {
-      
-        var className = 'leaflet-disabled';
-
-        dom.removeClass(this._zoomInButton, className);
-        
-        dom.removeClass(this._zoomOutButton, className);
-       
+    _updateDisabled () {      
+        let className = 'leaflet-disabled';
+        dom.removeClass(this._zoomInButton, className);        
+        dom.removeClass(this._zoomOutButton, className);       
         //if (map._zoom === map.getMinZoom()) {
         //    L.DomUtil.addClass(this._zoomOutButton, className);
         //}

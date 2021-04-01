@@ -109,6 +109,14 @@ export class Selection extends Layer {
         this.touchMeshes.visible = visible;
         this.emit('visibility-change');
     }
+    toggle () {
+        let visible = !this.visible;
+        this.visible = visible;
+        this.boxMesh.visible = visible;
+        this.displayMeshes.visible = visible;
+        this.touchMeshes.visible = visible;
+        this._map.update();
+    }
 
     scaleZ(z) {
         this.scale = z;

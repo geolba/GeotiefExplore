@@ -158,18 +158,18 @@ class Application {
         this.mapTitle = document.querySelector('#map-title');
         this.mapTitle.innerHTML += map.title;
         map.on('ready', () => {
-            this.selection.setUniforms();
+            this.selectionBox.setUniforms();
             this.animate();
         }, this);
 
-        this.selection = new Selection(
+        this.selectionBox = new Selection(
             // new Vector3(-7, -14, -14),
             // new Vector3(14, 9, 3)
             { name: 'Slicing Box' },
             new Vector3(this.map.x.min, this.map.y.min, this.map.z.min),
             new Vector3(this.map.x.max, this.map.y.max, this.map.z.max)
         );
-        this.map.addLayer(this.selection);
+        this.map.addLayer(this.selectionBox);
 
         this.map.picking = new PickingTool(this.map.size, this.map.center, this);
 
@@ -40602,7 +40602,7 @@ class Application {
         // this.slicer = new SlicerControl({ parentDiv: 'slicer-control' }).addTo(this.map);
 
 
-        this.capsScene.add(this.selection.boxMesh);
+        this.capsScene.add(this.selectionBox.boxMesh);
         // this.scene.add(this.selection.displayMeshes);
         // this.scene.add(this.selection.touchMeshes);
 
@@ -40790,6 +40790,12 @@ class Application {
         domEvent.on(chkGrid, 'click', function (e) {
             this.gridlayer.toggle();
         }, this);
+
+         //toggle SlicingBox
+         let chkSlicingBox = document.getElementById("chkSlicingBox");
+         domEvent.on(chkSlicingBox, 'click', function (e) {
+             this.selectionBox.toggle();
+         }, this);
 
     }
 

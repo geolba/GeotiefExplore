@@ -39,7 +39,7 @@ class HomeButton extends Control {
         //if (this.options.home) {
         this._homeButton = this._createButton(
             //this.options.zoomInText, this.options.zoomInTitle,
-            "", "b.title",
+            "<i class='fas fa-home'></i>", "b.title",
             className + '-do', container, this._goHome, this);
         this._init();
         //}
@@ -85,7 +85,7 @@ class HomeButton extends Control {
 
     _createButton(html, title, className, container, fn, context) {
         //var link = L.DomUtil.create('a', className, container);
-        let link = dom.createDom("span", { "class": className, innerHTML: html, title: title }, container);
+        let link = dom.createDom("a", { "class": className, innerHTML: html, title: title }, container);
 
         // let stop = domEvent.stopPropagation;
         domEvent

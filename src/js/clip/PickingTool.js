@@ -81,7 +81,7 @@ export class PickingTool {
     }
 
     mouseMove(event) {
-        if (this.isDraging == true || this.simulation.selection.visible == false || this.enabled == false) {
+        if (this.isDraging == true || this.simulation.selectionBox.visible == false || this.enabled == false) {
             return;
         }
         let point = this._getCanvasPoint(event);
@@ -92,7 +92,7 @@ export class PickingTool {
         this.mouse.set(x, y);
 
         this.ray.setFromCamera(this.mouse, this.simulation.map.camera);
-        let intersects = this.ray.intersectObjects(this.simulation.selection.selectables);
+        let intersects = this.ray.intersectObjects(this.simulation.selectionBox.selectables);
 
         if (intersects.length > 0) {
             let candidate = intersects[0].object;
@@ -120,10 +120,10 @@ export class PickingTool {
     }
 
     beginDrag(event) {
-        if (this.simulation.selection.visible == false && this.enabled == false) {
+        if (this.simulation.selectionBox.visible == false || this.enabled == false) {
             return;
         }
-        // exit drag method, if not left mouse button was clicked
+        // exit drag method, if not left mouse button was clicked on desktop:
         if (this.touchCapable == false && event.which != 1) {
             return;
         }
@@ -136,7 +136,7 @@ export class PickingTool {
         this.mouse.set(x, y);
 
         this.ray.setFromCamera(this.mouse, this.simulation.map.camera);
-        let intersects = this.ray.intersectObjects(this.simulation.selection.selectables);
+        let intersects = this.ray.intersectObjects(this.simulation.selectionBox.selectables);
 
         if (intersects.length > 0) {
             this.isDraging = true;
@@ -188,8 +188,8 @@ export class PickingTool {
                     } else if (axis === 'z1' || axis === 'z2') {
                         value = intersects[0].point.z;
                     }
-                    this.simulation.selection.setValue(axis, value);
-                    // this.simulation.selection.setValue('x1', 4452960);
+                    this.simulation.selectionBox.setValue(axis, value);
+                    // this.simulation.selectionBox.setValue('x1', 4452960);
                     // this.simulation.throttledRender();
                     this.simulation.deferringThrottle();
                 }
