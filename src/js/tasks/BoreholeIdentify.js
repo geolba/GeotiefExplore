@@ -171,7 +171,7 @@ export class BoreholeIdentify {
         let _queryableObjects = [];
         // this.layers.forEach(function (layer) {
             Object.values(this.layers).forEach(layer => {
-            if (layer.visible && layer.queryableObjects.length) {
+            if (layer.visible && layer.queryableObjects.length && layer.name !== "DEM_EGDI") {
                 _queryableObjects = _queryableObjects.concat(layer.queryableObjects);
             }
         });
@@ -183,7 +183,7 @@ export class BoreholeIdentify {
         // this.layers.forEach(function (layer) {
         Object.values(this.layers).forEach(layer => {
             //if (layer.visible && layer.queryableObjects.length) {
-            if (layer.queryableObjects.length) {
+            if (layer.queryableObjects.length && layer.name !== "DEM_EGDI") {
                 _queryableObjects = _queryableObjects.concat(layer.queryableObjects);
             }
         });

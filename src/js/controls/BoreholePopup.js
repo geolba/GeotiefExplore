@@ -2,6 +2,7 @@ import { Control } from "./Control";
 import * as util from '../core/utilities';
 import * as domEvent from '../core/domEvent';
 import * as dom from '../core/domUtil';
+import { BarChart } from '../core/BarChart';
 
 import './BoreholePopup.css';
 
@@ -117,14 +118,14 @@ export class BoreholePopup extends Control {
         this._contentPane.innerHTML = "";
 
         var valTextColor = "ffffff";
-        // this.barChart = new BarChart("d17100",
-        //     320, valTextColor, 'full',
-        //     400);
-        // this.barChart.draw(data);
-        // this._contentPane.appendChild(this.barChart._container);
+        this.barChart = new BarChart("d17100",
+            320, valTextColor, 'full',
+            400);
+        this.barChart.draw(data);
+        this._contentPane.appendChild(this.barChart._container);
 
-        // var table = this.barChart.getStatTable(data);
-        // this._contentPane.appendChild(table);
+        var table = this.barChart.getStatTable(data);
+        this._contentPane.appendChild(table);
         this._hasContent = true;
     }
 

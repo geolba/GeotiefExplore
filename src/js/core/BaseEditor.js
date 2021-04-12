@@ -116,17 +116,50 @@ export class BaseEditor {
     }
 
     handleQueryResults() {
-        let results = arguments;
-        //var content = [];
+        let results = arguments;       
         let features = results[0].features;
         let aufschlag = results[0].aufschlag;
+        // set the borhole marker
         if (!this.isConnected()) {
             this.connect(aufschlag);
         }
         else {
             this.marker.setLatLng(aufschlag);
         }
-        this.marker.setPopupChartData("test");
+
+        // calculate heights vor bar chart
+        let data = [];
+        for (let j = features.length - 1; j >= 0; j--) {
+            let feature = features[j];
+            let point = feature.point;
+            // // clicked coordinates: skalierung wieder wegrechnen:
+            // let pt = this.map.dataservice.toMapCoordinates(point.x, point.y, point.z);
+
+            let layerId = feature.layerId;
+            //var layer = this.map.dataservice.layers[layerId];
+            let layer = this.map._layers[layerId];
+            let nextPoint;
+            if (j !== features.length - 1) {
+                let previousPoint = { x: features[j + 1].point.x, y: features[j + 1].point.y, z: features[j + 1].point.z };
+                // let previousPt = this.map.dataservice.toMapCoordinates(previousPoint.x, previousPoint.y, previousPoint.z);
+
+                //var barHeight = point.z - previousPoint.z;
+
+                let realHeight = point.z - previousPoint.z;
+                //var dist = parseInt((300 / 6000) * realHeight);
+
+                data.push({
+                    dist: realHeight,//dist,
+                    max: point.z,
+                    min: previousPoint.z,
+                    color: layer.color,
+                    name: layer.name
+                });
+                //app.barChart.addBar(dist, layer.materialParameter[0].color, layer.name);
+            }
+        }
+
+        this.marker.setPopupChartData(data);
         this.marker.openPopup();
 
     }

@@ -110,7 +110,7 @@ export class DemBlock {
         // mesh.position.z =  -13616.3;
         mesh.userData.layerId = layer.index;
         this.obj = mesh;
-        layer.addObject(mesh);
+        layer.addObject(mesh, false);
         //layer.mainMesh = mesh;
     }
 
