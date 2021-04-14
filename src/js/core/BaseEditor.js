@@ -116,7 +116,7 @@ export class BaseEditor {
     }
 
     handleQueryResults() {
-        let results = arguments;       
+        let results = arguments;
         let features = results[0].features;
         let aufschlag = results[0].aufschlag;
         // set the borhole marker
@@ -148,14 +148,16 @@ export class BaseEditor {
                 let realHeight = point.z - previousPoint.z;
                 //var dist = parseInt((300 / 6000) * realHeight);
 
-                data.push({
-                    dist: realHeight,//dist,
-                    max: point.z,
-                    min: previousPoint.z,
-                    color: layer.color,
-                    name: layer.name
-                });
-                //app.barChart.addBar(dist, layer.materialParameter[0].color, layer.name);
+                if (Math.round(realHeight) > 0) {
+                    data.push({
+                        dist: realHeight,//dist,
+                        max: point.z,
+                        min: previousPoint.z,
+                        color: layer.color,
+                        name: layer.name
+                    });
+                    //app.barChart.addBar(dist, layer.materialParameter[0].color, layer.name);
+                }
             }
         }
 

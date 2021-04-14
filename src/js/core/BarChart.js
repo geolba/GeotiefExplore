@@ -97,8 +97,8 @@ export class BarChart {
 
         // Update the dimensions of the canvas only if they have changed
         if (ctx.canvas.width !== this.width || ctx.canvas.height !== this.height) {
-            ctx.canvas.width = this.width;
-            ctx.canvas.height = this.height;
+            ctx.canvas.width = this.width; //300
+            ctx.canvas.height = this.height; //400
         }
         //// Draw the background color white
         //ctx.fillStyle = this.backgroundColor;
@@ -115,11 +115,19 @@ export class BarChart {
 
         // Determine the largest value in the bar array
         // let largestValue = 0;
-        for (i = 0; i < arr.length; i += 1) {
-            if (arr[i].dist > largestValue) {
-                largestValue = arr[i].dist;
-            }
-        }
+        // for (i = 0; i < arr.length; i += 1) {
+        //     if (arr[i].dist > largestValue) {
+        //         largestValue = arr[i].dist;
+        //     }
+        // }   
+        largestValue = Math.max.apply(Math, arr.map(o => o.dist));
+
+        let maxValue = Math.max.apply(Math, arr.map(o => o.max));
+        this.maxValue = Math.round(maxValue);
+        let minValue = Math.min.apply(Math, arr.map(o => o.min));
+        this.minValue = Math.round(minValue);
+        // let smallestValue = Math.min.apply(Math, arr.map(o => o.dist));
+        let totalHeight = this.totalHeight =  this.maxValue - this.minValue; //6000;
 
         //// Draw grey bar background
         //ctx.fillStyle = "lightgray";
@@ -146,9 +154,11 @@ export class BarChart {
             //} else {
             //    ratio = arr[i].dist / largestValue;
             //}
+            ratio = arr[i].dist / totalHeight;
 
-            //barHeight = arr[i].dist;// ratio * maxBarHeight;
-            barHeight = parseInt((maxBarHeight / 6000) * arr[i].dist);
+            // //barHeight = arr[i].dist;// ratio * maxBarHeight;
+            // barHeight = parseInt((maxBarHeight / 6000) * arr[i].dist);
+            barHeight = parseInt(ratio * maxBarHeight);
             let x = this.margin;// this.margin + i * this.width / numOfBars
             let y = graphAreaHeight - barHeight;
             if (i == 0) {
@@ -174,7 +184,7 @@ export class BarChart {
                 // Use try / catch to stop IE 8 from going to error town
                 try {
                     if (arr[i].name !== "Basement") {
-                        ctx.fillText("Mächtigkeit " + arr[i].name + ": " + Math.round(arr[i].dist),//.toFixed(2),
+                        ctx.fillText("thickness " + arr[i].name + ": " + Math.round(arr[i].dist),//.toFixed(2),
                             //i * this.width / numOfBars + (this.width / numOfBars) / 2,
                             x + 30,
                             y + (barHeight / 2) + 4.5);
@@ -189,24 +199,27 @@ export class BarChart {
             }
 
             graphAreaHeight = graphAreaHeight - (barHeight - (border / 2));
-        }//for-loop
+        }//end for-loop
 
         if (this.startPointY) {
             ctx.beginPath();
             ctx.moveTo(20, this.startPointY);
             ctx.lineTo(20, this.startPointY - maxBarHeight);
-            var startPoint = this.startPointY;
-            var iwas = [-5500, -5000, -4500, -4000, -3500, -3000, -2500, -2000, -1500, -1000, -500, 0, 500];
-            iwas.forEach(function (item) {
-                var dist = (maxBarHeight / 6000) * 500;
 
+            let startPoint = this.startPointY;
+            let stepSize = this.totalHeight/arr.length;
+            let item = this.minValue;
+            do {
+                let dist = (maxBarHeight / this.totalHeight) * stepSize;
                 ctx.moveTo(20, startPoint);
                 ctx.lineTo(40, startPoint);
                 ctx.font = "10px Arial";
-                ctx.strokeText(item, 55, startPoint + 2.5);
+                ctx.strokeText(Math.round(item), 55, startPoint + 2.5);
                 startPoint = startPoint - dist;
+                item += stepSize;
+                // console.log(item);
+             } while (item < this.maxValue + 1);   
 
-            });
             //ctx.lineTo(70, 100);
             ctx.stroke();
         }
@@ -219,12 +232,12 @@ export class BarChart {
         let _lableHeaderColumn = dom.createDom("th", {}, _headerRow);
         let _minHeaderColumn = dom.createDom("th", {}, _headerRow);
         dom.createDom("div", {
-            innerHTML: "UNTERKANTE <br /> (m Seehöhe)",
+            innerHTML: "bottom <br /> (m)",
             style: "width:75px;"
         }, _minHeaderColumn);
         let _maxHeaderColumn = dom.createDom("th", {}, _headerRow);
         dom.createDom("div", {
-            innerHTML: "OBERKANTE <br /> (m Seehöhe)",
+            innerHTML: "top <br /> (m)",
             style: "width:75px;"
         }, _maxHeaderColumn);
 

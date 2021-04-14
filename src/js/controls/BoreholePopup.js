@@ -58,7 +58,7 @@ export class BoreholePopup extends Control {
         //this._minimizeButton = dom.createDom('div', {
         //    "class": "close", innerHTML: "<", title: b.NLS_minimize
         //}, this._menu);
-        this._contenLable = dom.createDom('lable', { innerHTML: "Virtuelles Bohrprofil laut Modell <br /> (Höhenangaben in m Seehöhe)" },
+        this._contenLable = dom.createDom('lable', { innerHTML: "Virtual borehole profile <br /> (Heights in m)" },
             this._body);
 
         /* hier kommt nach dem Identify das Bohrprofil hinein */
@@ -117,14 +117,14 @@ export class BoreholePopup extends Control {
     setChartContent(data) {
         this._contentPane.innerHTML = "";
 
-        var valTextColor = "ffffff";
+        let valTextColor = "ffffff";
         this.barChart = new BarChart("d17100",
             320, valTextColor, 'full',
-            400);
+            300);
         this.barChart.draw(data);
         this._contentPane.appendChild(this.barChart._container);
 
-        var table = this.barChart.getStatTable(data);
+        let table = this.barChart.getStatTable(data);
         this._contentPane.appendChild(table);
         this._hasContent = true;
     }
@@ -163,7 +163,7 @@ export class BoreholePopup extends Control {
             maxButtonVisible = this._hasContent;
         }
         // $(this._maxButton).css("visibility", maxButtonVisible ? "visible" : "hidden");
-        this._maxButton.style.visibility = addOrRemove ? "visible" : "hidden";
+        this._maxButton.style.visibility = maxButtonVisible ? "visible" : "hidden";
     }
 
     onRemove() {

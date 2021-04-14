@@ -75,7 +75,7 @@ export class BoreholeIdentify {
                     //raycaster.set(vector, direction);
 
                     //raycaster.setFromCamera(mouse, this.camera);
-                    let visibleMehses = this._getQueryableObjects();//nur die sichtbar sind
+                    let visibleMehses = this._getvisibleQueryableObjects();//nur die sichtbar sind
                     let allMeshes = this._getQueryableObjects2();//alle
                     let intersects = [];
                     let intersects1 = raycaster.intersectObjects(visibleMehses, true);
@@ -167,11 +167,11 @@ export class BoreholeIdentify {
         return clone;
     }
 
-    _getQueryableObjects() {
+    _getvisibleQueryableObjects() {
         let _queryableObjects = [];
         // this.layers.forEach(function (layer) {
             Object.values(this.layers).forEach(layer => {
-            if (layer.visible && layer.queryableObjects.length && layer.name !== "DEM_EGDI") {
+            if (layer.visible && layer.queryableObjects.length && layer.name !== "Topography") {
                 _queryableObjects = _queryableObjects.concat(layer.queryableObjects);
             }
         });
@@ -183,7 +183,7 @@ export class BoreholeIdentify {
         // this.layers.forEach(function (layer) {
         Object.values(this.layers).forEach(layer => {
             //if (layer.visible && layer.queryableObjects.length) {
-            if (layer.queryableObjects.length && layer.name !== "DEM_EGDI") {
+            if (layer.queryableObjects.length && layer.name !== "Topography") {
                 _queryableObjects = _queryableObjects.concat(layer.queryableObjects);
             }
         });
