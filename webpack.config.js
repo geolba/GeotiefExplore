@@ -60,14 +60,20 @@ module.exports = {
             //     test: /\.vue$/,
             //     loader: 'vue-loader'
             //   },
+            // {
+            //     test: /\.tsx?$/,
+            //     use: 'ts-loader',
+            //     exclude: /(node_modules|bower_components)/,
+            // },
             {
-                test: /\.js$/,
+                // test: /\.js$/,
+                test: /\.(js|jsx|tsx|ts)$/,
                 exclude: /(node_modules|bower_components)/,
                 use: {
                     loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env']
-                    }
+                    // options: {
+                    //     presets: ['@babel/preset-env']
+                    // }
                 }
             },
 
@@ -108,6 +114,9 @@ module.exports = {
 
         ]
     },
+    resolve: {
+        extensions: ['*', '.js', '.jsx', '.tsx', '.ts'],
+      },
     stats: {
         colors: true
     },

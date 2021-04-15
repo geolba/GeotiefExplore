@@ -1,12 +1,12 @@
-.gba-control-borehole {
+.gba-borehole-popup {
     cursor: pointer;
 }
 
-.gba-control-borehole .maximize.hidden {
+/* .gba-borehole-popup .maximize.hidden {
     display: none;
 }
 
-.gba-control-borehole .maximize {
+.gba-borehole-popup .maximize {
     color: rgb(220, 220, 220);
     background: gray;
     border: 1px solid #000000;
@@ -18,10 +18,10 @@
     text-align: center;
     float: left;
     cursor: pointer;
-}
+} */
 
 /*side-menu zumachen*/
-.gba-menu .close {
+.gba-borehole-menu .close {
     color: rgb(220, 220, 220);
     background: gray;
     border: 1px solid #000000;
@@ -34,54 +34,49 @@
     float: right;
     cursor: pointer;
 }
-.gba-close-icon {
-    background-repeat: no-repeat;
-    /* background-image: url("img/16.png"); */
+/* .gba-close-icon {
+    background-repeat: no-repeat;   
     background-position: -52px -9px;
     display: inline;
     padding: 0 10px;
-}
+} */
 .toolbox {
     list-style-image: none;
     list-style-position: inside;
     list-style-type: none;
 }
-.gba-menu .toolbox li {
+.gba-borehole-menu .toolbox li {
     color: #464646;
     line-height: 46px;
     cursor: pointer;
     float: right;
     padding: 0 5px;
 }
-.gba-menu .body {
+.gba-borehole-menu .body {
     clear: both;
     height: calc(100% - 46px);
 }
 
-.gba-menu {
-    /*width: 400px;*/
-    position: absolute;
+.gba-borehole-menu {
+    /* position: absolute;
     top: 0;
-    left: 0;
-    /*bottom: 0;*/
-    /*right: 0;*/
+    left: 0; 
     padding: 0 20px 2px 20px;
     border-right: 1px solid #ddd;
-    border-left: 1px solid #ddd;
-    /*display: none;*/
+    border-left: 1px solid #ddd; */
     overflow-y: auto;
     z-index: 1000;
     background-color: #fff;
     opacity: 0.93;
 }
 
-.gba-menu::-webkit-scrollbar {
+.gba-borehole-menu::-webkit-scrollbar {
     width: 7px;
     height: 7px;
     background: #f2f2f2;
 }
 
-.gba-menu::-webkit-scrollbar-thumb {
+.gba-borehole-menu::-webkit-scrollbar-thumb {
     border-radius: 2px;
     background: #777;
 }
@@ -89,18 +84,14 @@
 .chartTable {
     margin-left: 20px;
     border-width: 0;
-    border-spacing: 0; /* Removes the cell spacing via CSS */
-    border-collapse: collapse; /* Optional - if you don't want to have double border where cells touch */
+    border-spacing: 0;
+    border-collapse: collapse;
 }
 
 .chartTable div {
-    font: 10px sans-serif;
-    /*background-color: steelblue;*/
+    font: 10px sans-serif;    
     text-align: left;
-    /*padding: 3px;
-  margin: 1px;*/
     color: #464646;
-    /*width:75px;*/
 }
 
 .chartTable td {

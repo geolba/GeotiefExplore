@@ -59,12 +59,11 @@ class ZoomControl extends Control {
         let link = dom.createDom("a", { "class": className, innerHTML: html, title: title }, container);
 
         // let stop = domEvent.stopPropagation;
-        domEvent
-            // .on(link, 'click', stop)
-            // .on(link, 'mousedown', stop)
-            // .on(link, 'dblclick', stop)
-            // .on(link, 'click', domEvent.preventDefault)
-            .on(link, 'click', fn, context);
+        domEvent.on(link, 'click', domEvent.stopPropagation);
+        domEvent.on(link, 'mousedown', domEvent.stopPropagation);
+        domEvent.on(link, 'dblclick', domEvent.stopPropagation);
+        domEvent.on(link, 'click', domEvent.preventDefault);
+        domEvent.on(link, 'click', fn, context);
         return link;
     }
 

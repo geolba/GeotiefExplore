@@ -166,7 +166,7 @@ class Map extends OrbitControls {
         zoomControl.addTo(this);
 
         this._controls.maptoolControl = new BoreholeControl().addTo(this);
-        this._controls.boreholePopup = new BoreholePopup({});
+        this._controls.boreholePopup = new BoreholePopup({parentDiv: 'gba-borehole-control-parent-id'});
         this._controls.boreholePopup.addTo(this);
     }
 

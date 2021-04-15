@@ -84,6 +84,8 @@ export function removeListener(obj, type, fn) {  // (HTMLElement, String, Functi
 
     if (!handler) { return this; }
 
+    // if (l.ctx !== context) { continue; }
+
     if ('removeEventListener' in obj) {
         if (type === 'mousewheel') {
             obj.removeEventListener('DOMMouseScroll', handler, false);
@@ -123,14 +125,33 @@ function _checkMouse(el, e) {
     return (related !== el);
 }
 
+// export function stopPropagation(e) {
+//     if (e.stopPropagation) {
+//         e.stopPropagation();
+//     } else {
+//         e.cancelBubble = true;
+//     }
+//     skipped(e);
+//     return this;
+// }
+
+// @function stopPropagation(ev: DOMEvent): this
+// Stop the given event from propagation to parent elements. Used inside the listener functions:
+// ```js
+// L.DomEvent.on(div, 'click', function (ev) {
+// 	L.DomEvent.stopPropagation(ev);
+// });
+// ```
 export function stopPropagation(e) {
-    if (e.stopPropagation) {
-        e.stopPropagation();
-    } else {
-        e.cancelBubble = true;
-    }
-    skipped(e);
-    return this;
+	if (e.stopPropagation) {
+		e.stopPropagation();
+	} else if (e.originalEvent) {  
+		e.originalEvent._stopped = true;
+	} else {
+		e.cancelBubble = true;
+	}
+	skipped(e);
+	return this;
 }
 
 
@@ -160,10 +181,10 @@ export function fakeStop(e) {
     skipEvents[e.type] = true;
 }
 export function skipped(e) {
-    var skipped = skipEvents[e.type];
+    let events = skipEvents[e.type];
     // reset when checking, as it's only used in map container and propagates outside of the map
     skipEvents[e.type] = false;
-    return skipped;
+    return events;
 }
 
 

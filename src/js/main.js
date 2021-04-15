@@ -53,7 +53,7 @@ class Application {
         // this.$topTextInput = document.querySelector('#topText');
         // this.$bottomTextInput = document.querySelector('#bottomText');
         // this.$imageInput = document.querySelector('#image');
-        this.downloadButton = document.querySelector('#btnDownloadCanvasImage');
+        this.downloadButton = document.querySelector('#menu-dowload-button');
         this.menuIcon = document.querySelector('#menu-icon');
         this.navigation = document.getElementsByClassName('navigation')[0];
         // this.addEventListeners();
@@ -40773,7 +40773,7 @@ class Application {
             });
         }
 
-        var tabButtons = [].slice.call(document.querySelectorAll('ul.tab-nav li'));
+        let tabButtons = [].slice.call(document.querySelectorAll('ul.tab-nav li'));
 
         tabButtons.map(function (button) {
             button.addEventListener('click', function () {

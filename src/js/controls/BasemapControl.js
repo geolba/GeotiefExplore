@@ -13,34 +13,7 @@ export class BasemapControl extends Control {
     constructor(title, options) {
         super(title, options);
         util.setOptions(this, options);
-    }  
-
-    // onAdd(map) {
-    //     this._mainMap = map;
-    //     let basemaps = this.basemaps = map.basemaps;
-
-
-
-    //     let className = "gba-basemap-control";
-    //     let container;
-    //     let toggleable = false;
-
-    //     if (this.options.parentDiv) {
-    //         container = this._container = document.getElementById(this.options.parentDiv);
-    //         dom.addClass(container, className);
-    //         toggleable = false;
-    //     } else {
-    //         container = this._container = dom.createDom("div", { "class": className });
-    //         toggleable = true;
-    //     }
-    //     domEvent.on(container, 'click', domEvent.stopPropagation);
-
-    //     this._initBasemapHtml(basemaps.services);
-
-    //     if (!this.options.parentDiv) {
-    //         return container;
-    //     }
-    // }
+    }
 
     onAdd(map) {
         let container = this._initLayout(map);
@@ -58,25 +31,22 @@ export class BasemapControl extends Control {
         link.href = '#';
         link.title = 'Base Layers';
 
-        // let popupClassName = "gba-basemap-control";
-        // let dialogContainer = dom.createDom("div", { "class": popupClassName, "id": 'basemap-control-parent' });
-        // domEvent.on(dialogContainer, 'click', domEvent.stopPropagation);
-        
-
         // let dialog = this.dialog = new MobileDialog();
         this.dialog = new MobileDialog("Baselayer", this._map.container, { klass: "fm_basemap_list", parentDiv: 'basemap-control-parent' });//.addTo(this._map);
-        let basemaps = this.basemaps =  this._map.basemaps;
+        let basemaps = this.basemaps = this._map.basemaps;
         let html = this._initBasemapHtml(basemaps.services);
 
         // domEvent.on(link, 'click', this.expand, this);
+        domEvent.on(link, 'click', domEvent.stopPropagation);
+        domEvent.on(link, 'mousedown', domEvent.stopPropagation);
+        domEvent.on(link, 'dblclick', domEvent.stopPropagation);
+        domEvent.on(link, 'click', domEvent.preventDefault);
         domEvent.on(link, 'click', () => {
-            this.dialog.show(html);
-        }, this);
+                this.dialog.show(html);
+            }, this);
 
         return container;
     }
-
-
 
     _initBasemapHtml(basemapServices) {
 
@@ -105,7 +75,7 @@ export class BasemapControl extends Control {
                 domEvent.on(btnLink, 'click', function (e) {
                     e.preventDefault();
                     let name = e.currentTarget.getAttribute('data-name');
-                    this._setBasemap(name);                                  
+                    this._setBasemap(name);
                     return false;
                 }, this);
             }

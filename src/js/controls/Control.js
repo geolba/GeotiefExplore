@@ -10,7 +10,7 @@ class Control extends EventEmitter {
     // @section
     // @aka Control options
     options = {
-        position: 'topright',
+        // position: 'topright',
     };
     _map;
     _container;

@@ -8,6 +8,9 @@ import './BoreholeControl.css';
 
 export class BoreholeControl extends Control {
 
+    options = {
+        position: 'topright',
+    };
     onAdd (map) {
         this.map = map;
 

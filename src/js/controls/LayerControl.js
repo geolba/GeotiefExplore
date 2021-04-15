@@ -17,7 +17,7 @@ export class LayerControl extends Control {
         autoZIndex: true
     };
 
-    //private class fileds:
+    // private class fields:
     _container;
     _mainMap;
     _scene;
