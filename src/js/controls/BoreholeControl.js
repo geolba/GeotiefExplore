@@ -1,6 +1,5 @@
 import { Control } from "./Control";
 import * as dom from '../core/domUtil';
-import * as util from '../core/utilities';
 import * as domEvent from '../core/domEvent';
 import { BoreholeTool } from '../tools/BoreholeTool';
 
@@ -11,7 +10,8 @@ export class BoreholeControl extends Control {
     options = {
         position: 'topright',
     };
-    onAdd (map) {
+
+    onAdd(map) {
         this.map = map;
 
         // var b = this._nls = util.mixin({}, N.widgets.boreholetool);
@@ -24,8 +24,8 @@ export class BoreholeControl extends Control {
         //this.addUnit(inputDiv, 'mi', 'mi', 'miles');
         ////this.addUnit(inputDiv, 'nm', 'NM', 'nautical miles');
         let toggle = dom.createDom('a', { "class": "gba-maptool-toggle", href: "#", title: "b.title" }, this._container);
-      
-       domEvent.disableClickPropagation(this._container);
+
+        domEvent.disableClickPropagation(this._container);
         domEvent
             // .on(toggle, 'click', domEvent.stop)
             // .on(toggle, 'click', domEvent.preventDefault)

@@ -126,6 +126,28 @@ export async function getMetadata(serviceUrl) {
 	// return await response.json();        
 }
 
+export function swap(arr, i1, i2) {
+	// keep in a provisional the value of the first index
+	let aux = arr[i1];
+	// insert the value of the second index in the place of the first index
+	arr[i1] = arr[i2];
+	// By doing this I lose the original value but I have it stored in aux by 
+	// so I just need to match the second index to aux to complete 
+	arr[i2] = aux;
+	return arr;
+}
+
+export function round(wert, dez) {
+	wert = parseFloat(wert);
+	if (!wert) return 0;
+	dez = parseInt(dez);
+	if (!dez) dez = 0;
+
+	var umrechnungsfaktor = Math.pow(10, dez);
+
+	return Math.round(wert * umrechnungsfaktor) / umrechnungsfaktor;
+}
+
 // @function create(proto: Object, properties?: Object): Object
 // Compatibility polyfill for [Object.create](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
 export var create = Object.create || (function () {

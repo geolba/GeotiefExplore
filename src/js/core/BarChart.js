@@ -127,7 +127,7 @@ export class BarChart {
         let minValue = Math.min.apply(Math, arr.map(o => o.min));
         this.minValue = Math.round(minValue);
         // let smallestValue = Math.min.apply(Math, arr.map(o => o.dist));
-        let totalHeight = this.totalHeight =  this.maxValue - this.minValue; //6000;
+        let totalHeight = this.totalHeight = this.maxValue - this.minValue; //6000;
 
         //// Draw grey bar background
         //ctx.fillStyle = "lightgray";
@@ -184,7 +184,7 @@ export class BarChart {
                 // Use try / catch to stop IE 8 from going to error town
                 try {
                     if (arr[i].name !== "Basement") {
-                        ctx.fillText("thickness " + arr[i].name + ": " + Math.round(arr[i].dist),//.toFixed(2),
+                        ctx.fillText(arr[i].name + ": " + Math.round(arr[i].dist) + " m", //.toFixed(2),
                             //i * this.width / numOfBars + (this.width / numOfBars) / 2,
                             x + 30,
                             y + (barHeight / 2) + 4.5);
@@ -207,7 +207,7 @@ export class BarChart {
             ctx.lineTo(20, this.startPointY - maxBarHeight);
 
             let startPoint = this.startPointY;
-            let stepSize = this.totalHeight/arr.length;
+            let stepSize = this.totalHeight / 10; // arr.length;
             let item = this.minValue;
             do {
                 let dist = (maxBarHeight / this.totalHeight) * stepSize;
@@ -218,7 +218,7 @@ export class BarChart {
                 startPoint = startPoint - dist;
                 item += stepSize;
                 // console.log(item);
-             } while (item < this.maxValue + 1);   
+            } while (item < this.maxValue + 1);
 
             //ctx.lineTo(70, 100);
             ctx.stroke();
@@ -226,7 +226,8 @@ export class BarChart {
     }
 
     getStatTable(arr) {
-        let statTable = dom.createDom("table", { "class": "chartTable" });
+        let chartContainer = dom.createDom("div", { class: "chartContainer"});
+        let statTable = dom.createDom("table", { "class": "chartTable" }, chartContainer);
         let _headerRow = dom.createDom("tr", { style: "width:100px;" }, statTable);
         let _profileHeaderColumn = dom.createDom("th", {}, _headerRow);
         let _lableHeaderColumn = dom.createDom("th", {}, _headerRow);
@@ -262,9 +263,11 @@ export class BarChart {
             }, _profileColumn);
 
             let _lableColumn = dom.createDom("td", {}, _tr);
-            let lable = dom.createDom("div", {
-                innerHTML: arr[i].name,
-                style: "width:75px;"
+            let lable = arr[i].name.replace("_"," ");
+            dom.createDom("div", {
+                innerHTML: lable,
+                // style: "width:75px;",
+                class: "layerNameColumn"
             }, _lableColumn);
 
             let _minColumn = dom.createDom("td", {}, _tr);
@@ -290,7 +293,7 @@ export class BarChart {
             }, _maxColumn);
 
         }
-        return statTable;
+        return chartContainer;
     }
 
     _zfill(num, len) {
@@ -322,10 +325,6 @@ export class BarChart {
         if (this.hasLabel) {
             this.labelobj.visible = false;
         }
-        //// Hides HTML Label if set - uses jquery for DOM manipulation
-        //if ( this.hasHTMLLabel ) {
-        //    this.hasHTMLLabel.hide();
-        //}
     }
 
 }

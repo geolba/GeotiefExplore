@@ -101,14 +101,14 @@ export class BaseEditor {
         if (e._cancelled) return;
         //if (!this.isConnected()) {
         //    this.connect(e);
-        //}        
+        //} 
         let eventX = (e.clientX !== undefined) ? e.clientX : (e.touches && e.touches[0].clientX);
         let eventY = (e.clientY !== undefined) ? e.clientY : (e.touches && e.touches[0].clientY);
         let dxfIdentifyParams = {};
-        dxfIdentifyParams.clientX = eventX;
-        dxfIdentifyParams.clientY = eventY;
-        dxfIdentifyParams.width = this.map.container.clientWidth;
-        dxfIdentifyParams.height = this.map.container.clientHeight;
+        dxfIdentifyParams.clientX = eventX; //351
+        dxfIdentifyParams.clientY = eventY; //554;
+        dxfIdentifyParams.width = this.map.container.clientWidth; //712;
+        dxfIdentifyParams.height = this.map.container.clientHeight; //715; 
         let deferred = this.mapTool.drillTask.execute(dxfIdentifyParams);
         deferred.then(this.handleQueryResults.bind(this));
 
@@ -119,6 +119,39 @@ export class BaseEditor {
         let results = arguments;
         let features = results[0].features;
         let aufschlag = results[0].aufschlag;
+        // features.sort(function (point1, point2) {
+        //     // Sort by votes
+        //     // If the first item has a hwigher number, move it up
+        //     // If the first item has a lower number, move it down
+        //     if (point1.distance > point2.distance) return -1;
+        //     if (point1.distance < point2.distance) return 1;
+            
+        // });
+        // features.sort(function (point1, point2) {
+        //     // Sort by votes
+        //     // If the first item has a higher number, move it up
+        //     // If the first item has a lower number, move it down
+        //     if (point1.layerId > point2.layerId) return 1;
+        //     if (point1.layerId < point2.layerId) return -1;
+            
+        // });
+        // let newFeatures = [];
+        let featuresCopy = Array.from(features);
+        for (let i = 0; i < features.length; i ++) {
+            let p1 = features[i];
+            let p2;
+            if (features[i+2] != null){
+            if (util.round(features[i+1].distance, 4) == util.round(features[i+2].distance, 4)){
+               if (features[i+2].layerId == p1.layerId) {
+                    p2 = features[i+2]; 
+                    util.swap(features, i + 1, i +2);              
+
+                } 
+            }
+        }
+            // newFeatures.push(p1, p2);
+        }        
+        
         // set the borhole marker
         if (!this.isConnected()) {
             this.connect(aufschlag);
@@ -129,7 +162,7 @@ export class BaseEditor {
 
         // calculate heights vor bar chart
         let data = [];
-        for (let j = features.length - 1; j >= 0; j--) {
+        for (let j = features.length - 2; j >= 0; j--) {
             let feature = features[j];
             let point = feature.point;
             // // clicked coordinates: skalierung wieder wegrechnen:
@@ -140,6 +173,10 @@ export class BaseEditor {
             let layer = this.map._layers[layerId];
             let nextPoint;
             if (j !== features.length - 1) {
+                let previousFeature = features[j + 1];
+                // if (feature.distance == previousFeature.distance) {
+                //     continue;
+                // }
                 let previousPoint = { x: features[j + 1].point.x, y: features[j + 1].point.y, z: features[j + 1].point.z };
                 // let previousPt = this.map.dataservice.toMapCoordinates(previousPoint.x, previousPoint.y, previousPoint.z);
 
@@ -149,14 +186,14 @@ export class BaseEditor {
                 //var dist = parseInt((300 / 6000) * realHeight);
 
                 if (Math.round(realHeight) > 0) {
-                    data.push({
-                        dist: realHeight,//dist,
-                        max: point.z,
-                        min: previousPoint.z,
-                        color: layer.color,
-                        name: layer.name
-                    });
-                    //app.barChart.addBar(dist, layer.materialParameter[0].color, layer.name);
+                data.push({
+                    dist: realHeight,//dist,
+                    max: point.z,
+                    min: previousPoint.z,
+                    color: layer.color,
+                    name: layer.name
+                });
+                //app.barChart.addBar(dist, layer.materialParameter[0].color, layer.name);
                 }
             }
         }
@@ -166,6 +203,7 @@ export class BaseEditor {
 
     }
 
+    
     connect(e) {
         // On touch, the latlng has not been updated because there is
         // no mousemove.

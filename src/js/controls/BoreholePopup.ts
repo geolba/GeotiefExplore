@@ -7,7 +7,7 @@ import { BarChart } from '../core/BarChart';
 import './BoreholePopup.css';
 
 interface BoreholePopupOptions {
-    position?: string
+    position: string
     width?: string
     height?: string
     parentDiv?: string
@@ -19,31 +19,25 @@ export class BoreholePopup extends Control {
     options: BoreholePopupOptions = {
         position: 'topleft',
         width: '300px',
-        height: '100%',       
+        height: '100%',
         parentDiv: null
     };
 
-    // private class fields:
+    //#region  private class fields:
     private _innerHTML;
     private _clearButton;
     private _body;
     private _contentPane;
-    private _contenLable;
-    _container;
-    private _mainMap;
-    private _scene;
-    private _hasContent;
+    private _contentLabel;
     private _menu;
     private _isShowing;
-    barChart;
+    private _barChart;
+    //#endregion
 
     constructor(options) {
         super();
         this._innerHTML = "Es wurde noch keine Bohrloch ausgewählt!";
         util.setOptions(this, options);
-        //this._startPosition = -(parseInt(this.options.width, 10));
-        //this._isLeftPosition = true;
-        this._hasContent = false;
     }
 
     // happens after added to map
@@ -53,7 +47,6 @@ export class BoreholePopup extends Control {
             //logger.warning('HomeButton::map required', true);
             return;
         }
-        this._mainMap = map;
         let container;
         // var b = this._nls = util.mixin({}, N.widgets.boreholepopup);
         // let container = this._container = dom.createDom("div", { "class": "gba-borehole-popup" });
@@ -66,30 +59,38 @@ export class BoreholePopup extends Control {
             container = this._container = dom.createDom("div", { "class": "gba-borehole-popup" }, dom.byId("webgl"));
         }
 
-        //button:
-        // this._maxButton = dom.createDom('div', {
-        //     "class": "maximize", innerHTML: ">", title: "b.NLS_maximize"
-        // }, this._container);
+
+
+
         let className = "gba-borehole-menu";
         this._menu = dom.createDom('div', { "class": className }, container); //dom.byId("webgl"));
-        this._menu.style.width = this.options.width;
+        // this._menu.style.width = this.options.width;
         // this._menu.style.height = this.options.height;
         this._menu.style.left = 0;// '-' + this.options.width;
         this._menu.style.top = 0;
 
+
+
         this._body = dom.createDom('div', { "class": "body" }, this._menu);
-        this._contenLable = dom.createDom('lable', { innerHTML: "Virtual borehole profile <br /> (Heights in m)" },
+         //button:
+         this._clearButton = dom.createDom('div', {
+            "class": "gba-close-link", innerHTML: "<i class='fas fa-window-close'></i>", title: "b.NLS_maximize"
+        }, this._body);
+        // dom.createDom('span', { title: "b.NLS_close", innerHTML: "Close" }, this._clearButton);
+
+        this._contentLabel = dom.createDom('div', { class: "header", innerHTML: "<label>VIRTUAL PROFILE <br /> (sealevel [m])</label>" },
             this._body);
+       
+
         /* place holder for borehole profile after Identify */
         this._contentPane = dom.createDom('div', { "class": "gba-menu-contents" }, this._body);
         this._contentPane.innerHTML = this._innerHTML;
         this._contentPane.style.clear = 'both';
 
         // close button
-        let toolboxList = dom.createDom('ul', { "class": "toolbox" }, this._menu);
-        this._clearButton = dom.createDom('button', { "class": "gba-close-link button is-dark" }, toolboxList);
-        // dom.createDom('i', { "class": "gba-close-icon" }, this._clearButton);
-        dom.createDom('span', { title: "b.NLS_close", innerHTML: "Close" }, this._clearButton);
+        // let toolboxList = dom.createDom('ul', { "class": "toolbox" }, this._menu);
+        // this._clearButton = dom.createDom('button', { "class": "gba-close-link button is-dark" }, toolboxList);     
+        // dom.createDom('span', { title: "b.NLS_close", innerHTML: "Close" }, this._clearButton);
 
         // events:
         // don't let double clicks and mousedown get to the map
@@ -123,7 +124,7 @@ export class BoreholePopup extends Control {
         //}
     }
 
-    _setContent(innerHTML) {
+    setContent(innerHTML) {
         if (innerHTML instanceof HTMLElement) {
             this._contentPane.innerHTML = "";
             this._contentPane.appendChild(innerHTML);
@@ -132,39 +133,33 @@ export class BoreholePopup extends Control {
             this._contentPane.innerHTML = innerHTML;
         }
         this._contentPane.style.display = "block";
-        //this._contentPane.innerHTML = innerHTML;
-        //this._contentPane.style.display = "block";            
     }
 
     setChartContent(data) {
         this._contentPane.innerHTML = "";
 
         let valTextColor = "ffffff";
-        this.barChart = new BarChart("d17100",
+        this._barChart = new BarChart("d17100",
             320, valTextColor, 'full',
             300);
-        this.barChart.draw(data);
-        this._contentPane.appendChild(this.barChart._container);
+        this._barChart.draw(data);
+        this._contentPane.appendChild(this._barChart._container);
 
-        let table = this.barChart.getStatTable(data);
+        let table = this._barChart.getStatTable(data);
         this._contentPane.appendChild(table);
-        this._hasContent = true;
     }
 
-    _close(e) {
-
+    private _close(e) {
         this._clearContent();
         this._toggleVisibility(false);
         this.emit("closed");
     }
 
-    _clearContent() {
-        // $(this._contentPane).html('');
+    private _clearContent() {
         this._contentPane.innerHTML = '';
-        this._hasContent = false;
     }
 
-    _toggleVisibility(visible) {
+    private _toggleVisibility(visible) {
         this._setVisibility(visible);
         this._isShowing = visible;
 
@@ -184,20 +179,8 @@ export class BoreholePopup extends Control {
         }
     }
 
-    _setVisibility(addOrRemove) {
-        // $(this._menu).css("visibility", addOrRemove ? "visible" : "hidden");
+    private _setVisibility(addOrRemove) {
         this._menu.style.visibility = addOrRemove ? "visible" : "hidden";
-
-        // var maxButtonVisible = false;
-        // //if add, max Button not visible
-        // if (addOrRemove == true) {
-        //     maxButtonVisible = !addOrRemove;
-        // }
-        // //if remove , then max Button only visible if popup has content
-        // else if (addOrRemove == false) {
-        //     maxButtonVisible = this._hasContent;
-        // }      
-        // // this._maxButton.style.visibility = maxButtonVisible ? "visible" : "hidden";
     }
 
     onRemove() {
@@ -209,11 +192,9 @@ export class BoreholePopup extends Control {
         //    f.remove();
         //}
         domEvent.off(this._clearButton, 'click', this._close);
-        // domEvent.off(this._maxButton, 'click', this.show, this);
-        //this.map.off('mouse-pan', this.hide, this);
         //C.destroy(this.domNode);
         //this.getContainer().parentNode.removeChild(this.getContainer());
-        this._innerHTML = this._hasContent = this._menu = this._body = this._contenLable = this._contentPane = this._clearButton = null;
+        this._innerHTML = this._menu = this._body = this._contentLabel = this._contentPane = this._clearButton = null;
     }
 
 }

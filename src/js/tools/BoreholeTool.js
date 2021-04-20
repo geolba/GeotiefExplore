@@ -1,6 +1,5 @@
 import { EventEmitter } from '../core/EventEmitter';
 import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
-import * as domEvent from '../core/domEvent';
 import { MarkerLayer } from '../layer/MarkerLayer';
 import * as dom from '../core/domUtil';
 import * as util from '../core/utilities';
