@@ -1,24 +1,38 @@
 import { EventEmitter } from '../core/EventEmitter';
 import { BoreholePopup } from '../controls/BoreholePopup';
+import { Map } from '../core/Map';
+import { Scene } from 'three/src/scenes/Scene';
 
-class Layer extends EventEmitter {
+abstract class Layer extends EventEmitter {
+
+    // #region "properties"
+    protected _map: Map;
+    protected _popup: BoreholePopup;
+    protected _popupHandlersAdded: boolean = false;
+    // #endregion "properties"
 
     options = {
         pane: 'overlayPane',
         nonBubblingEvents: []  // Array of events that should not be bubbled to DOM parents (like the map)
     };
 
-    constructor(size) {
+    constructor() {
         super();
     }
 
-    addTo(map) {
+    abstract onAdd(map): void;
+    abstract onRemove(map): void;
+    abstract scaleZ(z): void;
+    abstract setVisible(visible): void;
+    abstract setWireframeMode(wireframe: boolean): void;
+
+    addTo(map: Map) {
         map.addLayer(this);
         return this;
     }
 
     async _layerAdd(e) {
-        var map = e;//.target;
+        let map = e;//.target;
 
         // check in case layer gets added and then removed before the map is ready
         if (!map.hasLayer(this)) { return; }
@@ -39,11 +53,8 @@ class Layer extends EventEmitter {
         //map.fire('layeradd', { layer: this });
     }
 
-    setWireframeMode(wireframe) {
-        return;
-    }
 
-    getScene() {
+    getScene(): Scene {
         return this._map.scene;
     }
 
@@ -61,7 +72,7 @@ class Layer extends EventEmitter {
 
         if (!this._popup) {
             //this._popup = new L.Popup(options, this);
-            this._popup = new BoreholePopup({}, this);
+            this._popup = new BoreholePopup({});
             this._popup.addTo(this._map);
             this._popup.setChartContent(content);
         }
@@ -92,7 +103,7 @@ class Layer extends EventEmitter {
     // Closes the popup bound to this layer if it is open.
     closePopup() {
         if (this._popup) {
-            this._popup._close();
+            this._popup.close();
             //this._popup.removeFrom(this._map);
         }
         return this;

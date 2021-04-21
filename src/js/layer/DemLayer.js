@@ -7,9 +7,8 @@ import { DoubleSide, FlatShading, LinearFilter } from 'three/src/constants';
 import * as browser from '../core/browser';
 import { Texture } from 'three/src/textures/Texture';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
-import { Plane } from 'three/src/math/Plane';
+
 import { Vector3 } from 'three/src/math/Vector3';
-import { Color } from 'three/src/math/Color';
 import proj4 from 'proj4/dist/proj4';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { shader } from '../clip/shader';
@@ -162,13 +161,6 @@ export class DemLayer extends Layer {
         // layer opacity is the average opacity of materials
         this.opacity = sum_opacity / this.materials.length;
     }
-
-
-    // filterMaterial(filterXMin, filterXMax, filterYMax) {
-    //     this.xMinLocalPlane.constant = filterXMin;
-    //     this.xMaxLocalPlane.constant = filterXMax;
-    //     this.yMaxLocalPlane.constant = filterYMax;
-    // }
 
     scaleZ(z) {
         this.objectGroup.scale.z = z;

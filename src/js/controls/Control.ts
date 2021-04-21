@@ -1,5 +1,6 @@
 import * as util from '../core/utilities';
 import { EventEmitter } from '../core/EventEmitter';
+import { Map } from '../core/Map';
 
 abstract class Control extends EventEmitter {
 
@@ -32,12 +33,12 @@ abstract class Control extends EventEmitter {
     
     abstract onAdd(map) : HTMLElement;
 
-    addTo(map) {
+    addTo(map: Map): Control {
         this._map = map;
 
-        var container = this._container = this.onAdd(map);
-        var pos = this.getPosition();//"topright"
-        var corner = map._controlCorners[pos];
+        let container = this._container = this.onAdd(map);
+        let pos = this.getPosition();//"topright"
+        let corner = map.controlCorners[pos];
         if (container) {
             // $(container).addClass('gba-control');
             container.classList.add("gba-control");
@@ -49,7 +50,6 @@ abstract class Control extends EventEmitter {
                 corner.appendChild(container);
             }
         }
-
         return this;
     }
 

@@ -14,8 +14,7 @@ export class BoreholeIdentify {
         this.type = "DxfIdentify";
         this.searchUrl = "";
         this.camera = defaults.camera;
-        this.domElement = defaults.domElement;
-        //this.layer = defaults.layer;
+        this.domElement = defaults.domElement;      
         this.highlightMaterial = defaults.highlightMaterial;
         this.layers = defaults.layers;
     }
@@ -35,16 +34,11 @@ export class BoreholeIdentify {
     }
 
     execute(params) {
-        // let canvasOffset = $(this.domElement).offset();
         let canvasOffset = this._getOffset(this.domElement);
         let xClickedOnCanvas = params.clientX - canvasOffset.left;
-        let yClickedonCanvas = params.clientY - canvasOffset.top;       
-        //this.camera = params.camera;
+        let yClickedonCanvas = params.clientY - canvasOffset.top;    
 
-        let eventsResponse = this._intersectObjects(xClickedOnCanvas, yClickedonCanvas, params.width, params.height);
-        //if (objs.length == 0) {
-        //    //
-        //}
+        let eventsResponse = this._intersectObjects(xClickedOnCanvas, yClickedonCanvas, params.width, params.height);      
         return eventsResponse.then(
             function (response) {
                 return response;
@@ -52,7 +46,6 @@ export class BoreholeIdentify {
     }
 
     _intersectObjects(offsetX, offsetY, width, height) {
-        // let deferred = $.Deferred();
         return new Promise(
             (resolve, reject) => { // (A)
                 if (offsetX === undefined || offsetY === undefined) {
@@ -74,8 +67,7 @@ export class BoreholeIdentify {
                     //var raycaster = new THREE.Raycaster();
                     //raycaster.set(vector, direction);
 
-                    //raycaster.setFromCamera(mouse, this.camera);
-                    let visibleMehses = this._getvisibleQueryableObjects();//nur die sichtbar sind
+                    let visibleMehses = this._getvisibleQueryableObjects();//only the visible layers
                     let allMeshes = this._getQueryableObjects2();//alle
                     let intersects = [];
                     let intersects1 = raycaster.intersectObjects(visibleMehses, true);
@@ -92,11 +84,7 @@ export class BoreholeIdentify {
                     //for (var i = objs.length - 1; i >= 0; i--) {
                     for (let i = 0; i < intersects.length; i++) {
                         let obj = intersects[i];
-                        if (!obj.object.visible) continue;
-                        // get layerId and featureId of clicked object
-                        //var object = obj.object;
-                        //var layerId = object.userData.layerId;
-                        //var featureId = obj.faceIndex;
+                        if (!obj.object.visible) continue;                       ;
                         let layer = obj.object;
                         let layerId = layer.userData.layerId;
                         let objectGroup = layer.parent;

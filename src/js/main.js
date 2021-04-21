@@ -40729,11 +40729,6 @@ class Application {
     }
 
     addEventListeners() {
-
-        // domEvent.on(this.mapIcon, 'click', () => {
-        //     this.basemapControl.show();
-        // }, this);
-
         domEvent.on(window, 'resize', this.onWindowResize, this);
         domEvent.on(window, 'keydown', this.keydown, this);
 
@@ -40896,26 +40891,3 @@ class Application {
 let container = document.getElementById("webgl");
 let app = new Application(container);
 app.build();
-
-// new Vue({
-//     el: '#app',
-//     components: { Modal },
-//     data() {
-//         return {
-//             isModalVisible: false,
-//         }
-//     },
-//     mounted() {
-//         let container = document.getElementById("webgl");
-//         let app = new Application(container);
-//         app.build();
-//     },
-//     methods: {
-//         showModal() {
-//             this.isModalVisible = true;
-//         },
-//         closeModal() {
-//             this.isModalVisible = false;
-//         },
-//     }
-// });

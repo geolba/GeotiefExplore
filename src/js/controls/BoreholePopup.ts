@@ -22,6 +22,7 @@ export class BoreholePopup extends Control {
         height: '100%',
         parentDiv: null
     };
+    _source;
 
     //#region  private class fields:
     private _innerHTML;
@@ -99,7 +100,7 @@ export class BoreholePopup extends Control {
         domEvent.on(this._clearButton, 'mouseup', domEvent.stopPropagation);
         domEvent.on(this._clearButton, 'click', domEvent.stopPropagation);
         domEvent.on(this._clearButton, 'click', domEvent.preventDefault);
-        domEvent.on(this._clearButton, 'click', this._close, this);;
+        domEvent.on(this._clearButton, 'click', this.close, this);;
 
         this._toggleVisibility(false);
 
@@ -108,7 +109,7 @@ export class BoreholePopup extends Control {
         }
     }
 
-    show(a) {
+    show() {
         //this._clearContent();
         this._toggleVisibility(true);
         //this._animate(true);
@@ -149,7 +150,7 @@ export class BoreholePopup extends Control {
         this._contentPane.appendChild(table);
     }
 
-    private _close(e) {
+    close() {
         this._clearContent();
         this._toggleVisibility(false);
         this.emit("closed");
@@ -191,7 +192,7 @@ export class BoreholePopup extends Control {
         //    var f = this._eventConnections[i];
         //    f.remove();
         //}
-        domEvent.off(this._clearButton, 'click', this._close);
+        domEvent.off(this._clearButton, 'click', this.close);
         //C.destroy(this.domNode);
         //this.getContainer().parentNode.removeChild(this.getContainer());
         this._innerHTML = this._menu = this._body = this._contentLabel = this._contentPane = this._clearButton = null;

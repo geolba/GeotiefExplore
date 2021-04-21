@@ -5,6 +5,7 @@
     "main": "dist/main.js",
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.2",
+        "@types/three": "^0.127.1",
         "bulma": "^0.9.2",
         "lodash": "^4.17.21",
         "normalize.css": "^8.0.1",
