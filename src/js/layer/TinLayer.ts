@@ -13,12 +13,17 @@ import { Group } from 'three/src/objects/Group';
 // import { Texture } from 'three/src/textures/Texture';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import proj4 from 'proj4/dist/proj4';
+import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
+import { shader } from '../clip/shader';
+import { Material } from 'three/src/materials/Material';
+import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
 
 class TinLayer extends Layer {
 
+    name: string;
     q: boolean;
     queryableObjects;
     borderVisible;
@@ -28,16 +33,36 @@ class TinLayer extends Layer {
     opacity: number;
     materialParameter: Array<string>;
     materialsArray: Array<any>;
-    material: MyMeshStandardMaterial;
+    material: Material;
     featuregeom_id: number;
     color: string;
     mainMesh;
-    uniforms: Object;
+    uniforms = {
+        clipping: {}
+    };
     public baseExtent = {
         min: { x: 0, y: 0 },
         max: { x: 0, y: 0 }
     };
     index: number;
+    images = [{
+        width: 405,
+        // "url": "https://sdi.noe.gv.at/at.gv.noe.geoserver/OGD/wms",
+        url: " https://ows.terrestris.de/osm/service",
+        height: 549,
+        bboxSR: 3857,
+        type: "wms",
+        texture: undefined
+    },
+    {
+        width: 405,
+        url: "https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/export",
+        height: 549, //509
+        bboxSR: 3034,
+        type: "esri",
+        texture: undefined
+    }
+    ];
 
     constructor(params) {
         super();
@@ -85,10 +110,23 @@ class TinLayer extends Layer {
         map.scene.remove(this.objectGroup);
     }
 
+    async initMaterials() {
+    }
+
     async build(app_scene) {
         let geometry = new BufferGeometry();
-        let posArray = await (this.points(this.featuregeom_id));
-        let positions = new Float32BufferAttribute(posArray, 3);
+        let vertices = await (this.points(this.featuregeom_id));
+        // const positions = [];
+        // const normals = [];
+        // const uvs = [];
+        // for (let i = 0; i < vertices.length; i = i +3) {
+        //     // positions.push(...vertex.pos);
+        //     // normals.push(...vertex.norm);
+        //     uvs.push([0,0]);
+        //     uvs.push([1, 0]);
+        //     uvs.push([0, 1]);
+        //   }
+        let positions = new Float32BufferAttribute(vertices, 3);
         geometry.setAttribute('position', positions);
 
         //var TypeArray = this.idx.length > 65535 ? Uint32Array : Uint16Array;
@@ -97,6 +135,11 @@ class TinLayer extends Layer {
         let indexArray = await (this.edges(this.featuregeom_id));
         let indices = new Uint16BufferAttribute(indexArray, 1);//.setDynamic(true);
         geometry.setIndex(indices);
+
+        // const uvNumComponents = 2;
+        // geometry.setAttribute(
+        //     'uv',
+        //     new Float32BufferAttribute(new Float32Array(uvs), uvNumComponents));
 
         geometry.scale(1, 1, 1);
         geometry.computeBoundingSphere();
@@ -121,24 +164,66 @@ class TinLayer extends Layer {
         // });
         // this.materialsArray.push(this.material);
 
-        let uniforms = this.uniforms = {
-            clipping: {
-                clippingScale: { type: "f", value: 1.0 },
-                color: { type: "c", value: new Color(color) },
-                clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
-                clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) }
+
+
+        if (this.name == "test") {
+            let image = this.images[0];
+            if (image.texture === undefined) {
+
+                // if (image.type == "esri") {
+                //     // image.texture = this._loadTextureData(image.data);
+                //     let data = await this.requestImage(image.url, image);
+
+                //     // image.texture = await new TextureLoader().load(data.href);
+                //     image.texture = await this.loadTexture(data.href);
+                // } 
+                if (image.type == "wms") {
+                    image.texture = await this.loadTextureWms(image.url, image);
+                }
+
             }
-        };
-        this.material = new MyMeshStandardMaterial({
-            color: color,
-            metalness: 0.1,
-            roughness: 0.75,
-            flatShading: true,
-            side: DoubleSide,
-            // clippingPlanes: [this.xLocalPlane, this.yLocalPlane],
-            // clipIntersection: false,
-            // clipShadows: true,
-        }, uniforms.clipping);
+            this.uniforms = {
+                clipping: {
+                    clippingScale: { type: "f", value: 1.0 },
+                    clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
+                    clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) },
+                    // map: { type: 't', value: image.texture },
+                    percent: { type: "f", value: 0.7 }
+                }
+            };
+
+            // this.material = new MeshLambertMaterial({
+            //     map: image.texture,
+            //     transparent: true,
+            //     side: DoubleSide,
+            // });
+            this.material = new ShaderMaterial({
+                transparent: true,
+                side: DoubleSide,
+                uniforms: this.uniforms.clipping,
+                vertexShader: shader.vertexClipping,
+                fragmentShader: shader.fragmentClippingFront,
+            });
+
+        } else {
+            let uniforms = this.uniforms = {
+                clipping: {
+                    clippingScale: { type: "f", value: 1.0 },
+                    color: { type: "c", value: new Color(color) },
+                    clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
+                    clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) }
+                }
+            };
+
+            this.material = new MyMeshStandardMaterial({
+                color: color,
+                metalness: 0.1,
+                roughness: 0.75,
+                flatShading: true,
+                side: DoubleSide
+            }, uniforms.clipping);
+        }
+
         this.materialsArray.push(this.material);
         let mesh = this.mainMesh = new Mesh(geometry, this.material);
         mesh.userData.layerId = this.index;

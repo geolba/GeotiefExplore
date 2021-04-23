@@ -5,6 +5,8 @@ import { Mesh } from 'three/src/objects/Mesh';
 
 export class DemBlock {
 
+    layer;
+
     constructor(params) {
         //properties
         for (var k in params) {

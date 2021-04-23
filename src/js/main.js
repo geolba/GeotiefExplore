@@ -192,7 +192,7 @@ class Application {
         this.northArrow = new NorthArrow({ headLength: 1, headWidth: 1 }).addTo(this.map);
 
         let demLayer = new DemLayer({
-            q: 0, shading: true, type: 'dem', name: 'DEM Layer', color: 16382457, "baseExtent": this.map.baseExtent,
+            q: 0, shading: true, type: 'dem', name: 'DEM Layer', color: 16382457,
             "materialParameter": [{
                 "i": 0,
                 "materialtypee": 0,

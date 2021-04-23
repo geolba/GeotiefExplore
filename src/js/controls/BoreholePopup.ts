@@ -15,7 +15,6 @@ interface BoreholePopupOptions {
 
 export class BoreholePopup extends Control {
 
-    // default options
     options: BoreholePopupOptions = {
         position: 'topleft',
         width: '300px',

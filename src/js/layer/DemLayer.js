@@ -5,7 +5,8 @@ import { DemBlock } from './DemBlock';
 // import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
 import { DoubleSide, FlatShading, LinearFilter } from 'three/src/constants';
 import * as browser from '../core/browser';
-import { Texture } from 'three/src/textures/Texture';
+
+
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 
 import { Vector3 } from 'three/src/math/Vector3';
@@ -31,10 +32,23 @@ export class DemLayer extends Layer {
         type: "esri"
     }
     ];
-
+    q;
+    objectGroup;
+    visible;
+    opacity;
+    materialParameter;
+    materialsArray;
+    material;
     queryableObjects;
     borderVisible;
+    mainMesh;
     uniforms;
+    blocks;
+    baseExtent = {
+        min: { x: 0, y: 0 },
+        max: { x: 0, y: 0 }
+    };
+    index;
 
     constructor(params) {
         super();
@@ -42,7 +56,7 @@ export class DemLayer extends Layer {
         this.opacity = 1;
         this.material;
         this.materialParameter = [];
-        this.materials = [];
+        this.materialsArray = [];
         for (var k in params) {
             this[k] = params[k];
         }
@@ -66,25 +80,29 @@ export class DemLayer extends Layer {
 
     async initMaterials() {
         if (this.materialParameter.length === 0) return;
-        // this.xMaxLocalPlane = new Plane(new Vector3(-1, 0, 0), this._map.x.max);
-        // this.yMaxLocalPlane = new Plane(new Vector3(0, -1, 0), this._map.y.max);
-
         let sum_opacity = 0;
         this.material;
         for (let i = 0, l = this.materialParameter.length; i < l; i++) {
             let m = this.materialParameter[i];
-
-            let opt = {};
-            //if (m.ds && !Gba3D.isIE) opt.side = THREE.DoubleSide;
+            let opt = {
+                opacity: null,
+                side: null,
+                // shading: null,
+                transparent: null,
+                wireframe: null,
+                uniforms: null,               
+                vertexShader: null,
+                fragmentShader: null
+            };
             if (m.ds && !browser.ie) opt.side = DoubleSide;
-            if (m.flat) opt.shading = FlatShading;
+            // if (m.flat) opt.shading = FlatShading;
             //m.i = 1;
             let image;
             if (m.i !== undefined) {
                 image = this.images[m.i];
                 if (image.texture === undefined) {
                     if (image.src !== undefined) {
-                        image.texture = THREE.ImageUtils._loadTexture(image.src);
+                        // image.texture = THREE.ImageUtils._loadTexture(image.src);
                     }
                     else {
                         if (image.type == "esri") {
@@ -106,13 +124,7 @@ export class DemLayer extends Layer {
             }
             if (m.t) opt.transparent = true;
             if (m.w) opt.wireframe = true;
-            //opt.wireframe = true;
-
-            // // Clipping setup:
-            // opt.clippingPlanes = this.clippingPlanes = [this.xMinLocalPlane, this.xMaxLocalPlane, this.yMaxLocalPlane];
-            // opt.clipIntersection = false;
-            // opt.clipShadows = true;
-
+            
             // let color =  parseInt("ffffff", 16);
             // // opt.color = color;
             let uniforms = this.uniforms = {
@@ -131,35 +143,20 @@ export class DemLayer extends Layer {
                 //if (m.color !== undefined) opt.color = opt.ambient = m.color;
                 if (m.color !== undefined) opt.color = m.color;
                 //opt.skinning = true;
-                opt.uniforms = this.uniforms.clipping;
+                opt.uniforms = uniforms.clipping;
                 opt.vertexShader = shader.vertexClipping;
                 opt.fragmentShader = shader.fragmentClippingFront;
                 this.material = new ShaderMaterial(opt);
                 // this.material = new MeshStandardMaterial(opt);                 
-            }
-            // else if (m.materialtype === MaterialType.MeshPhong) {
-            //     if (m.color !== undefined) opt.color = opt.ambient = m.color;
-            //     mat = new THREE.MeshPhongMaterial(opt);
-            // }
-            // else if (m.materialtype === MaterialType.LineBasic) {
-            //     opt.color = m.color;
-            //     mat = new THREE.LineBasicMaterial(opt);
-            // }
-            else {
-                if (m.color !== undefined) opt.color = m.color;
-                this.material = new MeshStandardMaterial(opt);
-            }
+            }       
 
             m.mat = this.material;
-            //if (m.side !== undefined) {
-            //    m.
-            //}
-            this.materials.push(this.material);
+            this.materialsArray.push(this.material);
             sum_opacity += this.material.opacity;
         }
 
         // layer opacity is the average opacity of materials
-        this.opacity = sum_opacity / this.materials.length;
+        this.opacity = sum_opacity / this.materialsArray.length;
     }
 
     scaleZ(z) {
@@ -174,15 +171,15 @@ export class DemLayer extends Layer {
     }
 
     addBlock(params, clipped = false) {
-        let BlockClass = clipped ? ClippedDEMBlock : DemBlock;
-        var block = new BlockClass(params);
+        // let BlockClass = clipped ? ClippedDEMBlock : DemBlock;
+        let block = new DemBlock(params);
         block.layer = this;
         this.blocks.push(block);
         return block;
     }
 
     setWireframeMode(wireframe) {
-        this.materials.forEach(function (mat) {
+        this.materialsArray.forEach(function (mat) {
             //if (m.w) return;
             //m.mat.wireframe = wireframe;
             mat.wireframe = wireframe;
@@ -229,13 +226,11 @@ export class DemLayer extends Layer {
     async loadTextureWms(url, imageParameter) {
         let dest = new proj4.Proj("EPSG:3857");
         let source = new proj4.Proj("EPSG:3034");
-        let p1 = new proj4.toPoint([this.baseExtent.x.min, this.baseExtent.y.min]);
-        let p2 = new proj4.toPoint([this.baseExtent.x.max, this.baseExtent.y.max]);
+        let p1 = proj4.toPoint([this.baseExtent.min.x, this.baseExtent.min.y]);
+        let p2 = proj4.toPoint([this.baseExtent.max.x, this.baseExtent.max.y]);
 
         proj4.transform(source, dest, p1);
         proj4.transform(source, dest, p2);
-
-        // let bbox = this.baseExtent.x.min + "," + this.baseExtent.y.min + "," + this.baseExtent.x.max + "," + this.baseExtent.y.max;
         let bbox = p1.x + "," + p1.y + "," + p2.x + "," + p2.y;
 
         let params = {
@@ -272,11 +267,19 @@ export class DemLayer extends Layer {
     }
 
     async onAdd(map) {
+        this.baseExtent.min.x = map.baseExtent.x.min;
+        this.baseExtent.min.y = map.baseExtent.y.min;
+        this.baseExtent.max.x = map.baseExtent.x.max;
+        this.baseExtent.max.y = map.baseExtent.y.max;
         //this._zoomAnimated = this._zoomAnimated && map.options.markerZoomAnimation;
         await this.initMaterials();
         this.build(this.getScene());
         map.update();
         this.emit('add');
+    }
+
+    onRemove(map) {
+        map.scene.remove(this.objectGroup);
     }
 
     build(app_scene) {
@@ -356,8 +359,8 @@ export class DemLayer extends Layer {
     async requestImage(url, imageParameter) {
         let dest = new proj4.Proj("EPSG:3857");
         let source = new proj4.Proj("EPSG:3034");
-        let p1 = new proj4.toPoint([this.baseExtent.x.min, this.baseExtent.y.min]);
-        let p2 = new proj4.toPoint([this.baseExtent.x.max, this.baseExtent.y.max]);
+        let p1 = proj4.toPoint([this.baseExtent.min.x, this.baseExtent.min.y]);
+        let p2 = proj4.toPoint([this.baseExtent.max.x, this.baseExtent.max.y]);
 
         proj4.transform(source, dest, p1);
         proj4.transform(source, dest, p2);
