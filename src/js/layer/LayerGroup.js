@@ -92,6 +92,10 @@ import * as util from '../core/utilities';
        return;
     }
 
+    setWireframeMode(wireframe) {
+        return;
+    }
+
     getLayerId(layer) {
         return util.stamp(layer);
     }

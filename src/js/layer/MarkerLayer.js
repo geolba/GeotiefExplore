@@ -3,7 +3,7 @@ import * as util from '../core/utilities';
 import { BaseEditor } from '../core/BaseEditor';
 import { CylinderGeometry } from 'three/src/geometries/CylinderGeometry';
 import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
-import { MathUtils } from 'three/src/math/MathUtils';
+import * as MathUtils from 'three/src/math/MathUtils';
 import { Mesh } from 'three/src/objects/Mesh';
 
 export class MarkerLayer extends Layer {

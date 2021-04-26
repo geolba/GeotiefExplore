@@ -26,6 +26,7 @@ class Map extends OrbitControls {
     public serviceUrl: string;
     public basemaps: Object;
     public baseExtent: Object;
+    public currentBasemap;
 
     constructor(x, y, z, scene, container) {
 
@@ -124,7 +125,8 @@ class Map extends OrbitControls {
                 citation: layerData.geologicdescription !== null ? layerData.geologicdescription.citation : null,
                 feature_type: layerData.geologicdescription !== null ? layerData.geologicdescription['feature type'] : null,
             });
-            callStack.push(this.addLayer(dxfLayer))
+            callStack.push(this.addLayer(dxfLayer));
+            if (dxfLayer.name == " Topography") this.currentBasemap = dxfLayer;
         }
         await Promise.all(callStack);
         this.emit("ready");

@@ -16,7 +16,9 @@ import proj4 from 'proj4/dist/proj4';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { shader } from '../clip/shader';
 import { Material } from 'three/src/materials/Material';
-import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
+// import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
+import { Vector2 } from 'three/src/math/Vector2';
+import { Matrix4 } from 'three/src/math/Matrix4';
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
@@ -113,19 +115,183 @@ class TinLayer extends Layer {
     async initMaterials() {
     }
 
+    _applyBoxUV(geom, transformMatrix, bbox, bbox_max_size) {
+
+        let coords = [];
+        coords.length = 2 * geom.attributes.position.array.length / 3;
+
+        // geom.removeAttribute('uv');
+        if (geom.attributes.uv === undefined) {
+            geom.setAttribute('uv', new Float32BufferAttribute(coords, 2));
+
+            // const uvNumComponents = 2;
+            // geometry.setAttribute(
+            //     'uv',
+            //     new Float32BufferAttribute(new Float32Array(uvs), uvNumComponents));
+        }
+
+        //maps 3 verts of 1 face on the better side of the cube
+        //side of the cube can be XY, XZ or YZ
+        let makeUVs = function (v0, v1, v2) {
+
+            //pre-rotate the model so that cube sides match world axis
+            v0.applyMatrix4(transformMatrix);
+            v1.applyMatrix4(transformMatrix);
+            v2.applyMatrix4(transformMatrix);
+
+            //get normal of the face, to know into which cube side it maps better
+            let n = new Vector3();
+            n.crossVectors(v1.clone().sub(v0), v1.clone().sub(v2)).normalize();
+
+            n.x = Math.abs(n.x);
+            n.y = Math.abs(n.y);
+            n.z = Math.abs(n.z);
+
+            let uv0 = new Vector2();
+            let uv1 = new Vector2();
+            let uv2 = new Vector2();
+            // xz mapping
+            if (n.y > n.x && n.y > n.z) {
+                uv0.x = (v0.x - bbox.min.x) / bbox_max_size;
+                uv0.y = (bbox.max.z - v0.z) / bbox_max_size;
+
+                uv1.x = (v1.x - bbox.min.x) / bbox_max_size;
+                uv1.y = (bbox.max.z - v1.z) / bbox_max_size;
+
+                uv2.x = (v2.x - bbox.min.x) / bbox_max_size;
+                uv2.y = (bbox.max.z - v2.z) / bbox_max_size;
+            } else
+                if (n.x > n.y && n.x > n.z) {
+                    uv0.x = (v0.z - bbox.min.z) / bbox_max_size;
+                    uv0.y = (v0.y - bbox.min.y) / bbox_max_size;
+
+                    uv1.x = (v1.z - bbox.min.z) / bbox_max_size;
+                    uv1.y = (v1.y - bbox.min.y) / bbox_max_size;
+
+                    uv2.x = (v2.z - bbox.min.z) / bbox_max_size;
+                    uv2.y = (v2.y - bbox.min.y) / bbox_max_size;
+                } else
+                    if (n.z > n.y && n.z > n.x) {
+                        uv0.x = (v0.x - bbox.min.x) / bbox_max_size;
+                        uv0.y = (v0.y - bbox.min.y) / bbox_max_size;
+
+                        uv1.x = (v1.x - bbox.min.x) / bbox_max_size;
+                        uv1.y = (v1.y - bbox.min.y) / bbox_max_size;
+
+                        uv2.x = (v2.x - bbox.min.x) / bbox_max_size;
+                        uv2.y = (v2.y - bbox.min.y) / bbox_max_size;
+                    }
+
+            return {
+                uv0: uv0,
+                uv1: uv1,
+                uv2: uv2
+            };
+        };
+
+        if (geom.index) { // is it indexed buffer geometry?
+            for (let vi = 0; vi < geom.index.array.length; vi += 3) {
+                let idx0 = geom.index.array[vi];
+                let idx1 = geom.index.array[vi + 1];
+                let idx2 = geom.index.array[vi + 2];
+
+                let vx0 = geom.attributes.position.array[3 * idx0];
+                let vy0 = geom.attributes.position.array[3 * idx0 + 1];
+                let vz0 = geom.attributes.position.array[3 * idx0 + 2];
+
+                let vx1 = geom.attributes.position.array[3 * idx1];
+                let vy1 = geom.attributes.position.array[3 * idx1 + 1];
+                let vz1 = geom.attributes.position.array[3 * idx1 + 2];
+
+                let vx2 = geom.attributes.position.array[3 * idx2];
+                let vy2 = geom.attributes.position.array[3 * idx2 + 1];
+                let vz2 = geom.attributes.position.array[3 * idx2 + 2];
+
+                let v0 = new Vector3(vx0, vy0, vz0);
+                let v1 = new Vector3(vx1, vy1, vz1);
+                let v2 = new Vector3(vx2, vy2, vz2);
+
+                let uvs = makeUVs(v0, v1, v2);
+
+                coords[2 * idx0] = uvs.uv0.x;
+                coords[2 * idx0 + 1] = uvs.uv0.y;
+
+                coords[2 * idx1] = uvs.uv1.x;
+                coords[2 * idx1 + 1] = uvs.uv1.y;
+
+                coords[2 * idx2] = uvs.uv2.x;
+                coords[2 * idx2 + 1] = uvs.uv2.y;
+            }
+        } else {
+            for (let vi = 0; vi < geom.attributes.position.array.length; vi += 9) {
+                let vx0 = geom.attributes.position.array[vi];
+                let vy0 = geom.attributes.position.array[vi + 1];
+                let vz0 = geom.attributes.position.array[vi + 2];
+
+                let vx1 = geom.attributes.position.array[vi + 3];
+                let vy1 = geom.attributes.position.array[vi + 4];
+                let vz1 = geom.attributes.position.array[vi + 5];
+
+                let vx2 = geom.attributes.position.array[vi + 6];
+                let vy2 = geom.attributes.position.array[vi + 7];
+                let vz2 = geom.attributes.position.array[vi + 8];
+
+                let v0 = new Vector3(vx0, vy0, vz0);
+                let v1 = new Vector3(vx1, vy1, vz1);
+                let v2 = new Vector3(vx2, vy2, vz2);
+
+                let uvs = makeUVs(v0, v1, v2);
+
+                let idx0 = vi / 3;
+                let idx1 = idx0 + 1;
+                let idx2 = idx0 + 2;
+
+                coords[2 * idx0] = uvs.uv0.x;
+                coords[2 * idx0 + 1] = uvs.uv0.y;
+
+                coords[2 * idx1] = uvs.uv1.x;
+                coords[2 * idx1 + 1] = uvs.uv1.y;
+
+                coords[2 * idx2] = uvs.uv2.x;
+                coords[2 * idx2 + 1] = uvs.uv2.y;
+            }
+        }
+
+        geom.attributes.uv.array = new Float32Array(coords);
+    }
+
+    applyBoxUV(bufferGeometry, transformMatrix, boxSize?) {
+
+        if (transformMatrix === undefined) {
+            transformMatrix = new Matrix4();
+        }
+
+        let geom = bufferGeometry;
+        geom.computeBoundingBox();
+        // let bbox = geom.boundingBox;
+        if (boxSize === undefined) {
+            let geom = bufferGeometry;
+            geom.computeBoundingBox();
+            let bbox = geom.boundingBox;
+
+            let bbox_size_x = bbox.max.x - bbox.min.x;
+            let bbox_size_z = bbox.max.z - bbox.min.z;
+            let bbox_size_y = bbox.max.y - bbox.min.y;
+
+            boxSize = Math.max(bbox_size_x, bbox_size_y, bbox_size_z);
+        }
+
+        //let uvBbox = new Box3(new Vector3(-boxSize / 2, -boxSize / 2, -boxSize / 2), new Vector3(boxSize / 2, boxSize / 2, boxSize / 2));
+        let uvBbox = geom.boundingBox
+
+        this._applyBoxUV(bufferGeometry, transformMatrix, uvBbox, boxSize);
+
+    }
+
     async build(app_scene) {
         let geometry = new BufferGeometry();
         let vertices = await (this.points(this.featuregeom_id));
-        // const positions = [];
-        // const normals = [];
-        // const uvs = [];
-        // for (let i = 0; i < vertices.length; i = i +3) {
-        //     // positions.push(...vertex.pos);
-        //     // normals.push(...vertex.norm);
-        //     uvs.push([0,0]);
-        //     uvs.push([1, 0]);
-        //     uvs.push([0, 1]);
-        //   }
+
         let positions = new Float32BufferAttribute(vertices, 3);
         geometry.setAttribute('position', positions);
 
@@ -136,21 +302,26 @@ class TinLayer extends Layer {
         let indices = new Uint16BufferAttribute(indexArray, 1);//.setDynamic(true);
         geometry.setIndex(indices);
 
-        // const uvNumComponents = 2;
-        // geometry.setAttribute(
-        //     'uv',
-        //     new Float32BufferAttribute(new Float32Array(uvs), uvNumComponents));
+
 
         geometry.scale(1, 1, 1);
         geometry.computeBoundingSphere();
         geometry.computeVertexNormals();// computed vertex normals are orthogonal to the face f
+        // geometry.computeBoundingBox();
+
+        //find out the dimensions, to let texture size 100% fit without stretching
         geometry.computeBoundingBox();
+        // const center = new Vector3();       
+        // let bboxSize = geometry.boundingBox.getSize(center);
+        // let uvMapSize = Math.min(bboxSize.x, bboxSize.y, bboxSize.z);
+
+
+
         let boundingBox = geometry.boundingBox;
         this.baseExtent.min.x = boundingBox.min.x;
         this.baseExtent.min.y = boundingBox.min.y;
         this.baseExtent.max.x = boundingBox.max.x;
         this.baseExtent.max.y = boundingBox.max.y;
-
         let color = parseInt(this.color, 16);
         // this.material = new MeshStandardMaterial({
         //     color: color,
@@ -166,7 +337,8 @@ class TinLayer extends Layer {
 
 
 
-        if (this.name == "test") {
+
+        if (this.name == "Topography") {
             let image = this.images[0];
             if (image.texture === undefined) {
 
@@ -187,15 +359,23 @@ class TinLayer extends Layer {
                     clippingScale: { type: "f", value: 1.0 },
                     clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
                     clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) },
-                    // map: { type: 't', value: image.texture },
+                    map: { type: 't', value: image.texture },
                     percent: { type: "f", value: 0.7 }
                 }
             };
+
+            //calculate UV coordinates, if uv attribute is not present, it will be added
+            // https://jsfiddle.net/mmalex/pcjbysn1/
+            // https://stackoverflow.com/questions/20774648/three-js-generate-uv-coordinate
+            this.applyBoxUV(geometry, new Matrix4());
+            //let three.js know
+            geometry.attributes.uv.needsUpdate = true;
 
             // this.material = new MeshLambertMaterial({
             //     map: image.texture,
             //     transparent: true,
             //     side: DoubleSide,
+            //     opacity: 0.7
             // });
             this.material = new ShaderMaterial({
                 transparent: true,
@@ -204,6 +384,8 @@ class TinLayer extends Layer {
                 vertexShader: shader.vertexClipping,
                 fragmentShader: shader.fragmentClippingFront,
             });
+            // this.material.map.wrapS = RepeatWrapping;
+            // this.material.map.wrapT = RepeatWrapping;
 
         } else {
             let uniforms = this.uniforms = {
