@@ -154,7 +154,11 @@ class Application {
         // this.camera.position.set(0, -0.1, 150);
         // this.camera.lookAt(new Vector3(0, 0, 0));
 
-        let map = this.map = await Map.build(this.scene, this.container, 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta_all?modelid=20');
+        let map = this.map = await Map.build(
+            this.scene,
+            this.container,
+            'https://geusegdi01.geus.dk/meta3d/rpc/model_meta_all?modelid=20'
+        );
         this.mapTitle = document.querySelector('#map-title');
         this.mapTitle.innerHTML += map.title;
         map.on('ready', () => {
@@ -396,11 +400,11 @@ class Application {
             this.gridlayer.toggle();
         }, this);
 
-         //toggle SlicingBox
-         let chkSlicingBox = document.getElementById("chkSlicingBox");
-         domEvent.on(chkSlicingBox, 'click', function (e) {
-             this.selectionBox.toggle();
-         }, this);
+        //toggle SlicingBox
+        let chkSlicingBox = document.getElementById("chkSlicingBox");
+        domEvent.on(chkSlicingBox, 'click', function (e) {
+            this.selectionBox.toggle();
+        }, this);
 
     }
 

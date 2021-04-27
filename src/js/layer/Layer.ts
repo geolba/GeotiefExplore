@@ -24,7 +24,7 @@ abstract class Layer extends EventEmitter {
     abstract onRemove(map): void;
     abstract scaleZ(z): void;
     abstract setVisible(visible): void;
-    abstract setWireframeMode(wireframe: boolean): void;
+    abstract setWireframeMode(wireframe?: boolean): void;
 
     addTo(map: Map) {
         map.addLayer(this);

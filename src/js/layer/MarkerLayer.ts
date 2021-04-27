@@ -6,7 +6,30 @@ import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
 import * as MathUtils from 'three/src/math/MathUtils';
 import { Mesh } from 'three/src/objects/Mesh';
 
+
+interface MarkerLayerOtions { 
+    pane: string,
+    nonBubblingEvents: Array<string>,          
+    opacity: number,
+    clickable: boolean,
+    editOptions?,
+    drawingCSSClass?: string,
+    drawingCursor?: string
+}
+
 export class MarkerLayer extends Layer {
+
+    _material;
+    _icon;
+    _latlng;
+    map;
+    editor;  
+    options: MarkerLayerOtions = {
+        pane: 'markerPane',
+        nonBubblingEvents: ['click', 'dblclick', 'mouseover', 'mouseout', 'contextmenu'],
+        opacity: 1,
+        clickable: true
+    };
 
     constructor(latlng, options) {
         super();
@@ -15,9 +38,18 @@ export class MarkerLayer extends Layer {
 
     }
 
+    setVisible(visible: any): void {
+        this._icon
+    }
+
+    setWireframeMode(wireframe?: boolean): void {
+        return;
+    }
+
     createEditor(map) {
         map = map || this._map;
-        var Klass = this.options.editorClass || this.getEditorClass(map);
+        // var Klass = this.options.editorClass || this.getEditorClass(map);
+        let Klass = this.getEditorClass(map);
         return new Klass(map, this, this.options.editOptions);
     }
 
@@ -32,13 +64,7 @@ export class MarkerLayer extends Layer {
         return BaseEditor;
     }
 
-    options = {
-        pane: 'markerPane',
-        nonBubblingEvents: ['click', 'dblclick', 'mouseover', 'mouseout', 'contextmenu'],
-        //icon: new L.Icon.Default(),         
-        opacity: 1,
-        clickable: true,
-    };
+  
 
 
 
@@ -78,8 +104,8 @@ export class MarkerLayer extends Layer {
     _initIcon() {
         //create default icon
         let options = { r: 0.25, c: 0xffff00, o: 0.8 };
-        let icon = new Mesh(new CylinderGeometry(0, 500, 1500),
-            new MeshLambertMaterial({ color: 0x38eeff, opacity: options.o, transparent: (options.o < 1) }));
+        this._material = new MeshLambertMaterial({ color: 0x38eeff, opacity: options.o, transparent: (options.o < 1) });
+        let icon = new Mesh(new CylinderGeometry(0, 500, 1500), this._material);
         icon.rotation.x = MathUtils.degToRad(-90);
         icon.visible = true;
         //app.scene.add(app.boreholeMarker);

@@ -8,17 +8,16 @@ import { Vector3 } from 'three/src/math/Vector3';
 import { Color } from 'three/src/math/Color';
 import { MyMeshStandardMaterial } from '../clip/MyMeshStandardMaterial';
 import { Group } from 'three/src/objects/Group';
-
-// topography overlay
-// import { Texture } from 'three/src/textures/Texture';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import proj4 from 'proj4/dist/proj4';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { shader } from '../clip/shader';
 import { Material } from 'three/src/materials/Material';
-// import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
+import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
 import { Vector2 } from 'three/src/math/Vector2';
 import { Matrix4 } from 'three/src/math/Matrix4';
+import { Box3 } from 'three/src/math/Box3';
+import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry';
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
@@ -40,13 +39,21 @@ class TinLayer extends Layer {
     color: string;
     mainMesh;
     uniforms = {
-        clipping: {}
+        clipping: {
+            clippingScale: { type: "f", value: 1.0 },
+            color: { type: "c", value: null },
+            clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
+            clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) },
+            map: { type: 't', value: null },
+            percent: { type: "f", value: 1 }
+        }
     };
     public baseExtent = {
         min: { x: 0, y: 0 },
         max: { x: 0, y: 0 }
     };
     index: number;
+    boundingBox: Box3;
     images = [{
         width: 405,
         // "url": "https://sdi.noe.gv.at/at.gv.noe.geoserver/OGD/wms",
@@ -104,6 +111,8 @@ class TinLayer extends Layer {
     }
 
     async onAdd(map) {
+        proj4.defs("EPSG:4312", "+proj=longlat +ellps=bessel +towgs84=577.326,90.129,463.919,5.137,1.474,5.297,2.4232 +no_defs");
+        proj4.defs("EPSG:3034", "+proj=lcc +lat_1=35 +lat_2=65 +lat_0=52 +lon_0=10 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
         await this.build(this.getScene());
         map.update();
     }
@@ -307,38 +316,45 @@ class TinLayer extends Layer {
         geometry.scale(1, 1, 1);
         geometry.computeBoundingSphere();
         geometry.computeVertexNormals();// computed vertex normals are orthogonal to the face f
-        // geometry.computeBoundingBox();
-
         //find out the dimensions, to let texture size 100% fit without stretching
         geometry.computeBoundingBox();
-        // const center = new Vector3();       
-        // let bboxSize = geometry.boundingBox.getSize(center);
-        // let uvMapSize = Math.min(bboxSize.x, bboxSize.y, bboxSize.z);
-
-
-
-        let boundingBox = geometry.boundingBox;
+        let boundingBox = this.boundingBox = geometry.boundingBox;
         this.baseExtent.min.x = boundingBox.min.x;
         this.baseExtent.min.y = boundingBox.min.y;
         this.baseExtent.max.x = boundingBox.max.x;
         this.baseExtent.max.y = boundingBox.max.y;
+        // const convexGeometry = new ConvexGeometry(points);
+
+        // let dest = new proj4.Proj("EPSG:3034");
+        // let source = new proj4.Proj("EPSG:4312");
+        // let p1 = proj4.toPoint([-34600.164063, 281125.718750]);
+        // let p2 = proj4.toPoint([51019.078125, 402863.976562]);
+        // proj4.transform(source, dest, p1);
+        // proj4.transform(source, dest, p2);
+        // this.baseExtent.min.x = p1.x;
+        // this.baseExtent.min.y = p1.y;
+        // this.baseExtent.max.x = p2.x;
+        // this.baseExtent.max.y = p2.y;
+
+        // this.baseExtent.min.x = -34600.164063;
+        // this.baseExtent.min.y = 281125.718750;
+        // this.baseExtent.max.x = 51019.078125;
+        // this.baseExtent.max.y = 402863.976562;
+
         let color = parseInt(this.color, 16);
-        // this.material = new MeshStandardMaterial({
-        //     color: color,
-        //     metalness: 0.1,
-        //     roughness: 0.75,
-        //     flatShading: true,
-        //     side: DoubleSide,
-        //     clippingPlanes: [this.xLocalPlane, this.yLocalPlane],
-        //     clipIntersection: false,
-        //     clipShadows: true,
-        // });
-        // this.materialsArray.push(this.material);
-
-
-
 
         if (this.name == "Topography") {
+            let width = this.baseExtent.max.x - this.baseExtent.min.x;
+            let height = this.baseExtent.max.y - this.baseExtent.min.y;
+            let planeGeometry = new PlaneGeometry(width, height, 298, 134)
+            let planeMaterial = new MeshLambertMaterial({ color: 0xecf0f1, side: DoubleSide });
+            let planeMesh = new Mesh(planeGeometry, planeMaterial);
+            let center = new Vector3((this.baseExtent.min.x + this.baseExtent.max.x) / 2, (this.baseExtent.min.y + this.baseExtent.max.y) / 2, 0);
+            planeMesh.position.x = center.x;
+            planeMesh.position.y = center.y;
+
+            this._addObject(planeMesh, false);
+
             let image = this.images[0];
             if (image.texture === undefined) {
 
@@ -354,15 +370,12 @@ class TinLayer extends Layer {
                 }
 
             }
-            this.uniforms = {
-                clipping: {
-                    clippingScale: { type: "f", value: 1.0 },
-                    clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
-                    clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) },
-                    map: { type: 't', value: image.texture },
-                    percent: { type: "f", value: 0.7 }
-                }
-            };
+            this.uniforms.clipping.clippingScale = { type: "f", value: 1.0 };
+            this.uniforms.clipping.clippingLow = { type: "v3", value: new Vector3(0, 0, 0) };
+            this.uniforms.clipping.clippingHigh = { type: "v3", value: new Vector3(0, 0, 0) };
+            this.uniforms.clipping.map = { type: 't', value: image.texture };
+            this.uniforms.clipping.percent = { type: "f", value: 0.7 };
+
 
             //calculate UV coordinates, if uv attribute is not present, it will be added
             // https://jsfiddle.net/mmalex/pcjbysn1/
@@ -384,18 +397,19 @@ class TinLayer extends Layer {
                 vertexShader: shader.vertexClipping,
                 fragmentShader: shader.fragmentClippingFront,
             });
-            // this.material.map.wrapS = RepeatWrapping;
-            // this.material.map.wrapT = RepeatWrapping;
 
         } else {
-            let uniforms = this.uniforms = {
-                clipping: {
-                    clippingScale: { type: "f", value: 1.0 },
-                    color: { type: "c", value: new Color(color) },
-                    clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
-                    clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) }
-                }
-            };
+            // let uniforms = this.uniforms.clipping = {
+            //         clippingScale: { type: "f", value: 1.0 },
+            //         color: { type: "c", value: new Color(color) },
+            //         clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
+            //         clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) }
+            //     }
+            // };
+            this.uniforms.clipping.clippingScale = { type: "f", value: 1.0 };
+            this.uniforms.clipping.color = { type: "c", value: new Color(color) };
+            this.uniforms.clipping.clippingLow = { type: "v3", value: new Vector3(0, 0, 0) };
+            this.uniforms.clipping.clippingHigh = { type: "v3", value: new Vector3(0, 0, 0) };
 
             this.material = new MyMeshStandardMaterial({
                 color: color,
@@ -403,7 +417,7 @@ class TinLayer extends Layer {
                 roughness: 0.75,
                 flatShading: true,
                 side: DoubleSide
-            }, uniforms.clipping);
+            }, this.uniforms.clipping);
         }
 
         this.materialsArray.push(this.material);
@@ -514,6 +528,35 @@ class TinLayer extends Layer {
     }
 
     async loadTextureWms(url, imageParameter) {
+        const vertexA = new Vector3(this.baseExtent.min.x, this.baseExtent.min.y); // set this from cube
+        const vertexB = new Vector3(this.baseExtent.min.x, this.baseExtent.max.y);
+        const vertexC = new Vector3(this.baseExtent.max.x, this.baseExtent.max.y);
+        // let screenSpaceVector = new Vector3().subVectors(vertexA.project(this._map.camera), vertexB.project(this._map.camera));
+        // screenSpaceVector.x *= this._map.container.clientWidth;
+        // screenSpaceVector.y *= this._map.container.clientWidth;
+        // screenSpaceVector.z = 0
+        // const pixelLength = screenSpaceVector.length();
+
+        vertexA.project(this._map.camera);
+        vertexB.project(this._map.camera);
+        vertexC.project(this._map.camera);
+        // let distWidth = vertexA.project(this._map.camera).distanceTo(vertexB.project(this._map.camera));
+        let width = this._map.container.clientWidth;
+        let height = this._map.container.clientHeight;
+
+        vertexA.x = (vertexA.x + 1) * width / 2;
+        vertexA.y = - (vertexA.y - 1) * height / 2;
+        vertexA.z = 0;
+        vertexB.x = (vertexB.x + 1) * width / 2;
+        vertexB.y = - (vertexB.y - 1) * height / 2;
+        vertexB.z = 0;
+        vertexC.x = (vertexC.x + 1) * width / 2;
+        vertexC.y = - (vertexC.y - 1) * height / 2;
+        vertexC.z = 0;
+
+        let distWidth = Math.round(vertexA.distanceTo(vertexB));
+        let distHeight = Math.round(vertexB.distanceTo(vertexC));
+
         let dest = new proj4.Proj("EPSG:3857");
         let source = new proj4.Proj("EPSG:3034");
         let p1 = proj4.toPoint([this.baseExtent.min.x, this.baseExtent.min.y]);
@@ -529,8 +572,8 @@ class TinLayer extends Layer {
             version: "1.3.0",
             service: "WMS",
             request: "GetMap",
-            "width": imageParameter.width,
-            "height": imageParameter.height,
+            "width": distWidth, //imageParameter.width,
+            "height": distHeight, //imageParameter.height,
             // "size": imageParameter.width + "," + imageParameter.height,
             "crs": "EPSG:3857", //  + imageParameter.bboxSR,
             // "bboxSR": imageParameter.bboxSR,
@@ -547,6 +590,104 @@ class TinLayer extends Layer {
             .join('&');
         let texturePath = url + '?' + query;
 
+        const textureLoader = new TextureLoader();
+        return new Promise((resolve, reject) => {
+            textureLoader.load(
+                texturePath,
+                (texture) => resolve(texture),
+                undefined,
+                err => reject(err)
+            );
+        });
+    }
+
+    async changeImage(i) {
+        //this.mainMesh.material.map = THREE.ImageUtils.loadTexture(src);
+        let image = this.images[i];
+        // if (image.texture === undefined) {
+        if (image.type == "esri") {
+            // image.texture = this._loadTextureData(image.data);
+            let data = await this.requestImage(image.url, image);
+
+            // image.texture = await new TextureLoader().load(data.href);
+            image.texture = await this.loadTexture(data.href);
+        } else if (image.type == "wms") {
+            image.texture = await this.loadTextureWms(image.url, image);
+        }
+        // }
+        //configure the material now that we have all of the data
+        // this.mainMesh.material.map = image.texture;
+        this.uniforms.clipping.map.value = image.texture;
+        this.mainMesh.material.needsUpdate = true;
+        if (this.visible === false) {
+            this.setVisible(true);
+        }
+        this._map.update();
+    }
+
+    async requestImage(url, imageParameter) {
+        const vertexA = new Vector3(this.boundingBox.min.x, this.boundingBox.min.y); // set this from cube
+        const vertexB = new Vector3(this.boundingBox.min.x, this.boundingBox.max.y);
+        const vertexC = new Vector3(this.boundingBox.max.x, this.boundingBox.max.y);
+        // let screenSpaceVector = new Vector3().subVectors(vertexA.project(this._map.camera), vertexB.project(this._map.camera));
+        // screenSpaceVector.x *= this._map.container.clientWidth;
+        // screenSpaceVector.y *= this._map.container.clientWidth;
+        // screenSpaceVector.z = 0
+        // const pixelLength = screenSpaceVector.length();
+
+        vertexA.project(this._map.camera);
+        vertexB.project(this._map.camera);
+        vertexC.project(this._map.camera);
+        // let distWidth = vertexA.project(this._map.camera).distanceTo(vertexB.project(this._map.camera));
+        let width = this._map.container.clientWidth;
+        let height = this._map.container.clientHeight;
+
+        vertexA.x = (vertexA.x + 1) * width / 2;
+        vertexA.y = - (vertexA.y - 1) * height / 2;
+        vertexA.z = 0;
+        vertexB.x = (vertexB.x + 1) * width / 2;
+        vertexB.y = - (vertexB.y - 1) * height / 2;
+        vertexB.z = 0;
+        vertexC.x = (vertexC.x + 1) * width / 2;
+        vertexC.y = - (vertexC.y - 1) * height / 2;
+        vertexC.z = 0;
+
+        let distWidth = Math.round(vertexA.distanceTo(vertexB));
+        let distHeight = Math.round(vertexB.distanceTo(vertexC));
+
+        let dest = new proj4.Proj("EPSG:3857");
+        let source = new proj4.Proj("EPSG:3034");
+        let p1 = proj4.toPoint([this.baseExtent.min.x, this.baseExtent.min.y]);
+        let p2 = proj4.toPoint([this.baseExtent.max.x, this.baseExtent.max.y]);
+
+        proj4.transform(source, dest, p1);
+        proj4.transform(source, dest, p2);
+
+        // let bbox = this.baseExtent.x.min + "," + this.baseExtent.y.min + "," + this.baseExtent.x.max + "," + this.baseExtent.y.max;
+        let bbox = p1.x + "," + p1.y + "," + p2.x + "," + p2.y;
+
+        let params = {
+            // "size": imageParameter.width + "," + imageParameter.height,
+            "size": distWidth + "," + distHeight,
+            "bboxSR": "3857", // imageParameter.bboxSR,            
+            "bbox": bbox,
+            "format": "png",
+            "f": "pjson"
+        };
+        let query = Object.keys(params)
+            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+            .join('&');
+        url = url + '?' + query;
+        const response = await fetch(url);
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error("HTTP error, status = " + response.status);
+        }
+    }
+
+    //helper function to load in the texture
+    async loadTexture(texturePath) {
         const textureLoader = new TextureLoader();
         return new Promise((resolve, reject) => {
             textureLoader.load(

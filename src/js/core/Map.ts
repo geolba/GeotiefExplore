@@ -126,7 +126,9 @@ class Map extends OrbitControls {
                 feature_type: layerData.geologicdescription !== null ? layerData.geologicdescription['feature type'] : null,
             });
             callStack.push(this.addLayer(dxfLayer));
-            if (dxfLayer.name == " Topography") this.currentBasemap = dxfLayer;
+            if (dxfLayer.name == "Topography") {
+                this.currentBasemap = dxfLayer;
+            }
         }
         await Promise.all(callStack);
         this.emit("ready");
