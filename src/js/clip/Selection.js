@@ -9,6 +9,10 @@ import { Layer } from '../layer/Layer';
 import { Group } from 'three/src/objects/Group';
 
 export class Selection extends Layer {
+    visible;
+    opacity;
+    type;
+    limit;
     limitLow;
     limitHigh;
     box;
@@ -18,6 +22,7 @@ export class Selection extends Layer {
     faces;
     map;
     scale;
+    boxLines;
 
     constructor(parameters, low, high) {
         super();
@@ -92,6 +97,12 @@ export class Selection extends Layer {
         this.emit('add');
     }
 
+    onRemove(map) {
+        map.scene.remove(this.displayMeshes);
+        map.scene.remove(this.touchMeshes);
+    }
+
+
     build(app_scene) {
         // app_scene.add(this.boxMesh);
         app_scene.add(this.displayMeshes);
@@ -99,7 +110,7 @@ export class Selection extends Layer {
     }
 
     setWireframeMode(wireframe) {
-        return;
+        return wireframe;
     }
 
     setVisible(visible) {
@@ -175,17 +186,18 @@ export class Selection extends Layer {
         let unif = uniforms.clipping;
         unif.clippingLow.value.copy(this.limitLow);
         unif.clippingHigh.value.copy(this.limitHigh);
+        unif.clippingScale.value = this.scale;
 
-        if (this.map.layers) {
-            for (const [key, layer] of Object.entries(this.map.layers)) {
-                if (layer.uniforms ) {
-                    let scale = Number(this.scale);
-                    layer.uniforms.clipping.clippingLow.value.copy(this.limitLow);
-                    layer.uniforms.clipping.clippingHigh.value.copy(this.limitHigh);
-                    layer.uniforms.clipping.clippingScale.value = scale;
-                }
-            }
-        }
+        // if (this.map.layers) {
+        //     for (const [key, layer] of Object.entries(this.map.layers)) {
+        //         if (layer.uniforms ) {
+        //             let scale = Number(this.scale);
+        //             layer.uniforms.clipping.clippingLow.value.copy(this.limitLow);
+        //             layer.uniforms.clipping.clippingHigh.value.copy(this.limitHigh);
+        //             layer.uniforms.clipping.clippingScale.value = scale;
+        //         }
+        //     }
+        // }
     }
 
     setValue(axis, value) {

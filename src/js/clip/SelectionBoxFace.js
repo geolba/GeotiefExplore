@@ -9,7 +9,6 @@ export class SelectionBoxFace {
         let frontFaceGeometry = this.fontFaceGeometry = new PlaneGeometry(v0, v1, v2, v3);
         // frontFaceGeometry.dynamic = true;
         selection.meshGeometries.push(frontFaceGeometry);
-
         let frontFaceMesh = new Mesh(frontFaceGeometry, material.Invisible);
         frontFaceMesh.axis = axis;
         frontFaceMesh.guardian = this;
@@ -19,7 +18,6 @@ export class SelectionBoxFace {
         let backFaceGeometry = this.backFaceGeometry = new PlaneGeometry(v3, v2, v1, v0);
         // backFaceGeometry.dynamic = true;
         selection.meshGeometries.push(backFaceGeometry);
-
         let backFaceMesh = new Mesh(backFaceGeometry, material.BoxBackFace);
         selection.displayMeshes.add(backFaceMesh);
 

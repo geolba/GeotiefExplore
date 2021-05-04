@@ -18,6 +18,7 @@ import { Vector2 } from 'three/src/math/Vector2';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Box3 } from 'three/src/math/Box3';
 import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry';
+import { uniforms } from '../clip/uniforms';
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
@@ -38,16 +39,18 @@ class TinLayer extends Layer {
     featuregeom_id: number;
     color: string;
     mainMesh;
-    uniforms = {
-        clipping: {
-            clippingScale: { type: "f", value: 1.0 },
-            color: { type: "c", value: null },
-            clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
-            clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) },
-            map: { type: 't', value: null },
-            percent: { type: "f", value: 1 }
-        }
-    };
+    geometry: BufferGeometry;
+    uniforms;
+    // uniforms = {
+    //     clipping: {
+    //         clippingScale: { type: "f", value: 1.0 },
+    //         color: { type: "c", value: null },
+    //         clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
+    //         clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) },
+    //         map: { type: 't', value: null },
+    //         percent: { type: "f", value: 1 }
+    //     }
+    // };
     public baseExtent = {
         min: { x: 0, y: 0 },
         max: { x: 0, y: 0 }
@@ -89,6 +92,7 @@ class TinLayer extends Layer {
         this.scale = 1;
         this.objectGroup = new Group();
         this.q = true;
+        this.uniforms = uniforms;
     }
 
     setWireframeMode(wireframe) {
@@ -298,7 +302,7 @@ class TinLayer extends Layer {
     }
 
     async build(app_scene) {
-        let geometry = new BufferGeometry();
+        let geometry = this.geometry = new BufferGeometry();
         let vertices = await (this.points(this.featuregeom_id));
 
         let positions = new Float32BufferAttribute(vertices, 3);
@@ -344,17 +348,18 @@ class TinLayer extends Layer {
         let color = parseInt(this.color, 16);
 
         if (this.name == "Topography") {
-            let width = this.baseExtent.max.x - this.baseExtent.min.x;
-            let height = this.baseExtent.max.y - this.baseExtent.min.y;
-            let planeGeometry = new PlaneGeometry(width, height, 298, 134)
-            let planeMaterial = new MeshLambertMaterial({ color: 0xecf0f1, side: DoubleSide });
-            let planeMesh = new Mesh(planeGeometry, planeMaterial);
-            let center = new Vector3((this.baseExtent.min.x + this.baseExtent.max.x) / 2, (this.baseExtent.min.y + this.baseExtent.max.y) / 2, 0);
-            planeMesh.position.x = center.x;
-            planeMesh.position.y = center.y;
+            // //add bounding  box of layer:
+            // let width = this.baseExtent.max.x - this.baseExtent.min.x;
+            // let height = this.baseExtent.max.y - this.baseExtent.min.y;
+            // let planeGeometry = new PlaneGeometry(width, height, 298, 134)
+            // let planeMaterial = new MeshLambertMaterial({ color: 0xecf0f1, side: DoubleSide });
+            // let planeMesh = new Mesh(planeGeometry, planeMaterial);
+            // let center = new Vector3((this.baseExtent.min.x + this.baseExtent.max.x) / 2, (this.baseExtent.min.y + this.baseExtent.max.y) / 2, 0);
+            // planeMesh.position.x = center.x;
+            // planeMesh.position.y = center.y;
+            // this._addObject(planeMesh, false);
 
-            this._addObject(planeMesh, false);
-
+            // load image:
             let image = this.images[0];
             if (image.texture === undefined) {
 
@@ -368,16 +373,15 @@ class TinLayer extends Layer {
                 if (image.type == "wms") {
                     image.texture = await this.loadTextureWms(image.url, image);
                 }
-
             }
-            this.uniforms.clipping.clippingScale = { type: "f", value: 1.0 };
-            this.uniforms.clipping.clippingLow = { type: "v3", value: new Vector3(0, 0, 0) };
-            this.uniforms.clipping.clippingHigh = { type: "v3", value: new Vector3(0, 0, 0) };
+            // this.uniforms.clipping.clippingScale = { type: "f", value: 1.0 };
+            // this.uniforms.clipping.clippingLow = { type: "v3", value: new Vector3(0, 0, 0) };
+            // this.uniforms.clipping.clippingHigh = { type: "v3", value: new Vector3(0, 0, 0) };
             this.uniforms.clipping.map = { type: 't', value: image.texture };
             this.uniforms.clipping.percent = { type: "f", value: 0.7 };
 
 
-            //calculate UV coordinates, if uv attribute is not present, it will be added
+            //calculate UV coordinates for projecting image, if uv attribute is not present, it will be added
             // https://jsfiddle.net/mmalex/pcjbysn1/
             // https://stackoverflow.com/questions/20774648/three-js-generate-uv-coordinate
             this.applyBoxUV(geometry, new Matrix4());
@@ -392,24 +396,17 @@ class TinLayer extends Layer {
             // });
             this.material = new ShaderMaterial({
                 transparent: true,
-                side: DoubleSide,
-                uniforms: this.uniforms.clipping,
+                // side: DoubleSide,
+                uniforms: this.uniforms.clipping,                
                 vertexShader: shader.vertexClipping,
                 fragmentShader: shader.fragmentClippingFront,
             });
 
-        } else {
-            // let uniforms = this.uniforms.clipping = {
-            //         clippingScale: { type: "f", value: 1.0 },
-            //         color: { type: "c", value: new Color(color) },
-            //         clippingLow: { type: "v3", value: new Vector3(0, 0, 0) },
-            //         clippingHigh: { type: "v3", value: new Vector3(0, 0, 0) }
-            //     }
-            // };
-            this.uniforms.clipping.clippingScale = { type: "f", value: 1.0 };
-            this.uniforms.clipping.color = { type: "c", value: new Color(color) };
-            this.uniforms.clipping.clippingLow = { type: "v3", value: new Vector3(0, 0, 0) };
-            this.uniforms.clipping.clippingHigh = { type: "v3", value: new Vector3(0, 0, 0) };
+        } else {           
+            // this.uniforms.clipping.clippingScale = { type: "f", value: 1.0 };
+            // this.uniforms.clipping.color = { type: "c", value: new Color(color) };
+            // this.uniforms.clipping.clippingLow = { type: "v3", value: new Vector3(0, 0, 0) };
+            // this.uniforms.clipping.clippingHigh = { type: "v3", value: new Vector3(0, 0, 0) };
 
             this.material = new MyMeshStandardMaterial({
                 color: color,
@@ -418,6 +415,7 @@ class TinLayer extends Layer {
                 flatShading: true,
                 side: DoubleSide
             }, this.uniforms.clipping);
+            // }, this.uniforms.clipping);
         }
 
         this.materialsArray.push(this.material);

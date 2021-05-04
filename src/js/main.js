@@ -4,7 +4,7 @@ import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { Scene } from 'three/src/scenes/Scene';
 import { Vector3 } from 'three/src/math/Vector3';
 import { GridLayer } from './layer/GridLayer';
-import { DemLayer } from './layer/DemLayer';
+// import { DemLayer } from './layer/DemLayer';
 import { Map } from './core/Map';
 import * as domEvent from './core/domEvent';
 import { Coordinates } from './controls/Coordinates';
@@ -20,11 +20,14 @@ import * as browser from './core/browser';
 import * as domUtil from './core/domUtil';
 import { PickingTool } from './clip/PickingTool';
 import { ShowModal } from './components/ShowModal';
+import * as material from './clip/material';
+import { Group } from 'three/src/objects/Group';
 
 import { Selection } from './clip/Selection';
 import _ from "lodash";
 
 import '../css/page_bulma.scss'; /* style loader will import it */
+import { TinLayer } from './layer/TinLayer';
 
 class Application {
 
@@ -56,15 +59,12 @@ class Application {
         this.downloadButton = document.querySelector('#menu-dowload-button');
         this.menuIcon = document.querySelector('#menu-icon');
         this.navigation = document.getElementsByClassName('navigation')[0];
-        // this.addEventListeners();
 
         let parentContainer = document.getElementById("app");
         this.dialog = new ShowModal("Help", parentContainer, { klass: "fm_about" });
 
         // this.dialog = new MobileDialog("Help", container, { klass: "fm_about" });
         this.aboutIcon = document.querySelector('#menu-about-icon');
-
-
         // this.createScene();
         // this.addEventListeners();
     }
@@ -97,6 +97,7 @@ class Application {
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
         this.renderer.setClearColor(0x000000, 0.0); // second param is opacity, 0 => transparent 
+        // this.renderer.setClearColor( 0xffffff );
 
         // enable clipping
         // let Empty = Object.freeze([]);
@@ -107,8 +108,8 @@ class Application {
         /* Scene: that will hold all our elements such as objects, cameras and lights. */
         this.scene = new Scene();
         this.capsScene = new Scene();
-        // this.backStencil = new Scene();
-        // this.frontStencil = new Scene();
+        this.backStencil = new Scene();
+        this.frontStencil = new Scene();
         this._buildDefaultLights(this.scene);
         //app.scene.autoUpdate = false;
         //// show axes in the screen
@@ -163,18 +164,46 @@ class Application {
         this.mapTitle.innerHTML += map.title;
         map.on('ready', () => {
             this.selectionBox.setUniforms();
+
+
+            this.capsScene.add(this.selectionBox.boxMesh);
+            // this.scene.add(this.selection.displayMeshes);
+            // this.scene.add(this.selection.touchMeshes);
+            this.map.addLayer(this.selectionBox);
+
+            let frontGroup = new Group();
+            for (var i in map.layers) {
+                let layer = map.layers[i];
+                if (layer instanceof TinLayer && layer.name != "Topography") {
+                    let mesh = new Mesh(layer.geometry.clone(), material.frontStencilMaterial);
+                    frontGroup.add(mesh);
+                }
+            }           
+            frontGroup.updateMatrix();
+            // let frontMesh = new Mesh(frontGroup, material.frontStencilMaterial);
+            this.frontStencil.add(frontGroup);
+
+            let backGroup = new Group();
+            for (var i in map.layers) {
+                let layer = map.layers[i];
+                if (layer instanceof TinLayer && layer.name != "Topography") {
+                    let mesh = new Mesh(layer.geometry.clone(), material.backStencilMaterial);
+                    backGroup.add(mesh);
+                }
+            }           
+            backGroup.updateMatrix();
+            // let frontMesh = new Mesh(frontGroup, material.frontStencilMaterial);
+            this.backStencil.add(backGroup);
+
             this.animate();
         }, this);
 
         this.selectionBox = new Selection(
-            // new Vector3(-7, -14, -14),
-            // new Vector3(14, 9, 3)
             { name: 'Slicing Box' },
             new Vector3(this.map.x.min, this.map.y.min, this.map.z.min),
             new Vector3(this.map.x.max, this.map.y.max, this.map.z.max)
         );
-        this.map.addLayer(this.selectionBox);
-
+        // this.map.addLayer(this.selectionBox);
         this.map.picking = new PickingTool(this.map.size, this.map.center, this);
 
 
@@ -185,7 +214,7 @@ class Application {
 
         //add map controls:
         if (util.hasTouch() == false) {
-            let coordinates = new Coordinates({ camera: this.map.camera, crs: "EPSG:3034" }).addTo(this.map);
+            new Coordinates({ camera: this.map.camera, crs: "EPSG:3034" }).addTo(this.map);
             // coordinates.addListener('onPoint', (args) => {
             //     let vector = args[0];
             //     this.queryMarker.position.set(vector.x, vector.y, vector.z);
@@ -195,7 +224,7 @@ class Application {
         }
         this.northArrow = new NorthArrow({ headLength: 1, headWidth: 1 }).addTo(this.map);
 
-        
+
 
         this.gridlayer = new GridLayer({ center: this.map.center, name: "coordinate grid", appWidth: this.width, appHeight: this.height });
         this.map.addLayer(this.gridlayer);
@@ -211,14 +240,6 @@ class Application {
 
         //slider for scaling z value
         this.slider = new SliderControl({ layers: this.map.layers }).addTo(this.map);
-
-        //slice on x and y axes:
-        // this.slicer = new SlicerControl({ parentDiv: 'slicer-control' }).addTo(this.map);
-
-
-        this.capsScene.add(this.selectionBox.boxMesh);
-        // this.scene.add(this.selection.displayMeshes);
-        // this.scene.add(this.selection.touchMeshes);
 
         this.start();
     }
@@ -242,7 +263,6 @@ class Application {
             let layer = this.map._layers[key];
             layer.setWireframeMode(wireframe);
         }
-
         this.wireframeMode = wireframe;
         this.animate();
     }
@@ -308,36 +328,36 @@ class Application {
         this.renderer.clear();
 
         // The HTML5 Canvas's 'webgl' context obtained from the canvas where the renderer will draw.
-        let gl = this.renderer.context;
+        let gl = this.renderer.getContext();
 
         if (this.showCaps && gl != undefined) {
-
             // enable stencil test
-            gl.enable(gl.STENCIL_TEST);
+            gl.enable(gl.STENCIL_TEST);          
+            // this.renderer.state.setStencilFunc( true );
             // gl.stencilFunc( gl.ALWAYS, 1, 0xff );
             // gl.stencilOp( gl.REPLACE, gl.REPLACE, gl.REPLACE );
-
-            this.renderer.state.setStencilTest(true);
-
-            gl.StencilFunc(gl.ALWAYS, 1, 0xff);
-            gl.StencilOp(gl.KEEP, gl.KEEP, gl.INCR);
-            // this.renderer.render(this.backStencil, this.camera);
+                 
+            gl.stencilFunc(gl.ALWAYS, 1, 0xff);
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);           
+            this.renderer.render(this.backStencil, this.map.camera);
 
             gl.stencilFunc(gl.ALWAYS, 1, 0xff);
-            gl.StencilOp(gl.KEEP, gl.KEEP, gl.DECR);
-            // this.renderer.render(this.frontStencil, this.camera);
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR);
+            this.renderer.render(this.frontStencil, this.map.camera);
 
-            gl.StencilFunc(gl.EQUAL, 1, 0xff);
-            gl.StencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-            this.renderer.render(this.capsScene, this.camera);
-
-            this.renderer.state.setStencilTest(false);
+            gl.stencilFunc(gl.EQUAL, 1, 0xff);
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+            this.renderer.render(this.capsScene, this.map.camera);
 
             // disable stencil test
             gl.disable(gl.STENCIL_TEST);
+            // gl.stencilMask(0);
+            // this.renderer.state.setStencilFunc( false );
         }
 
+
         this.renderer.render(this.scene, this.map.camera);
+
         this.northArrow.animate();
         this.gridlayer.animate();
     }
@@ -357,11 +377,6 @@ class Application {
             e.preventDefault();
             this.dialog.show();
         }, this);
-
-        // domEvent.on(this.menuIcon, 'click', function (e) {
-        //     e.preventDefault();
-        //     this.navigation.classList.toggle("active");
-        // }, this);
 
         const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
         // Check if there are any navbar burgers
@@ -409,24 +424,6 @@ class Application {
     }
 
     downloadMapImage() {
-        // if(!this.$imageInput.files[0]) {
-        //   this.$imageInput.parentElement.classList.add('has-error');
-        //   return;
-        // }
-        // if(this.$bottomTextInput.value === '') {
-        //   this.$imageInput.parentElement.classList.remove('has-error');
-        //   this.$bottomTextInput.parentElement.classList.add('has-error');
-        //   return;
-        // }
-        // this.$imageInput.parentElement.classList.remove('has-error');
-        // this.$bottomTextInput.parentElement.classList.remove('has-error');
-
-        // const imageSource = this.renderer.domElement.toDataURL('image/png');
-        // const att = document.createAttribute('href');
-        // att.value = imageSource.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
-        // this.downloadButton.setAttributeNode(att);
-        // this.renderer.preserveDrawingBuffer = true;
-        // this.renderer.render(this.scene, this.camera);
         this.saveCanvasImage(this.renderer.domElement);
     }
 
@@ -437,14 +434,10 @@ class Application {
         var binStr = atob(canvas.toDataURL("image/png").split(',')[1]);
         var len = binStr.length;
         var arr = new Uint8Array(len);
-
         for (var i = 0; i < len; i++) {
             arr[i] = binStr.charCodeAt(i);
         }
-
         this.saveBlob(new Blob([arr], { type: "image/png" }));
-
-
     }
 
     saveBlob(blob) {
