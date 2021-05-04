@@ -106,12 +106,13 @@ class TinLayer extends Layer {
     setVisible(visible) {
         this.visible = visible;
         this.objectGroup.visible = visible;
-        this.emit('visibility-change');
+        this.emit('visibility-change', visible);
     }
 
     scaleZ(z) {
         this.scale = z;
         this.objectGroup.scale.z = z;
+        this.emit('scale-change', z);
     }
 
     async onAdd(map) {

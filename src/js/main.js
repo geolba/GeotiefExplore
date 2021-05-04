@@ -176,9 +176,18 @@ class Application {
                 let layer = map.layers[i];
                 if (layer instanceof TinLayer && layer.name != "Topography") {
                     let mesh = new Mesh(layer.geometry.clone(), material.frontStencilMaterial);
+                    mesh.userData.layerId = layer.index;
                     frontGroup.add(mesh);
+                    layer.on('visibility-change', (args) => {
+                        let visible = args[0];
+                        mesh.visible = visible;
+                    });
+                    layer.on('scale-change', (args) => {
+                        let z = args[0];
+                        mesh.scale.z = z;
+                    });
                 }
-            }           
+            }
             frontGroup.updateMatrix();
             // let frontMesh = new Mesh(frontGroup, material.frontStencilMaterial);
             this.frontStencil.add(frontGroup);
@@ -188,9 +197,19 @@ class Application {
                 let layer = map.layers[i];
                 if (layer instanceof TinLayer && layer.name != "Topography") {
                     let mesh = new Mesh(layer.geometry.clone(), material.backStencilMaterial);
+                    mesh.userData.layerId = layer.index;
                     backGroup.add(mesh);
+                    layer.on('visibility-change', (args) => {
+                        let visible = args[0];
+                        mesh.visible = visible;
+                    });
+                    layer.on('scale-change', (args) => {
+                        let z = args[0];
+                        mesh.scale.z = z;
+                    });
+
                 }
-            }           
+            }
             backGroup.updateMatrix();
             // let frontMesh = new Mesh(frontGroup, material.frontStencilMaterial);
             this.backStencil.add(backGroup);
@@ -332,13 +351,13 @@ class Application {
 
         if (this.showCaps && gl != undefined) {
             // enable stencil test
-            gl.enable(gl.STENCIL_TEST);          
+            gl.enable(gl.STENCIL_TEST);
             // this.renderer.state.setStencilFunc( true );
             // gl.stencilFunc( gl.ALWAYS, 1, 0xff );
             // gl.stencilOp( gl.REPLACE, gl.REPLACE, gl.REPLACE );
-                 
+
             gl.stencilFunc(gl.ALWAYS, 1, 0xff);
-            gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);           
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
             this.renderer.render(this.backStencil, this.map.camera);
 
             gl.stencilFunc(gl.ALWAYS, 1, 0xff);

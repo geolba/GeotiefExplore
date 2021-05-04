@@ -102,7 +102,6 @@ export class Selection extends Layer {
         map.scene.remove(this.touchMeshes);
     }
 
-
     build(app_scene) {
         // app_scene.add(this.boxMesh);
         app_scene.add(this.displayMeshes);
@@ -131,7 +130,7 @@ export class Selection extends Layer {
 
     scaleZ(z) {
         this.scale = z;
-        this.boxMesh.scale.z = z;
+        // this.boxMesh.scale.z = z;
         this.displayMeshes.scale.z = z;      
         this.touchMeshes.scale.z = z;
         this.setUniforms();
