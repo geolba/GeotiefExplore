@@ -1,4 +1,3 @@
-import { BoxGeometry } from 'three/src/geometries/BoxGeometry';
 import { Mesh } from 'three/src/objects/Mesh';
 import * as material from './material';
 import { Vector3 } from 'three/src/math/Vector3';
@@ -7,6 +6,7 @@ import { SelectionBoxFace } from './SelectionBoxFace';
 import { SelectionBoxLine } from './SelectionBoxLine';
 import { Layer } from '../layer/Layer';
 import { Group } from 'three/src/objects/Group';
+import { UpdatableBoxGeometry } from './UpdatableBoxGeometry';
 
 export class Selection extends Layer {
     visible;
@@ -15,10 +15,10 @@ export class Selection extends Layer {
     limit;
     limitLow;
     limitHigh;
-    box;
-    boxMesh;
+    box: UpdatableBoxGeometry;
+    boxMesh: Mesh;
     vertices;
-    touchMeshes; displayMeshes; meshGeometries; selectables;
+    touchMeshes; displayMeshes; meshGeometries; lineGeometries; selectables;
     faces;
     map;
     scale;
@@ -44,8 +44,7 @@ export class Selection extends Layer {
         }
         this.scale = 1.0;
 
-        this.box = new BoxGeometry(1, 1, 1);
-        this.boxMesh = new Mesh(this.box, material.capMaterial);
+
 
         this.vertices = [
             new Vector3(), new Vector3(),
@@ -53,10 +52,15 @@ export class Selection extends Layer {
             new Vector3(), new Vector3(),
             new Vector3(), new Vector3()
         ];
-        this.updateVertices();
+
+        this._updateVertices();
+
+        // this.box = new BoxGeometry(1, 1, 1);      
+        let box = this.box = new UpdatableBoxGeometry(this.vertices)
+        this.boxMesh = new Mesh(box, material.capMaterial);
+
 
         let v = this.vertices;
-
         this.touchMeshes = new Group(); //Object3D();
         this.displayMeshes = new Group(); // Object3D();
         this.meshGeometries = [];
@@ -86,14 +90,13 @@ export class Selection extends Layer {
         this.boxLines.push(new SelectionBoxLine(v[5], v[7], f[3], f[5], this));
         this.boxLines.push(new SelectionBoxLine(v[6], v[7], f[4], f[5], this));
 
-        this.setBox();
+        // this.setBox();
         // this.setUniforms();
     }
 
     onAdd(map) {
         this.map = map;
-        this.build(this.getScene());
-        //this.update();
+        this.build(this.getScene());        
         this.emit('add');
     }
 
@@ -114,12 +117,13 @@ export class Selection extends Layer {
 
     setVisible(visible) {
         this.visible = visible;
-        this.boxMesh.visible = visible;
+        // this.boxMesh.visible = visible;
         this.displayMeshes.visible = visible;
         this.touchMeshes.visible = visible;
         this.emit('visibility-change');
     }
-    toggle () {
+
+    toggle() {
         let visible = !this.visible;
         this.visible = visible;
         this.boxMesh.visible = visible;
@@ -130,13 +134,13 @@ export class Selection extends Layer {
 
     scaleZ(z) {
         this.scale = z;
-        // this.boxMesh.scale.z = z;
-        this.displayMeshes.scale.z = z;      
+        this.boxMesh.scale.z = z;
+        this.displayMeshes.scale.z = z;
         this.touchMeshes.scale.z = z;
         this.setUniforms();
     }
 
-    updateVertices() {
+    _updateVertices() {
         this.vertices[0].set(this.limitLow.x, this.limitLow.y, this.limitLow.z);
         this.vertices[1].set(this.limitHigh.x, this.limitLow.y, this.limitLow.z);
         this.vertices[2].set(this.limitLow.x, this.limitHigh.y, this.limitLow.z);
@@ -171,14 +175,6 @@ export class Selection extends Layer {
         for (let i = 0; i < this.boxLines.length; i++) {
             this.boxLines[i].update();
         }
-    }
-
-    setBox() {
-        let width = new Vector3();
-        width.subVectors(this.limitHigh, this.limitLow);
-        this.boxMesh.scale.copy(width);
-        width.multiplyScalar(0.5).add(this.limitLow);
-        this.boxMesh.position.copy(width);
     }
 
     setUniforms() {
@@ -223,10 +219,12 @@ export class Selection extends Layer {
             this.limitHigh.z = Math.max(this.limitLow.z + buffer, Math.min(this.limit.z2, value));
         }
 
-        this.setBox();
+
         this.setUniforms();
 
-        this.updateVertices();
+        this._updateVertices();
         this.updateGeometries();
+        // this.setBox();
+        this.box.update();
     }
 }
