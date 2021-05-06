@@ -9,6 +9,7 @@ import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { Scene } from 'three/src/scenes/Scene';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { BoxGeometry } from '../core/BoxGeometry';
+import { UpdatableBoxGeometry } from '../clip/UpdatableBoxGeometry';
 import { Mesh } from 'three/src/objects/Mesh';
 import * as material from '../clip/material';
 import { Texture } from 'three/src/textures/Texture';
@@ -112,7 +113,7 @@ export class NorthArrow extends Control {
         // let zTo = new Vector3(from.x, from.y, from.z + 1);
         // let zDirection = zTo.clone().sub(from);
         this.objectGroup.add(new ArrowHelper(zTo, from, size, 0x6b716f, headLength, headWidth)); //8 is the length,  Gray = z; 20 and 10 are head length and width
-      
+
         // let spritey = this._makeTextSprite(
         //     "top",
         //     { fontsize: 32, backgroundColor: { r: 255, g: 100, b: 100, a: 1 } }
@@ -125,56 +126,56 @@ export class NorthArrow extends Control {
         // myText.position.set(2.5, 2.5, 6);
         // this.objectGroup.add(myText);
 
-      
+
 
         let eastTexture = this._makeTextTexture("E", 0.6, 'rgba(0,0,0,1)');
-        let eastMaterial = new MeshBasicMaterial({            
+        let eastMaterial = new MeshBasicMaterial({
             transparent: true,
+            // color:  0x6f6f6f,
             side: DoubleSide,
             map: eastTexture,
             // wireframe: true
         });
         let westTexture = this._makeTextTexture("W", 0.6, 'rgba(0,0,0,1)');
-        let westMaterial = new MeshBasicMaterial({            
+        let westMaterial = new MeshBasicMaterial({
             transparent: true,
             side: DoubleSide,
             map: westTexture
         });
         let northTexture = this._makeTextTexture("N", 0.6, 'rgba(0,0,0,1)');
-        let northMaterial = new MeshBasicMaterial({            
+        let northMaterial = new MeshBasicMaterial({
             transparent: true,
             side: DoubleSide,
             map: northTexture
         });
         let southTexture = this._makeTextTexture("S", 0.6, 'rgba(0,0,0,1)');
-        let southMaterial = new MeshBasicMaterial({            
+        let southMaterial = new MeshBasicMaterial({
             transparent: true,
             side: DoubleSide,
-            map: southTexture          
+            map: southTexture
         });
         let topTexture = this._makeTextTexture("top", 0.6, 'rgba(0,0,0,1)');
-        let topMaterial = new MeshBasicMaterial({            
+        let topMaterial = new MeshBasicMaterial({
             transparent: true,
             side: DoubleSide,
             map: topTexture
-        });   
+        });
+      
+        //add orientation box:        
+        let vertices = [
+            new Vector3(0, 0, 0), new Vector3(5, 0, 0),
+            new Vector3(0, 5, 0), new Vector3(5, 5, 0),
+            new Vector3(0, 0, 5), new Vector3(5, 0, 5),
+            new Vector3(0, 5, 5), new Vector3(5, 5, 5)
+        ];
+        this.boxGeometry = new UpdatableBoxGeometry(vertices);        
+         this.boxMesh = new Mesh(this.boxGeometry,
+            [southMaterial, material.BoxBackFace, eastMaterial, westMaterial, northMaterial, topMaterial]);
 
-        // var mesh1 = new Mesh(
-        //     new PlaneGeometry(5, 5),
-        //     material1
-        // );
-        // // const yScale = this.textHeight * lines.length + border[1] * 2 + padding[1] * 2;
-        // // mesh1.scale.set(yScale * canvas.width / canvas.height, yScale, 0);
-
-        // mesh1.position.set(2.5, 2.5, 5.1);
-        // this.objectGroup.add(mesh1);
-
-        //add box:
-        this.boxGeometry = new BoxGeometry(5, 5, 5);
-        this.boxMesh = new Mesh(this.boxGeometry,
-            [eastMaterial, westMaterial, northMaterial, southMaterial, topMaterial,  material.BoxBackFace]);
-        // material.BoxBackFace.wireframe = true;
-        this.boxMesh.position.set(2.5, 2.5, 2.5);
+        // this.boxGeometry = new BoxGeometry(5, 5, 5);
+        // this.boxMesh = new Mesh(this.boxGeometry,
+        //     [eastMaterial, westMaterial, northMaterial, southMaterial, topMaterial, material.BoxBackFace]);
+        // this.boxMesh.position.set(2.5, 2.5, 2.5);
         this.objectGroup.add(this.boxMesh);
 
         if (app_scene) {
@@ -182,7 +183,7 @@ export class NorthArrow extends Control {
         }
     }
 
-    _makeTextTexture(message, textHeight = 0.6, color = 'rgba(0,0,0,1)') {   
+    _makeTextTexture(message, textHeight = 0.6, color = 'rgba(0,0,0,1)') {
         let text = `${message}`;
         // this.textHeight = textHeight;
         // this.color = color;
@@ -264,21 +265,21 @@ export class NorthArrow extends Control {
         if (drawTextStroke) {
             ctx.lineWidth = strokeWidth * fontSize / 10;
             ctx.strokeStyle = strokeColor;
-        }       
-  
+        }
+
         lines.forEach((line, index) => {
             const lineX = (innerWidth - ctx.measureText(line).width) / 2;
             const lineY = (index + 1) * fontSize;
 
-           
+
 
             drawTextStroke == true && ctx.strokeText(line, lineX, lineY);
             ctx.fillText(line, lineX, lineY);
-           
-        });
-       
 
-        
+        });
+
+
+
 
 
 
@@ -287,7 +288,7 @@ export class NorthArrow extends Control {
         texture.needsUpdate = true;
 
         return texture;
-    } 
+    }
 
     _buildLabels() {
 
