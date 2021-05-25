@@ -153,6 +153,9 @@ module.exports = {
         new webpack.DefinePlugin({ // Remove this plugin if you don't plan to define any global constants
             ENVIRONMENT: JSON.stringify(process.env.NODE_ENV),
             CONSTANT_VALUE: JSON.stringify(process.env.CONSTANT_VALUE),
+            MATOMO_SITE_ID: JSON.stringify(process.env.MATOMO_SITE_ID),
+            MATOMO_TRACKER_URL: JSON.stringify(process.env.MATOMO_TRACKER_URL),
+            CUSTOM_VAR: JSON.stringify('value5 goes here'), // no quotes needed, string value
         }),
         // extractLess,
 

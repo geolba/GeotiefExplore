@@ -192,7 +192,7 @@ export class NorthArrow extends Control {
         let _padding = 3;
         let borderWidth = 0;
         let _borderRadius = 0;
-        let borderColor = 'white';
+        // let borderColor = 'white';
 
         let strokeWidth = 0;
         let strokeColor = 'white';

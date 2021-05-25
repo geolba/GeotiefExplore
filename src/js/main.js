@@ -71,6 +71,25 @@ class Application {
     async build() {
         await this.createScene();
         this.addEventListeners();
+        // add matomo code if defined in .env file:
+        if (ENVIRONMENT == "production" && MATOMO_TRACKER_URL != null && MATOMO_SITE_ID != null) {
+            let _paq = window._paq = window._paq || [];
+            /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
+            (function () {
+                let u = MATOMO_TRACKER_URL;
+                _paq.push(['setTrackerUrl', u + 'matomo.php']);
+                _paq.push(['setSiteId', MATOMO_SITE_ID]);
+                let d = document; let g = d.createElement('script');
+                let s = d.getElementsByTagName('script')[0];
+                g.type = 'text/javascript'; 
+                g.async = true; 
+                g.src = u + 'matomo.js'; 
+                s.parentNode.insertBefore(g, s);
+            })();
+        }
+
     }
 
     async createScene() {
