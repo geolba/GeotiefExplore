@@ -93,8 +93,7 @@ class Application {
     }
 
     async createScene() {
-
-        var dirNode = document.getElementsByTagName("body")[0];
+        let dirNode = document.getElementsByTagName("body")[0];
         if (browser.touch == true && browser.mobile == true) {
             //dirNode.setAttribute("dir", "ltr");
             domUtil.addClass(dirNode, "touch");
@@ -103,7 +102,7 @@ class Application {
         }
 
         // let opt = { r: 200, c: 0x38eeff, o: 0.8 };
-        var opt = { r: 5, c: 0xffff00, o: 1 };
+        let opt = { r: 5, c: 0xffff00, o: 1 };
         this.queryMarker = new Mesh(new SphereGeometry(opt.r),
             new MeshLambertMaterial({ color: opt.c, opacity: opt.o, transparent: (opt.o < 1) }));
 

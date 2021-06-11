@@ -189,9 +189,9 @@ let shader = {
 		}`,
 
 	fragmentClippingMeshStandard: `
-		#ifdef GL_ES
-		precision highp float;
-		#endif
+		// #ifdef GL_ES
+		// precision highp float;
+		// #endif
 
 		#define STANDARD
 
@@ -219,8 +219,9 @@ let shader = {
 		#include <aomap_pars_fragment>
 		#include <lightmap_pars_fragment>
 		#include <emissivemap_pars_fragment>
-		#include <transmissionmap_pars_fragment>
+		// #include <transmissionmap_pars_fragment>
 		#include <bsdfs>
+		#include <transmission_pars_fragment>
 		#include <cube_uv_reflection_fragment>
 		#include <envmap_common_pars_fragment>
 		#include <envmap_physical_pars_fragment>
@@ -246,6 +247,7 @@ let shader = {
 		
 			#ifdef TRANSMISSION
 				float totalTransmission = transmission;
+				float thicknessFactor = thickness;
 			#endif
 		
 			#include <logdepthbuf_fragment>
@@ -260,8 +262,11 @@ let shader = {
 			#include <clearcoat_normal_fragment_begin>
 			#include <clearcoat_normal_fragment_maps>
 			#include <emissivemap_fragment>
-			#include <transmissionmap_fragment>
-		
+			//#include <transmissionmap_fragment>
+
+			vec3 rawDiffuseColor = diffuseColor.rgb;
+			#include <transmission_fragment>
+					
 			// accumulation
 			#include <lights_physical_fragment>
 			#include <lights_fragment_begin>
@@ -272,11 +277,6 @@ let shader = {
 			#include <aomap_fragment>
 		
 			vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
-		
-			// // this is a stub for the transmission model
-			// #ifdef TRANSMISSION
-			// 	diffuseColor.a *= mix( saturate( 1. - totalTransmission + linearToRelativeLuminance( reflectedLight.directSpecular + reflectedLight.indirectSpecular ) ), 1.0, metalness );
-			// #endif	
 
 			if (
 				worldPosition.x < clippingLow.x  

@@ -126,7 +126,7 @@ export class Selection extends Layer {
     toggle() {
         let visible = !this.visible;
         this.visible = visible;
-        this.boxMesh.visible = visible;
+        // this.boxMesh.visible = visible;
         this.displayMeshes.visible = visible;
         this.touchMeshes.visible = visible;
         this._map.update();
