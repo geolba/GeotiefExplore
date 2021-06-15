@@ -7,6 +7,7 @@ import { SelectionBoxLine } from './SelectionBoxLine';
 import { Layer } from '../layer/Layer';
 import { Group } from 'three/src/objects/Group';
 import { UpdatableBoxGeometry } from './UpdatableBoxGeometry';
+import { TinLayer } from '../layer/TinLayer';
 
 export class Selection extends Layer {
     visible;
@@ -96,8 +97,15 @@ export class Selection extends Layer {
 
     onAdd(map) {
         this.map = map;
-        this.build(this.getScene());        
+        this.build(this.getScene());
         this.emit('add');
+        if (this.map.layers) {
+            for (const [key, layer] of Object.entries(this.map.layers)) {
+                if (layer instanceof TinLayer) {
+                    layer.buildBorder(this.vertices);
+                }
+            }
+        }
     }
 
     onRemove(map) {
@@ -226,5 +234,12 @@ export class Selection extends Layer {
         this.updateGeometries();
         // this.setBox();
         this.box.update();
+        // if (this.map.layers) {
+        //     for (const [key, layer] of Object.entries(this.map.layers)) {
+        //         if (layer instanceof TinLayer) {
+        //             layer.box.update();
+        //         }
+        //     }
+        // }
     }
 }

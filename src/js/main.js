@@ -31,6 +31,8 @@ import { TinLayer } from './layer/TinLayer';
 
 class Application {
 
+    capsSceneArray;
+
     constructor(container) {
         this.container = container;
         this.running = false;
@@ -83,9 +85,9 @@ class Application {
                 _paq.push(['setSiteId', MATOMO_SITE_ID]);
                 let d = document; let g = d.createElement('script');
                 let s = d.getElementsByTagName('script')[0];
-                g.type = 'text/javascript'; 
-                g.async = true; 
-                g.src = u + 'matomo.js'; 
+                g.type = 'text/javascript';
+                g.async = true;
+                g.src = u + 'matomo.js';
                 s.parentNode.insertBefore(g, s);
             })();
         }
@@ -109,7 +111,6 @@ class Application {
         this.queryMarker.visible = true;
         // this.queryMarker.position.set(4282010, 2302070, -13616.3);
         /* Renderer */
-        // let bgcolor = 0xfdfdfd;
         this.renderer = new WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(this.width, this.height);
@@ -128,6 +129,7 @@ class Application {
         this.capsScene = new Scene();
         this.backStencil = new Scene();
         this.frontStencil = new Scene();
+        this.capsSceneArray = new Array();
         this._buildDefaultLights(this.scene);
         //app.scene.autoUpdate = false;
         //// show axes in the screen
@@ -188,6 +190,20 @@ class Application {
             // this.scene.add(this.selection.displayMeshes);
             // this.scene.add(this.selection.touchMeshes);
             this.map.addLayer(this.selectionBox);
+
+            // for (const [key, layer] of Object.entries(this.map.layers)) {
+            //     // let layer = map.layers[i];
+            //     if (layer instanceof TinLayer && layer.name != "Topography") {
+            //         // let capsScene = new Scene();
+            //         // capsScene.add(layer.borderMesh);
+            //         // this.capsSceneArray.push(capsScene);
+            //         this.capsScene.add(layer.borderMesh);
+            //         layer.on('visibility-change', (args) => {
+            //             let visible = args[0];
+            //             layer.borderMesh.visible = visible;
+            //         });
+            //     }
+            // }
 
             let frontGroup = new Group();
             for (var i in map.layers) {
@@ -370,10 +386,15 @@ class Application {
         if (this.showCaps && gl != undefined) {
             // enable stencil test
             gl.enable(gl.STENCIL_TEST);
-            // this.renderer.state.setStencilFunc( true );
-            // gl.stencilFunc( gl.ALWAYS, 1, 0xff );
-            // gl.stencilOp( gl.REPLACE, gl.REPLACE, gl.REPLACE );
 
+            // for (let i in this.map.layers) {
+            //     let layer = this.map.layers[i];
+            //     if (layer instanceof TinLayer && layer.name != "Topography") {
+            //         layer.animate();
+            //         break;
+            //     }
+            // }
+           
             gl.stencilFunc(gl.ALWAYS, 1, 0xff);
             gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
             this.renderer.render(this.backStencil, this.map.camera);

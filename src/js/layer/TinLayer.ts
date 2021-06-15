@@ -6,6 +6,7 @@ import { Layer } from './Layer';
 import { BitStream } from '../lib/bitstream';
 import { Vector3 } from 'three/src/math/Vector3';
 import { MyMeshStandardMaterial } from '../clip/MyMeshStandardMaterial';
+import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial';
 import { Group } from 'three/src/objects/Group';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import proj4 from 'proj4/dist/proj4-src';
@@ -16,6 +17,9 @@ import { Vector2 } from 'three/src/math/Vector2';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Box3 } from 'three/src/math/Box3';
 import { uniforms } from '../clip/uniforms';
+import { UpdatableBoxGeometry } from '../clip/UpdatableBoxGeometry';
+import { Scene } from 'three/src/scenes/Scene';
+import { CSG } from 'three-csg-ts';
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
@@ -36,7 +40,9 @@ class TinLayer extends Layer {
     featuregeom_id: number;
     color: string;
     mainMesh;
+    borderMesh;
     geometry: BufferGeometry;
+    box: UpdatableBoxGeometry;
     uniforms;
     // uniforms = {
     //     clipping: {
@@ -72,6 +78,9 @@ class TinLayer extends Layer {
         texture: undefined
     }
     ];
+    frontStencil: Scene;
+    backStencil: Scene;
+    capsScene: Scene;
 
     constructor(params) {
         super();
@@ -91,6 +100,70 @@ class TinLayer extends Layer {
         this.q = true;
         this.uniforms = uniforms;
     }
+
+    buildBorder(vertices) {
+        let box = this.box = new UpdatableBoxGeometry(vertices)
+        // this.boxMesh = new Mesh(box, material.capMaterial);
+
+        // let color = parseInt(this.color, 16);
+        // let meshMaterial = new MeshBasicMaterial({
+        //     color: color,
+        //     side: DoubleSide
+        // });
+        // this.materialsArray.push(meshMaterial);
+        // let meshA = this.mainMesh;
+        // let meshB = this.borderMesh = new Mesh(box, meshMaterial);
+        // this._addObject(mesh, false);
+
+        // Make sure the .matrix of each mesh is current
+        // meshA.updateMatrix();
+        // meshB.updateMatrix();
+
+        
+        // // Subtract meshB from meshA
+        // this.borderMesh = CSG.subtract(meshA, meshB);
+        // this._addObject(this.borderMesh, false);
+
+        // this.frontStencil = new Scene();
+        // let frontMesh = new Mesh(this.geometry.clone(), material.frontStencilMaterial);
+        // frontMesh.userData.layerId = this.index;
+        // this.frontStencil.add(frontMesh);
+
+        // this.backStencil = new Scene();
+        // let backMesh = new Mesh(this.geometry.clone(), material.backStencilMaterial);
+        // backMesh.userData.layerId = this.index;
+        // this.backStencil.add(frontMesh);
+
+        // this.capsScene = new Scene();
+        // this.capsScene.add(this.borderMesh);
+    }
+
+    // animate() {
+    //     let gl = this._map.renderer.getContext();
+
+    //     if (gl != undefined && this.capsScene != undefined) {
+    //         gl.enable(gl.STENCIL_TEST);
+    //         // this.renderer.state.setStencilFunc( true );
+    //         // gl.stencilFunc( gl.ALWAYS, 1, 0xff );
+    //         // gl.stencilOp( gl.REPLACE, gl.REPLACE, gl.REPLACE );
+
+    //         gl.stencilFunc(gl.ALWAYS, 1, 0xff);
+    //         gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
+    //         this._map.renderer.render(this.backStencil, this._map.camera);
+
+    //         gl.stencilFunc(gl.ALWAYS, 1, 0xff);
+    //         gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR);
+    //         this._map.renderer.render(this.frontStencil, this._map.camera);
+
+    //         gl.stencilFunc(gl.EQUAL, 1, 0xff);
+    //         gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+    //         this._map.renderer.render(this.capsScene, this._map.camera);
+
+
+    //         // disable stencil test
+    //         gl.disable(gl.STENCIL_TEST);
+    //     }
+    // }
 
     setWireframeMode(wireframe) {
         this.materialsArray.forEach(function (mat) {
@@ -395,12 +468,12 @@ class TinLayer extends Layer {
             this.material = new ShaderMaterial({
                 transparent: true,
                 // side: DoubleSide,
-                uniforms: this.uniforms.clipping,                
+                uniforms: this.uniforms.clipping,
                 vertexShader: shader.vertexClipping,
                 fragmentShader: shader.fragmentClippingFront,
             });
 
-        } else {           
+        } else {
             // this.uniforms.clipping.clippingScale = { type: "f", value: 1.0 };
             // this.uniforms.clipping.color = { type: "c", value: new Color(color) };
             // this.uniforms.clipping.clippingLow = { type: "v3", value: new Vector3(0, 0, 0) };
