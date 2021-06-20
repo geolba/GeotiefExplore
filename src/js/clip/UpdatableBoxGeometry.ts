@@ -2,6 +2,7 @@ import { BufferGeometry } from 'three/src/core/BufferGeometry';
 import { Uint16BufferAttribute } from 'three/src/core/BufferAttribute';
 import { Vector3 } from 'three/src/math/Vector3';
 import { Float32BufferAttribute } from 'three/src/core/BufferAttribute';
+import { eventMixin } from '../core/eventMixin';
 
 class UpdatableBoxGeometry extends BufferGeometry {
 
@@ -68,8 +69,11 @@ class UpdatableBoxGeometry extends BufferGeometry {
         this.setFromPoints(this.vertices);
         this.attributes.position.needsUpdate = true;
         this.computeBoundingSphere();
+        this.dispatchEvent( { type: 'update', message: "example" } );
     }
 
 }
+// Add the mixin with event-related methods
+// Object.assign(UpdatableBoxGeometry.prototype, eventMixin);
 
 export { UpdatableBoxGeometry };

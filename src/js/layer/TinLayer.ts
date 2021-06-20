@@ -19,7 +19,11 @@ import { Box3 } from 'three/src/math/Box3';
 import { uniforms } from '../clip/uniforms';
 import { UpdatableBoxGeometry } from '../clip/UpdatableBoxGeometry';
 import { Scene } from 'three/src/scenes/Scene';
+
 import { CSG } from 'three-csg-ts';
+import { Plane } from 'three/src/math/Plane';
+import { PlaneGeometry } from '../clip/PlaneGeometry';
+
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
@@ -102,7 +106,11 @@ class TinLayer extends Layer {
     }
 
     buildBorder(vertices) {
-        let box = this.box = new UpdatableBoxGeometry(vertices)
+        let box = this.box = new UpdatableBoxGeometry(vertices);
+        box.addEventListener("update", function ( event ) {
+            alert( event.message );        
+        } );
+        
         // this.boxMesh = new Mesh(box, material.capMaterial);
 
         // let color = parseInt(this.color, 16);
@@ -118,11 +126,38 @@ class TinLayer extends Layer {
         // Make sure the .matrix of each mesh is current
         // meshA.updateMatrix();
         // meshB.updateMatrix();
-
-        
         // // Subtract meshB from meshA
         // this.borderMesh = CSG.subtract(meshA, meshB);
         // this._addObject(this.borderMesh, false);
+
+    
+    
+        // // this.buildPlane(0, vertices[0], vertices[1], vertices[5], vertices[4], 0); //y1 south 
+        // let planeGeom = new PlaneGeometry(vertices[0], vertices[1], vertices[5], vertices[4]);
+        // planeGeom.rotateX(-Math.PI / 2);
+        // let plane = new Mesh(planeGeom, new MeshBasicMaterial({
+        //     color: "lightgray",
+        //     transparent: true,
+        //     opacity: 0.75,
+        //     side: DoubleSide
+        // }));
+        // this._addObject(plane, false);
+       
+        
+
+        // var a = new Vector3(),
+        //     b = new Vector3(),
+        //     c = new Vector3();
+        // var planePointA = new Vector3(),
+        //     planePointB = new Vector3(),
+        //     planePointC = new Vector3();
+        // // var lineAB = new Line3(),
+        // //   lineBC = new Line3(),
+        // //   lineCA = new Line3();
+
+        // var pointOfIntersection = new Vector3();
+
+        // let myPlane = new Plane(new Vector3(0, 1, 0), 0);
 
         // this.frontStencil = new Scene();
         // let frontMesh = new Mesh(this.geometry.clone(), material.frontStencilMaterial);

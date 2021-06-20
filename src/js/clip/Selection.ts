@@ -99,13 +99,14 @@ export class Selection extends Layer {
         this.map = map;
         this.build(this.getScene());
         this.emit('add');
-        if (this.map.layers) {
-            for (const [key, layer] of Object.entries(this.map.layers)) {
-                if (layer instanceof TinLayer) {
-                    layer.buildBorder(this.vertices);
-                }
-            }
-        }
+        // if (this.map.layers) {
+        //     for (const [key, layer] of Object.entries(this.map.layers)) {
+        //         if (layer instanceof TinLayer) {
+        //             layer.buildBorder(this.vertices);
+        //         }
+        //     }
+        // }
+        this.map.layers[17].buildBorder(this.vertices);
     }
 
     onRemove(map) {
@@ -148,7 +149,7 @@ export class Selection extends Layer {
         this.setUniforms();
     }
 
-    _updateVertices() {
+    private _updateVertices() {
         this.vertices[0].set(this.limitLow.x, this.limitLow.y, this.limitLow.z);
         this.vertices[1].set(this.limitHigh.x, this.limitLow.y, this.limitLow.z);
         this.vertices[2].set(this.limitLow.x, this.limitHigh.y, this.limitLow.z);
@@ -159,7 +160,7 @@ export class Selection extends Layer {
         this.vertices[7].set(this.limitHigh.x, this.limitHigh.y, this.limitHigh.z);
     }
 
-    updateGeometries() {
+    private _updateGeometries() {
         // for (var i = 0; i < this.meshGeometries.length; i++) {
         //     // this.meshGeometries[i].verticesNeedUpdate = true;
         //     // this.meshGeometries[i].getAttribute('position').needsUpdate = true;
@@ -185,7 +186,7 @@ export class Selection extends Layer {
         }
     }
 
-    setUniforms() {
+    public setUniforms() {
         let unif = uniforms.clipping;
         unif.clippingLow.value.copy(this.limitLow);
         unif.clippingHigh.value.copy(this.limitHigh);
@@ -231,9 +232,11 @@ export class Selection extends Layer {
         this.setUniforms();
 
         this._updateVertices();
-        this.updateGeometries();
+        this._updateGeometries();
         // this.setBox();
         this.box.update();
+        
+        this.map.layers[17].box.update();
         // if (this.map.layers) {
         //     for (const [key, layer] of Object.entries(this.map.layers)) {
         //         if (layer instanceof TinLayer) {
