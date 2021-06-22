@@ -23,7 +23,13 @@ import { Scene } from 'three/src/scenes/Scene';
 import { CSG } from 'three-csg-ts';
 import { Plane } from 'three/src/math/Plane';
 import { PlaneGeometry } from '../clip/PlaneGeometry';
-
+import { Line3 } from 'three/src/math/Line3';
+import { LineBasicMaterial } from 'three/src/materials/LineBasicMaterial';
+import { LineSegments } from 'three/src/objects/LineSegments';
+import { PointsMaterial } from 'three/src/materials/PointsMaterial';
+import { Points } from 'three/src/objects/Points';
+import { Line } from 'three/src/objects/Line';
+import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry';
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
@@ -43,8 +49,9 @@ class TinLayer extends Layer {
     material: Material;
     featuregeom_id: number;
     color: string;
-    mainMesh;
+    mainMesh: Mesh;
     borderMesh;
+    planeGeom: PlaneGeometry;
     geometry: BufferGeometry;
     box: UpdatableBoxGeometry;
     uniforms;
@@ -107,10 +114,10 @@ class TinLayer extends Layer {
 
     buildBorder(vertices) {
         let box = this.box = new UpdatableBoxGeometry(vertices);
-        box.addEventListener("update", function ( event ) {
-            alert( event.message );        
-        } );
-        
+
+
+
+
         // this.boxMesh = new Mesh(box, material.capMaterial);
 
         // let color = parseInt(this.color, 16);
@@ -130,32 +137,132 @@ class TinLayer extends Layer {
         // this.borderMesh = CSG.subtract(meshA, meshB);
         // this._addObject(this.borderMesh, false);
 
-    
-    
-        // // this.buildPlane(0, vertices[0], vertices[1], vertices[5], vertices[4], 0); //y1 south 
-        // let planeGeom = new PlaneGeometry(vertices[0], vertices[1], vertices[5], vertices[4]);
+
+
+        //let planeGeom = this.planeGeom = new PlaneGeometry(vertices[0], vertices[1], vertices[5], vertices[4]);
+        let planeGeom = this.planeGeom = new PlaneGeometry(this.box.vertices[0], this.box.vertices[1], this.box.vertices[2], this.box.vertices[3]);
         // planeGeom.rotateX(-Math.PI / 2);
-        // let plane = new Mesh(planeGeom, new MeshBasicMaterial({
-        //     color: "lightgray",
-        //     transparent: true,
-        //     opacity: 0.75,
-        //     side: DoubleSide
-        // }));
+        let plane = new Mesh(planeGeom, new MeshBasicMaterial({
+            color: "lightgray",
+            transparent: true,
+            opacity: 0.75,
+            side: DoubleSide
+        }));
         // this._addObject(plane, false);
-       
+
+        let pointsOfIntersection = new BufferGeometry();
+        let p_vertices = new Array(); // 3 vertices per point
+        // let positions = new Float32BufferAttribute(p_vertices, 3);
+        // pointsOfIntersection.setAttribute('position', positions);
+
+        var pointsMaterial = new PointsMaterial({
+            size: 100,
+            color: 0xff0000
+        });
+        var points = new Points(pointsOfIntersection, pointsMaterial);
+        this._addObject(points, false);
+
+        // var lines = new LineSegments(pointsOfIntersection, new LineBasicMaterial({
+        //     color: 0xa9a9a9
+        // }));
+        // material
+        // var material = new LineBasicMaterial( { color: 0xffffff, linewidth: 1 } );
+        // // line
+        // var line = new Line( pointsOfIntersection, material );
+        // this._addObject(line, false);   
         
+        let meshMaterial = new MeshBasicMaterial({
+            color: 0xa9a9a9
+        });   
+        let convexGeometry;// = new ConvexGeometry( p_vertices );
+        const mesh1 = new Mesh( convexGeometry, meshMaterial );
+        this._addObject(mesh1, false); 
 
-        // var a = new Vector3(),
-        //     b = new Vector3(),
-        //     c = new Vector3();
-        // var planePointA = new Vector3(),
-        //     planePointB = new Vector3(),
-        //     planePointC = new Vector3();
-        // // var lineAB = new Line3(),
-        // //   lineBC = new Line3(),
-        // //   lineCA = new Line3();
+        // let meshMaterial = new MeshBasicMaterial({
+        //     color: 0xa9a9a9
+        // });       
+        // let mesh = new Mesh(pointsOfIntersection, meshMaterial);
+        // this._addObject(mesh, false); 
+      
+        let a = new Vector3(),
+            b = new Vector3(),
+            c = new Vector3();
+        let planePointA = new Vector3(),
+            planePointB = new Vector3(),
+            planePointC = new Vector3();
+        let lineAB = new Line3(),
+            lineBC = new Line3(),
+            lineCA = new Line3();
+        let pointOfIntersection = new Vector3();
 
-        // var pointOfIntersection = new Vector3();
+        box.addEventListener("update", (event) => {
+            let ar = new Array(this.box.vertices[0], this.box.vertices[1], this.box.vertices[2], this.box.vertices[3]);
+            this.planeGeom.setFromPoints(ar);
+            this.planeGeom.update();
+
+            p_vertices = [];
+
+            let mathPlane = new Plane();
+            plane.localToWorld(planePointA.copy(plane.geometry.vertices[0]));
+            plane.localToWorld(planePointB.copy(plane.geometry.vertices[1]));
+            plane.localToWorld(planePointC.copy(plane.geometry.vertices[2]));
+            mathPlane.setFromCoplanarPoints(planePointA, planePointB, planePointC);
+
+            const setPointOfIntersection = (line: Line3, plane: Plane) => {
+                plane.intersectLine(line, pointOfIntersection);
+                if (pointOfIntersection.x != 0 && pointOfIntersection.y != 0 && pointOfIntersection.z != 0) {
+                    p_vertices.push(pointOfIntersection.clone());
+                }
+            }
+            let geom = this.mainMesh.geometry;
+            // this.mainMesh.geometry.faces.forEach(function (face) {
+            for (let vi = 0; vi < geom.index.array.length; vi += 3) {
+
+                let idx0 = geom.index.array[vi];
+                let idx1 = geom.index.array[vi + 1];
+                let idx2 = geom.index.array[vi + 2];
+
+                let vx0 = geom.attributes.position.array[3 * idx0];
+                let vy0 = geom.attributes.position.array[3 * idx0 + 1];
+                let vz0 = geom.attributes.position.array[3 * idx0 + 2];
+
+                let vx1 = geom.attributes.position.array[3 * idx1];
+                let vy1 = geom.attributes.position.array[3 * idx1 + 1];
+                let vz1 = geom.attributes.position.array[3 * idx1 + 2];
+
+                let vx2 = geom.attributes.position.array[3 * idx2];
+                let vy2 = geom.attributes.position.array[3 * idx2 + 1];
+                let vz2 = geom.attributes.position.array[3 * idx2 + 2];
+
+                let v0 = new Vector3(vx0, vy0, vz0);
+                let v1 = new Vector3(vx1, vy1, vz1);
+                let v2 = new Vector3(vx2, vy2, vz2);
+
+                this.mainMesh.localToWorld(a.copy(v0));
+                this.mainMesh.localToWorld(b.copy(v1));
+                this.mainMesh.localToWorld(c.copy(v2));
+                lineAB = new Line3(a, b);
+                lineBC = new Line3(b, c);
+                lineCA = new Line3(c, a);
+                setPointOfIntersection(lineAB, mathPlane);
+                setPointOfIntersection(lineBC, mathPlane);
+                setPointOfIntersection(lineCA, mathPlane);
+            }
+            if (p_vertices.length > 0) {
+                pointsOfIntersection.setFromPoints(p_vertices);
+                pointsOfIntersection.computeBoundingSphere()
+                pointsOfIntersection.attributes.position.needsUpdate = true;
+
+                // convexGeometry.setFromPoints(p_vertices);
+                convexGeometry  = new ConvexGeometry( p_vertices );
+                convexGeometry.computeBoundingSphere()
+                convexGeometry.attributes.position.needsUpdate = true;
+            }
+
+
+
+
+        });
 
         // let myPlane = new Plane(new Vector3(0, 1, 0), 0);
 
@@ -722,7 +829,7 @@ class TinLayer extends Layer {
         //configure the material now that we have all of the data
         // this.mainMesh.material.map = image.texture;
         this.uniforms.clipping.map.value = image.texture;
-        this.mainMesh.material.needsUpdate = true;
+        // this.mainMesh.material.needsUpdate = true;
         if (this.visible === false) {
             this.setVisible(true);
         }
