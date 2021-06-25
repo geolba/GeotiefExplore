@@ -1,3 +1,7 @@
 https://jsfiddle.net/prisoner849/8uxw667m/
 
 https://stackoverflow.com/questions/42348495/three-js-find-all-points-where-a-mesh-intersects-a-plane
+
+
+https://discourse.threejs.org/t/get-edges-between-vertices-outer-polygon/10213/8
+https://jsfiddle.net/prisoner849/uqm6bk1k/

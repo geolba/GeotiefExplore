@@ -29,10 +29,39 @@ import { LineSegments } from 'three/src/objects/LineSegments';
 import { PointsMaterial } from 'three/src/materials/PointsMaterial';
 import { Points } from 'three/src/objects/Points';
 import { Line } from 'three/src/objects/Line';
-import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry';
+// import hull from 'hull.js/src/hull';
+// import concaveman from 'concaveman/index';
 
 const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
 const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
+
+export class Point3 extends Vector3 {
+    // public x: number;
+    // public y: number;
+    private values: number[];
+    public checked: boolean;
+    public faceIndex: number;
+
+    constructor(x?: number, y?: number, z?: number) {
+        super(x, y, z);
+        // this.x = x;
+        // this.y = y;
+        // this.z = z;
+    }
+
+
+    public equals(v, tolerance?): boolean {
+        if (tolerance === undefined) {
+            return ((v.x === this.x) && (v.y === this.y) && (v.z === this.z));
+        } else {
+            return ((Math.abs(v.x - this.x) < tolerance) && (Math.abs(v.y - this.y) < tolerance) && (Math.abs(v.z - this.z) < tolerance));
+        }
+    }
+
+    public toString(): string {
+        return "x=" + this.x + " y=" + this.y;
+    }
+}
 
 class TinLayer extends Layer {
 
@@ -42,6 +71,7 @@ class TinLayer extends Layer {
     borderVisible;
     scale;
     objectGroup;
+    borderGroup;
     visible: boolean;
     opacity: number;
     materialParameter: Array<string>;
@@ -92,6 +122,8 @@ class TinLayer extends Layer {
     frontStencil: Scene;
     backStencil: Scene;
     capsScene: Scene;
+    p_vertices: Array<Point3>;
+    tolerance : number = 0.001;
 
     constructor(params) {
         super();
@@ -110,12 +142,15 @@ class TinLayer extends Layer {
         this.objectGroup = new Group();
         this.q = true;
         this.uniforms = uniforms;
+        this.borderGroup = new Group();
     }
 
     buildBorder(vertices) {
         let box = this.box = new UpdatableBoxGeometry(vertices);
 
-
+        
+        this.getScene().add(this.borderGroup);
+        
 
 
         // this.boxMesh = new Mesh(box, material.capMaterial);
@@ -162,28 +197,34 @@ class TinLayer extends Layer {
         var points = new Points(pointsOfIntersection, pointsMaterial);
         this._addObject(points, false);
 
+        // let color = parseInt(this.color, 16);
+        // var mesh = new Mesh(
+        //     pointsOfIntersection, // re-use the existing geometry
+        //     new MeshBasicMaterial({ color: 0xa9a9a9, side: DoubleSide })
+        // );
+        // this._addObject(mesh, false);
+
         // var lines = new LineSegments(pointsOfIntersection, new LineBasicMaterial({
         //     color: 0xa9a9a9
         // }));
-        // material
-        // var material = new LineBasicMaterial( { color: 0xffffff, linewidth: 1 } );
-        // // line
-        // var line = new Line( pointsOfIntersection, material );
-        // this._addObject(line, false);   
-        
-        let meshMaterial = new MeshBasicMaterial({
-            color: 0xa9a9a9
-        });   
-        let convexGeometry;// = new ConvexGeometry( p_vertices );
-        const mesh1 = new Mesh( convexGeometry, meshMaterial );
-        this._addObject(mesh1, false); 
+        // // var material = new LineBasicMaterial( { color: 0xffffff, linewidth: 1 } );
+        // // // line
+        // // var line = new Line( pointsOfIntersection, material );
+        // this._addObject(lines, false);
+
+        // let meshMaterial = new MeshBasicMaterial({
+        //     color: 0xa9a9a9
+        // });   
+        // let convexGeometry;// = new ConvexGeometry( p_vertices );
+        // const mesh1 = new Mesh( convexGeometry, meshMaterial );
+        // this._addObject(mesh1, false); 
 
         // let meshMaterial = new MeshBasicMaterial({
         //     color: 0xa9a9a9
         // });       
         // let mesh = new Mesh(pointsOfIntersection, meshMaterial);
         // this._addObject(mesh, false); 
-      
+
         let a = new Vector3(),
             b = new Vector3(),
             c = new Vector3();
@@ -193,14 +234,17 @@ class TinLayer extends Layer {
         let lineAB = new Line3(),
             lineBC = new Line3(),
             lineCA = new Line3();
-        let pointOfIntersection = new Vector3();
+        // let pointOfIntersection = new Vector3();
 
         box.addEventListener("update", (event) => {
             let ar = new Array(this.box.vertices[0], this.box.vertices[1], this.box.vertices[2], this.box.vertices[3]);
             this.planeGeom.setFromPoints(ar);
             this.planeGeom.update();
 
-            p_vertices = [];
+            this.borderGroup.clear();
+
+            this.p_vertices = [];
+            vertices = [];
 
             let mathPlane = new Plane();
             plane.localToWorld(planePointA.copy(plane.geometry.vertices[0]));
@@ -208,12 +252,7 @@ class TinLayer extends Layer {
             plane.localToWorld(planePointC.copy(plane.geometry.vertices[2]));
             mathPlane.setFromCoplanarPoints(planePointA, planePointB, planePointC);
 
-            const setPointOfIntersection = (line: Line3, plane: Plane) => {
-                plane.intersectLine(line, pointOfIntersection);
-                if (pointOfIntersection.x != 0 && pointOfIntersection.y != 0 && pointOfIntersection.z != 0) {
-                    p_vertices.push(pointOfIntersection.clone());
-                }
-            }
+           
             let geom = this.mainMesh.geometry;
             // this.mainMesh.geometry.faces.forEach(function (face) {
             for (let vi = 0; vi < geom.index.array.length; vi += 3) {
@@ -244,19 +283,45 @@ class TinLayer extends Layer {
                 lineAB = new Line3(a, b);
                 lineBC = new Line3(b, c);
                 lineCA = new Line3(c, a);
-                setPointOfIntersection(lineAB, mathPlane);
-                setPointOfIntersection(lineBC, mathPlane);
-                setPointOfIntersection(lineCA, mathPlane);
+                this.setPointOfIntersection(lineAB, mathPlane, vi);
+                this.setPointOfIntersection(lineBC, mathPlane, vi);
+                this.setPointOfIntersection(lineCA, mathPlane, vi);
             }
-            if (p_vertices.length > 0) {
-                pointsOfIntersection.setFromPoints(p_vertices);
+            if (this.p_vertices.length > 0) {
+                // pointsOfIntersection.setFromPoints(p_vertices);
+                // pointsOfIntersection.computeBoundingSphere()
+                // pointsOfIntersection.attributes.position.needsUpdate = true;
+
+                // // convexGeometry.setFromPoints(p_vertices);
+                // convexGeometry  = new ConvexGeometry( p_vertices );
+                // convexGeometry.computeBoundingSphere()
+                // convexGeometry.attributes.position.needsUpdate = true;
+                let test = this.p_vertices.map(v => {
+                    return [v.x, v.y, v.z];
+                });
+                // const indexHull = hull(test, 1); // returns points of the hull (in clockwise order)  
+                //  let vertices = indexHull.map(a => {
+                //     return new Vector3(a[0], a[1], a[2]);
+                // });   
+
+                // const indexAlpha = concaveman(test, 1);
+                // let vertices = indexAlpha.map(a => {
+                //     return new Vector3(a[0], a[1], a[2]);
+                // });
+               
+                pointsOfIntersection.setFromPoints(this.p_vertices);
                 pointsOfIntersection.computeBoundingSphere()
                 pointsOfIntersection.attributes.position.needsUpdate = true;
 
-                // convexGeometry.setFromPoints(p_vertices);
-                convexGeometry  = new ConvexGeometry( p_vertices );
-                convexGeometry.computeBoundingSphere()
-                convexGeometry.attributes.position.needsUpdate = true;
+                let contours = this.getContours(this.p_vertices, [], true);
+                contours.forEach(cntr => {
+                    let cntrGeom = new BufferGeometry();
+                    cntrGeom.setFromPoints(cntr);
+                    let contour = new Line(cntrGeom, new LineBasicMaterial({
+                      color: Math.random() * 0xffffff //0x777777 + 0x777777
+                    }));
+                    this.borderGroup.add(contour);
+                  });
             }
 
 
@@ -264,7 +329,7 @@ class TinLayer extends Layer {
 
         });
 
-        // let myPlane = new Plane(new Vector3(0, 1, 0), 0);
+
 
         // this.frontStencil = new Scene();
         // let frontMesh = new Mesh(this.geometry.clone(), material.frontStencilMaterial);
@@ -279,6 +344,92 @@ class TinLayer extends Layer {
         // this.capsScene = new Scene();
         // this.capsScene.add(this.borderMesh);
     }
+
+    private setPointOfIntersection(line: Line3, plane: Plane, faceIndex: number): void {
+        let pointOfIntersection = new Point3();
+        plane.intersectLine(line, pointOfIntersection);
+        if (pointOfIntersection.x != 0 && pointOfIntersection.y != 0 && pointOfIntersection.z != 0) {
+            // let p = pointOfIntersection.clone();
+            pointOfIntersection.checked = false;
+            pointOfIntersection.faceIndex = faceIndex;
+            this.p_vertices.push(pointOfIntersection);
+        }
+    }
+
+    private getContours(points: Array<Point3>, contours: Array<any>, firstRun: boolean) {
+        // console.log("firstRun:", firstRun);
+
+        let contour = new Array<Point3>();
+
+        // find first line for the contour
+        let firstPointIndex = 0;
+        let secondPointIndex = 0;
+        let firstPoint, secondPoint;
+        for (let i = 0; i < points.length; i++) {
+            let point = points[i];
+            if (point.checked == true) continue;
+            firstPointIndex = i;
+            firstPoint = points[firstPointIndex];
+            firstPoint.checked = true;
+            secondPointIndex = this.getPairIndex(firstPoint, firstPointIndex, points);
+            secondPoint = points[secondPointIndex];
+            secondPoint.checked = true;
+            contour.push(firstPoint);
+            contour.push(secondPoint);
+            break;
+        }
+
+        contour = this.getContour(secondPoint, points, contour);
+        contours.push(contour);
+        let allChecked = 0;
+        points.forEach(p => { allChecked += p.checked == true ? 1 : 0; });
+        // console.log("allChecked: ", allChecked == points.length);
+        if (allChecked != points.length) { return this.getContours(points, contours, false); }
+        return contours;
+    }
+
+    private getPairIndex(point, pointIndex, points) {
+        let index = 0;
+        for (let i = 0; i < points.length; i++) {
+            let p = points[i];
+            if (i != pointIndex && p.checked == false && p.faceIndex == point.faceIndex) {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    private getContour(currentPoint: Point3, points, contour) {
+        let p1Index = this.getNearestPointIndex(currentPoint, points);
+        let p1 = points[p1Index];
+        p1.checked = true;
+        let p2Index = this.getPairIndex(p1, p1Index, points);
+        let p2 = points[p2Index];
+        p2.checked = true;
+        let isClosed = p2.equals(contour[0], this.tolerance);
+        if (!isClosed) {
+            contour.push(p2);
+            return this.getContour(p2, points, contour);
+        } else {
+            contour.push(contour[0]);
+            return contour;
+        }
+    }
+
+    private getNearestPointIndex(point, points){
+        let index = 0;
+        for (let i = 0; i < points.length; i++){
+        //   let p = points[i];
+          if (points[i].checked == false && points[i].equals(point, this.tolerance)){ 
+            index = i;
+            break;
+          }
+        }
+        return index;
+      }
+      
+      
 
     // animate() {
     //     let gl = this._map.renderer.getContext();

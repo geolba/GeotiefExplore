@@ -383,35 +383,35 @@ class Application {
         // The HTML5 Canvas's 'webgl' context obtained from the canvas where the renderer will draw.
         let gl = this.renderer.getContext();
 
-        if (this.showCaps && gl != undefined) {
-            // enable stencil test
-            gl.enable(gl.STENCIL_TEST);
+        // if (this.showCaps && gl != undefined) {
+        //     // enable stencil test
+        //     gl.enable(gl.STENCIL_TEST);
 
-            // for (let i in this.map.layers) {
-            //     let layer = this.map.layers[i];
-            //     if (layer instanceof TinLayer && layer.name != "Topography") {
-            //         layer.animate();
-            //         break;
-            //     }
-            // }
+        //     // for (let i in this.map.layers) {
+        //     //     let layer = this.map.layers[i];
+        //     //     if (layer instanceof TinLayer && layer.name != "Topography") {
+        //     //         layer.animate();
+        //     //         break;
+        //     //     }
+        //     // }
            
-            gl.stencilFunc(gl.ALWAYS, 1, 0xff);
-            gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
-            this.renderer.render(this.backStencil, this.map.camera);
+        //     gl.stencilFunc(gl.ALWAYS, 1, 0xff);
+        //     gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
+        //     this.renderer.render(this.backStencil, this.map.camera);
 
-            gl.stencilFunc(gl.ALWAYS, 1, 0xff);
-            gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR);
-            this.renderer.render(this.frontStencil, this.map.camera);
+        //     gl.stencilFunc(gl.ALWAYS, 1, 0xff);
+        //     gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR);
+        //     this.renderer.render(this.frontStencil, this.map.camera);
 
-            gl.stencilFunc(gl.EQUAL, 1, 0xff);
-            gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-            this.renderer.render(this.capsScene, this.map.camera);
+        //     gl.stencilFunc(gl.EQUAL, 1, 0xff);
+        //     gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+        //     this.renderer.render(this.capsScene, this.map.camera);
 
-            // disable stencil test
-            gl.disable(gl.STENCIL_TEST);
-            // gl.stencilMask(0);
-            // this.renderer.state.setStencilFunc( false );
-        }
+        //     // disable stencil test
+        //     gl.disable(gl.STENCIL_TEST);
+        //     // gl.stencilMask(0);
+        //     // this.renderer.state.setStencilFunc( false );
+        // }
 
 
         this.renderer.render(this.scene, this.map.camera);
