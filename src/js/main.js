@@ -185,68 +185,61 @@ class Application {
         map.on('ready', () => {
             this.selectionBox.setUniforms();
 
+         
 
-            this.capsScene.add(this.selectionBox.boxMesh);
+            // this.capsScene.add(this.selectionBox.boxMesh);
             // this.scene.add(this.selection.displayMeshes);
             // this.scene.add(this.selection.touchMeshes);
             this.map.addLayer(this.selectionBox);
 
-            // for (const [key, layer] of Object.entries(this.map.layers)) {
-            //     // let layer = map.layers[i];
-            //     if (layer instanceof TinLayer && layer.name != "Topography") {
-            //         // let capsScene = new Scene();
-            //         // capsScene.add(layer.borderMesh);
-            //         // this.capsSceneArray.push(capsScene);
-            //         this.capsScene.add(layer.borderMesh);
-            //         layer.on('visibility-change', (args) => {
-            //             let visible = args[0];
-            //             layer.borderMesh.visible = visible;
-            //         });
-            //     }
-            // }
-
-            let frontGroup = new Group();
-            for (var i in map.layers) {
-                let layer = map.layers[i];
-                if (layer instanceof TinLayer && layer.name != "Topography") {
-                    let mesh = new Mesh(layer.geometry.clone(), material.frontStencilMaterial);
-                    mesh.userData.layerId = layer.index;
-                    frontGroup.add(mesh);
+            let profileNode = new Group();
+            for (const [key, layer] of Object.entries(this.map.layers)) {
+                // let layer = map.layers[i];
+                if (layer instanceof TinLayer && layer.name != "Topography") {   
+                    // this.capsScene.add(layer.borderMesh);
+                    profileNode.add(layer.borderMesh);
                     layer.on('visibility-change', (args) => {
                         let visible = args[0];
-                        mesh.visible = visible;
+                        layer.borderMesh.visible = visible;
                     });
                     layer.on('scale-change', (args) => {
                         let z = args[0];
-                        mesh.scale.z = z;
+                        layer.borderMesh.scale.z = z;
                     });
                 }
             }
-            frontGroup.updateMatrix();
-            // let frontMesh = new Mesh(frontGroup, material.frontStencilMaterial);
-            this.frontStencil.add(frontGroup);
+            // this.scene.add(profileNode);
 
-            let backGroup = new Group();
+            let stencilNode = new Group();
             for (var i in map.layers) {
                 let layer = map.layers[i];
                 if (layer instanceof TinLayer && layer.name != "Topography") {
-                    let mesh = new Mesh(layer.geometry.clone(), material.backStencilMaterial);
-                    mesh.userData.layerId = layer.index;
-                    backGroup.add(mesh);
+                    let stencilFeatureBack = new Mesh(layer.geometry, material.backStencilMaterial);
+                    stencilFeatureBack.name = 'stencilFeatureBack_' + i;
+                    stencilFeatureBack.userData.layerId = layer.index;
+                    stencilNode.add(stencilFeatureBack);
+                    
+                    let stencilFeatureFront = new Mesh(layer.geometry, material.frontStencilMaterial);
+                    stencilFeatureFront.name = 'stencilFeatureFront_' + i;
+                    stencilFeatureFront.userData.layerId = layer.index;
+                    stencilNode.add(stencilFeatureFront);
                     layer.on('visibility-change', (args) => {
                         let visible = args[0];
-                        mesh.visible = visible;
+                        stencilFeatureFront.visible = visible;
+                        stencilFeatureBack.visible = visible;
                     });
                     layer.on('scale-change', (args) => {
                         let z = args[0];
-                        mesh.scale.z = z;
+                        stencilFeatureFront.scale.z = z;
+                        stencilFeatureBack.scale.z = z;
                     });
-
                 }
-            }
-            backGroup.updateMatrix();
-            // let frontMesh = new Mesh(frontGroup, material.frontStencilMaterial);
-            this.backStencil.add(backGroup);
+            }   
+
+            // scene.add(node('selectNode'));
+            // scene.add(node('modelNode'));
+            this.scene.add(stencilNode);
+            this.scene.add(profileNode);
 
             this.animate();
         }, this);
@@ -408,7 +401,7 @@ class Application {
         //     this.renderer.render(this.capsScene, this.map.camera);
 
         //     // disable stencil test
-        //     gl.disable(gl.STENCIL_TEST);
+        //      gl.disable(gl.STENCIL_TEST);
         //     // gl.stencilMask(0);
         //     // this.renderer.state.setStencilFunc( false );
         // }

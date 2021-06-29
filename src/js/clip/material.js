@@ -3,29 +3,54 @@ import { LineBasicMaterial } from 'three/src/materials/LineBasicMaterial';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { uniforms } from "./uniforms";
 import { shader } from './shader';
-import { DoubleSide, BackSide } from 'three/src/constants';
+import { DoubleSide, BackSide, FrontSide } from 'three/src/constants';
+import { DecrementWrapStencilOp, IncrementWrapStencilOp } from 'three/src/constants';
+import { NotEqualStencilFunc, ReplaceStencilOp, AlwaysStencilFunc } from 'three/src/constants';
 
-let capMaterial = new ShaderMaterial({
+let profileMaterial = new ShaderMaterial({
+    color: 0xE91E63,
+    // metalness: 0.1,
+    // roughness: 0.75,
+    // flatShading: true,
+    stencilWrite: true,
+    // stencilRef: 0,
+    stencilFunc: NotEqualStencilFunc,
+    stencilFail: ReplaceStencilOp,
+    stencilZFail: ReplaceStencilOp,
+    stencilZPass: ReplaceStencilOp,
     uniforms: uniforms.caps,
     vertexShader: shader.vertex,
     fragmentShader: shader.fragment
 });
 
 let frontStencilMaterial = new ShaderMaterial({
+    depthWrite: false,
+    depthTest: false,
+    colorWrite: false,
+    stencilWrite: true,
+    stencilFunc: AlwaysStencilFunc,
     uniforms: uniforms.clipping,
     vertexShader: shader.vertexClipping,
-    fragmentShader: shader.fragmentClippingFront,
-    colorWrite: false,
-    depthWrite: false,
+    fragmentShader: shader.fragmentClippingFront, 
+    side: FrontSide,
+    stencilFail: DecrementWrapStencilOp,
+    stencilZFail: DecrementWrapStencilOp,
+    stencilZPass: DecrementWrapStencilOp
 });
 
 let backStencilMaterial = new ShaderMaterial({
+    depthWrite: false,
+    depthTest: false,
+    colorWrite: false,
+    stencilWrite: true,
+    stencilFunc: AlwaysStencilFunc,
     uniforms: uniforms.clipping,
     vertexShader: shader.vertexClipping,
-    fragmentShader: shader.fragmentClippingFront,
-    colorWrite: false,
-    depthWrite: false,
-    side: BackSide
+    fragmentShader: shader.fragmentClippingFront,   
+    side: BackSide,
+    stencilFail: IncrementWrapStencilOp,
+    stencilZFail: IncrementWrapStencilOp,
+    stencilZPass: IncrementWrapStencilOp
 });
 
 // beige:
@@ -45,7 +70,7 @@ let Invisible = new ShaderMaterial({
 });
 
 export {
-    capMaterial,
+    profileMaterial,
     frontStencilMaterial,
     backStencilMaterial,
     BoxBackFace,

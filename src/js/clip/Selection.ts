@@ -58,7 +58,7 @@ export class Selection extends Layer {
 
         // this.box = new BoxGeometry(1, 1, 1);      
         let box = this.box = new UpdatableBoxGeometry(this.vertices)
-        this.boxMesh = new Mesh(box, material.capMaterial);
+        this.boxMesh = new Mesh(box, material.profileMaterial);
 
 
         let v = this.vertices;
@@ -99,14 +99,15 @@ export class Selection extends Layer {
         this.map = map;
         this.build(this.getScene());
         this.emit('add');
-        // if (this.map.layers) {
-        //     for (const [key, layer] of Object.entries(this.map.layers)) {
-        //         if (layer instanceof TinLayer) {
-        //             layer.buildBorder(this.vertices);
-        //         }
-        //     }
-        // }
-        this.map.layers[17].buildBorder(this.vertices);
+        
+        if (this.map.layers) {
+            for (const [key, layer] of Object.entries(this.map.layers)) {
+                if (layer instanceof TinLayer) {
+                    layer.buildBorder(this.vertices);
+                }
+            }
+        }
+        // this.map.layers[17].buildBorder(this.vertices);
     }
 
     onRemove(map) {
@@ -236,13 +237,13 @@ export class Selection extends Layer {
         // this.setBox();
         this.box.update();
         
-        this.map.layers[17].box.update();
-        // if (this.map.layers) {
-        //     for (const [key, layer] of Object.entries(this.map.layers)) {
-        //         if (layer instanceof TinLayer) {
-        //             layer.box.update();
-        //         }
-        //     }
-        // }
+        // this.map.layers[17].box.update();
+        if (this.map.layers) {
+            for (const [key, layer] of Object.entries(this.map.layers)) {
+                if (layer instanceof TinLayer) {
+                    layer.box.update();
+                }
+            }
+        }
     }
 }

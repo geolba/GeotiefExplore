@@ -101,7 +101,7 @@ export class BoreholePopup extends Control {
         domEvent.on(this._clearButton, 'click', domEvent.preventDefault);
         domEvent.on(this._clearButton, 'click', this.close, this);;
 
-        this._toggleVisibility(false);
+        // this._toggleVisibility(false);
 
         if (!this.options.parentDiv) {
             return container;
