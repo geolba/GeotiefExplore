@@ -126,10 +126,10 @@ class Application {
 
         /* Scene: that will hold all our elements such as objects, cameras and lights. */
         this.scene = new Scene();
-        this.capsScene = new Scene();
-        this.backStencil = new Scene();
-        this.frontStencil = new Scene();
-        this.capsSceneArray = new Array();
+        // this.capsScene = new Scene();
+        // this.backStencil = new Scene();
+        // this.frontStencil = new Scene();
+        // this.capsSceneArray = new Array();
         this._buildDefaultLights(this.scene);
         //app.scene.autoUpdate = false;
         //// show axes in the screen
@@ -185,59 +185,79 @@ class Application {
         map.on('ready', () => {
             this.selectionBox.setUniforms();
 
-         
+
 
             // this.capsScene.add(this.selectionBox.boxMesh);
             // this.scene.add(this.selection.displayMeshes);
             // this.scene.add(this.selection.touchMeshes);
             this.map.addLayer(this.selectionBox);
 
+            let modelNode = new Group();
             let profileNode = new Group();
-            for (const [key, layer] of Object.entries(this.map.layers)) {
+            let stencilNode = new Group();
+            for (const [i, layer] of Object.entries(this.map.layers)) {
                 // let layer = map.layers[i];
-                if (layer instanceof TinLayer && layer.name != "Topography") {   
+                if (layer instanceof TinLayer && layer.name != "Topography") {
+                    modelNode.add(layer.mainMesh);
                     // this.capsScene.add(layer.borderMesh);
                     profileNode.add(layer.borderMesh);
+
+                    // const stencilMaterial = material.stencilMaterial.clone();
+
+                    let stencilFeatureBack = new Mesh(layer.geometry, material.backStencilMaterial.clone());
+                    stencilFeatureBack.name = 'stencilFeatureBack_' + i;
+                    stencilFeatureBack.userData.layerId = layer.index;
+                    stencilNode.add(stencilFeatureBack);
+
+                    let stencilFeatureFront = new Mesh(layer.geometry, material.frontStencilMaterial.clone());
+                    stencilFeatureFront.name = 'stencilFeatureFront_' + i;
+                    stencilFeatureFront.userData.layerId = layer.index;
+                    stencilNode.add(stencilFeatureFront);
+
                     layer.on('visibility-change', (args) => {
                         let visible = args[0];
+                        stencilFeatureFront.visible = visible;
+                        stencilFeatureBack.visible = visible;
                         layer.borderMesh.visible = visible;
                     });
                     layer.on('scale-change', (args) => {
                         let z = args[0];
+                        stencilFeatureFront.scale.z = z;
+                        stencilFeatureBack.scale.z = z;
                         layer.borderMesh.scale.z = z;
                     });
                 }
             }
             // this.scene.add(profileNode);
 
-            let stencilNode = new Group();
-            for (var i in map.layers) {
-                let layer = map.layers[i];
-                if (layer instanceof TinLayer && layer.name != "Topography") {
-                    let stencilFeatureBack = new Mesh(layer.geometry, material.backStencilMaterial);
-                    stencilFeatureBack.name = 'stencilFeatureBack_' + i;
-                    stencilFeatureBack.userData.layerId = layer.index;
-                    stencilNode.add(stencilFeatureBack);
-                    
-                    let stencilFeatureFront = new Mesh(layer.geometry, material.frontStencilMaterial);
-                    stencilFeatureFront.name = 'stencilFeatureFront_' + i;
-                    stencilFeatureFront.userData.layerId = layer.index;
-                    stencilNode.add(stencilFeatureFront);
-                    layer.on('visibility-change', (args) => {
-                        let visible = args[0];
-                        stencilFeatureFront.visible = visible;
-                        stencilFeatureBack.visible = visible;
-                    });
-                    layer.on('scale-change', (args) => {
-                        let z = args[0];
-                        stencilFeatureFront.scale.z = z;
-                        stencilFeatureBack.scale.z = z;
-                    });
-                }
-            }   
+
+            // for (var i in map.layers) {
+            //     let layer = map.layers[i];
+            //     if (layer instanceof TinLayer && layer.name != "Topography") {
+            //         let stencilFeatureBack = new Mesh(layer.geometry, material.backStencilMaterial);
+            //         stencilFeatureBack.name = 'stencilFeatureBack_' + i;
+            //         stencilFeatureBack.userData.layerId = layer.index;
+            //         stencilNode.add(stencilFeatureBack);
+
+            //         let stencilFeatureFront = new Mesh(layer.geometry, material.frontStencilMaterial);
+            //         stencilFeatureFront.name = 'stencilFeatureFront_' + i;
+            //         stencilFeatureFront.userData.layerId = layer.index;
+            //         stencilNode.add(stencilFeatureFront);
+            //         layer.on('visibility-change', (args) => {
+            //             let visible = args[0];
+            //             stencilFeatureFront.visible = visible;
+            //             stencilFeatureBack.visible = visible;
+            //         });
+            //         layer.on('scale-change', (args) => {
+            //             let z = args[0];
+            //             stencilFeatureFront.scale.z = z;
+            //             stencilFeatureBack.scale.z = z;
+            //         });
+            //     }
+            // }   
 
             // scene.add(node('selectNode'));
-            // scene.add(node('modelNode'));
+            this.scene.add(modelNode);
             this.scene.add(stencilNode);
             this.scene.add(profileNode);
 
@@ -387,7 +407,7 @@ class Application {
         //     //         break;
         //     //     }
         //     // }
-           
+
         //     gl.stencilFunc(gl.ALWAYS, 1, 0xff);
         //     gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
         //     this.renderer.render(this.backStencil, this.map.camera);

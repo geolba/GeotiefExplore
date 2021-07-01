@@ -30,7 +30,6 @@ import { PointsMaterial } from 'three/src/materials/PointsMaterial';
 import { Points } from 'three/src/objects/Points';
 import { Line } from 'three/src/objects/Line';
 import hull from 'hull.js/src/hull';
-import concaveman from 'concaveman/index';
 import { Color } from 'three/src/math/Color';
 
 
@@ -164,7 +163,8 @@ class TinLayer extends Layer {
             color: { type: "c", value: new Color(color) }
         }
         let profileMaterial = material.profileMaterial.clone();
-        profileMaterial.uniforms = caps;
+        profileMaterial.color = new Color(color);
+        // profileMaterial.uniforms = caps;
         this.borderMesh = new Mesh(box, profileMaterial);
         // this.borderMesh.name = 'stencilFeatureBack_' + this.index;
         this.borderMesh.name = 'profilePlane_' + this.name;
@@ -502,6 +502,7 @@ class TinLayer extends Layer {
     setVisible(visible) {
         this.visible = visible;
         this.objectGroup.visible = visible;
+        this.mainMesh.visible = visible;
         this.emit('visibility-change', visible);
     }
 
@@ -821,9 +822,9 @@ class TinLayer extends Layer {
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         this._addObject(mesh, true);
-        if (app_scene) {
-            app_scene.add(this.objectGroup);
-        }
+        // if (app_scene) {
+        //     app_scene.add(this.objectGroup);
+        // }
     }
 
     private _addObject(object, queryable) {
