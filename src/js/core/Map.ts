@@ -8,6 +8,7 @@ import * as util from './utilities';
 import { TinLayer } from '../layer/TinLayer';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Vector3 } from 'three/src/math/Vector3';
+import { Group } from 'three';
 
 class Map extends OrbitControls {
 
@@ -27,6 +28,10 @@ class Map extends OrbitControls {
     public basemaps: Object;
     public baseExtent: Object;
     public currentBasemap;
+    public contact: string;
+    private _modelNode: Group;
+    private _stencilNode: Group;
+    private _profileNode: Group;
 
     constructor(x, y, z, scene, container) {
 
@@ -57,6 +62,7 @@ class Map extends OrbitControls {
         this.size = size;
         this.camera = camera;
         this.container = container;
+        this.scene = scene;
         this.length = x.max - x.min;
         this.width = y.max - y.min;
         this.height = z.max - z.min;
@@ -68,6 +74,12 @@ class Map extends OrbitControls {
             x: x,
             y: y
         };
+        this._modelNode = new Group();
+        this._stencilNode = new Group();
+        this._profileNode = new Group();
+        this.scene.add(this._modelNode);
+        this.scene.add(this._stencilNode);
+        this.scene.add(this._profileNode);
 
         //init the control corners
         if (this._initControlPos) {
@@ -100,7 +112,20 @@ class Map extends OrbitControls {
         map._initControls();
 
         map.title = modelData.model.model_name;
+        map.contact = modelData.model.model_owner;
         return map;
+    }
+
+    get modelNode(): Group {
+        return this._modelNode;
+    }
+
+    get stencilNode(): Group {
+        return this._stencilNode;
+    }
+
+    get profileNode(): Group {
+        return this._profileNode;
     }
 
     get layers() {

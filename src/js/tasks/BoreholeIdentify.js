@@ -136,14 +136,14 @@ export class BoreholeIdentify {
         //};
 
         // create a highlight object (if layer type is Point, slightly bigger than the object)
-        var highlightObject = new THREE.Group();
+        // var highlightObject = new THREE.Group();
         //var clone;
         //var s = (layer.type == Q3D.LayerType.Point) ? 1.01 : 1;
 
         var geo = new THREE.Geometry();
-        var v1 = new THREE.Vector3(f.Punkt0.x, f.Punkt0.y, f.Punkt0.z);
-        var v2 = new THREE.Vector3(f.Punkt1.x, f.Punkt1.y, f.Punkt1.z);
-        var v3 = new THREE.Vector3(f.Punkt2.x, f.Punkt2.y, f.Punkt2.z);
+        var v1 = new Vector3(f.Punkt0.x, f.Punkt0.y, f.Punkt0.z);
+        var v2 = new Vector3(f.Punkt1.x, f.Punkt1.y, f.Punkt1.z);
+        var v3 = new Vector3(f.Punkt2.x, f.Punkt2.y, f.Punkt2.z);
         geo.vertices.push(v1);
         geo.vertices.push(v2);
         geo.vertices.push(v3);

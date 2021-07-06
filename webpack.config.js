@@ -155,6 +155,10 @@ module.exports = {
             CONSTANT_VALUE: JSON.stringify(process.env.CONSTANT_VALUE),
             MATOMO_SITE_ID: JSON.stringify(process.env.MATOMO_SITE_ID),
             MATOMO_TRACKER_URL: JSON.stringify(process.env.MATOMO_TRACKER_URL),
+            SERVICE_URL : JSON.stringify(process.env.SERVICE_URL),
+            POINT_URL : JSON.stringify(process.env.POINT_URL),
+            EDGE_URL : JSON.stringify(process.env.EDGE_URL),
+
             CUSTOM_VAR: JSON.stringify('value5 goes here'), // no quotes needed, string value
         }),
         // extractLess,

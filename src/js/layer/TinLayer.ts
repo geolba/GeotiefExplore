@@ -6,7 +6,6 @@ import { Layer } from './Layer';
 import { BitStream } from '../lib/bitstream';
 import { Vector3 } from 'three/src/math/Vector3';
 import { MyMeshStandardMaterial } from '../clip/MyMeshStandardMaterial';
-import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial';
 import { Group } from 'three/src/objects/Group';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import proj4 from 'proj4/dist/proj4-src';
@@ -20,22 +19,20 @@ import { uniforms } from '../clip/uniforms';
 import { UpdatableBoxGeometry } from '../clip/UpdatableBoxGeometry';
 import { Scene } from 'three/src/scenes/Scene';
 import * as material from '../clip/material';
+import { POINT_URL, EDGE_URL } from "../constants";
 
 import { Plane } from 'three/src/math/Plane';
 import { PlaneGeometry } from '../clip/PlaneGeometry';
 import { Line3 } from 'three/src/math/Line3';
-import { LineBasicMaterial } from 'three/src/materials/LineBasicMaterial';
-import { LineSegments } from 'three/src/objects/LineSegments';
-import { PointsMaterial } from 'three/src/materials/PointsMaterial';
-import { Points } from 'three/src/objects/Points';
-import { Line } from 'three/src/objects/Line';
-import hull from 'hull.js/src/hull';
+// import { LineBasicMaterial } from 'three/src/materials/LineBasicMaterial';
+// import { LineSegments } from 'three/src/objects/LineSegments';
+// import { PointsMaterial } from 'three/src/materials/PointsMaterial';
+// import { Points } from 'three/src/objects/Points';
+// import { Line } from 'three/src/objects/Line';
 import { Color } from 'three/src/math/Color';
 
-
-
-const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
-const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
+// const POINTURL = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';
+// const EDGEURL = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';
 
 export class Point3 extends Vector3 {
     // public x: number;
@@ -128,6 +125,10 @@ class TinLayer extends Layer {
     tolerance: number = 0.01;
     pointsOfIntersection: BufferGeometry;
     borderMaterial;
+    xLocalPlane;
+    yLocalPlane;
+    pointUrl: string;
+    edgeUrl: string;
 
     constructor(params) {
         super();
@@ -147,6 +148,18 @@ class TinLayer extends Layer {
         this.q = true;
         this.uniforms = uniforms;
         this.borderGroup = new Group();
+
+        this.xLocalPlane = new Plane(new Vector3(-1, 0, 0), 4508490);
+        this.yLocalPlane = new Plane(new Vector3(0, 1, 0), 2350280);
+
+        this.pointUrl = 'https://geusegdi01.geus.dk/geom3d/data/nodes/';   
+        this.edgeUrl = 'https://geusegdi01.geus.dk/geom3d/data/triangles/';        
+        if (POINT_URL != "") {
+            this.pointUrl = POINT_URL;
+        }
+        if (EDGE_URL != "") {
+            this.edgeUrl = EDGE_URL;
+        }
     }
 
     buildBorder(vertices) {
@@ -155,9 +168,7 @@ class TinLayer extends Layer {
 
 
         let color = parseInt(this.color, 16);
-
-        let planeGeom = new PlaneGeometry(this.box.vertices[0], this.box.vertices[1], this.box.vertices[2], this.box.vertices[3]);
-
+        let planeGeom = this.planeGeom = new PlaneGeometry(this.box.vertices[12], this.box.vertices[13], this.box.vertices[14], this.box.vertices[15]);
         let caps = {
             // red
             color: { type: "c", value: new Color(color) }
@@ -169,10 +180,7 @@ class TinLayer extends Layer {
         // this.borderMesh.name = 'stencilFeatureBack_' + this.index;
         this.borderMesh.name = 'profilePlane_' + this.name;
         // this.borderMesh.onAfterRender = this.debugRenderOrder;
-
-
-        // this.boxMesh = new Mesh(box, material.profileMaterial);
-
+        let self = this;
 
 
         // //let planeGeom = this.planeGeom = new PlaneGeometry(vertices[0], vertices[1], vertices[5], vertices[4]);
@@ -198,7 +206,7 @@ class TinLayer extends Layer {
         // var points = new Points(pointsOfIntersection, pointsMaterial);
         // this._addObject(points, false);
 
-      
+
 
         // var lines = new LineSegments(pointsOfIntersection, new LineBasicMaterial({
         //     color: 0xa9a9a9
@@ -211,7 +219,7 @@ class TinLayer extends Layer {
         // let meshMaterial = new MeshBasicMaterial({
         //     color: 0xa9a9a9
         // });   
-       
+
 
         let a = new Vector3(),
             b = new Vector3(),
@@ -224,127 +232,116 @@ class TinLayer extends Layer {
             lineCA = new Line3();
         // let pointOfIntersection = new Vector3();
 
-        // box.addEventListener("update", (event) => {
-        //     let ar = new Array(this.box.vertices[0], this.box.vertices[1], this.box.vertices[2], this.box.vertices[3]);
-        //     this.planeGeom.setFromPoints(ar);
-        //     this.planeGeom.update();
+        box.addEventListener("update", (event) => {
+            let ar = new Array(this.box.vertices[12], this.box.vertices[13], this.box.vertices[14], this.box.vertices[15]);
+            this.planeGeom.setFromPoints(ar);
+            this.planeGeom.update();
 
-        //     this.borderGroup.clear();
-
-        //     this.p_vertices = [];
-        //     vertices = [];
-
-        //     let mathPlane = new Plane();
-        //     plane.localToWorld(planePointA.copy(plane.geometry.vertices[0]));
-        //     plane.localToWorld(planePointB.copy(plane.geometry.vertices[1]));
-        //     plane.localToWorld(planePointC.copy(plane.geometry.vertices[2]));
-        //     mathPlane.setFromCoplanarPoints(planePointA, planePointB, planePointC);
+            self.xLocalPlane.constant = self.box.vertices[12].x;
 
 
-        //     let geom = this.mainMesh.geometry;
-        //     // this.mainMesh.geometry.faces.forEach(function (face) {
-        //     for (let vi = 0; vi < geom.index.array.length; vi += 3) {
+            //     this.borderGroup.clear();
 
-        //         let idx0 = geom.index.array[vi];
-        //         let idx1 = geom.index.array[vi + 1];
-        //         let idx2 = geom.index.array[vi + 2];
+            //     this.p_vertices = [];
+            //     vertices = [];
 
-        //         let vx0 = geom.attributes.position.array[3 * idx0];
-        //         let vy0 = geom.attributes.position.array[3 * idx0 + 1];
-        //         let vz0 = geom.attributes.position.array[3 * idx0 + 2];
-
-        //         let vx1 = geom.attributes.position.array[3 * idx1];
-        //         let vy1 = geom.attributes.position.array[3 * idx1 + 1];
-        //         let vz1 = geom.attributes.position.array[3 * idx1 + 2];
-
-        //         let vx2 = geom.attributes.position.array[3 * idx2];
-        //         let vy2 = geom.attributes.position.array[3 * idx2 + 1];
-        //         let vz2 = geom.attributes.position.array[3 * idx2 + 2];
-
-        //         let v0 = new Vector3(vx0, vy0, vz0);
-        //         let v1 = new Vector3(vx1, vy1, vz1);
-        //         let v2 = new Vector3(vx2, vy2, vz2);
-
-        //         this.mainMesh.localToWorld(a.copy(v0));
-        //         this.mainMesh.localToWorld(b.copy(v1));
-        //         this.mainMesh.localToWorld(c.copy(v2));
-        //         lineAB = new Line3(a, b);
-        //         lineBC = new Line3(b, c);
-        //         lineCA = new Line3(c, a);
-        //         let p1 = this.setPointOfIntersection(lineAB, mathPlane, vi);
-        //         let p2 = this.setPointOfIntersection(lineBC, mathPlane, vi);
-        //         let p3 = this.setPointOfIntersection(lineCA, mathPlane, vi);
-        //         // if (p1.x != 0 && p1.y != 0 && p1.z != 0 && p2.x != 0 && p2.y != 0 && p2.z != 0 && p3.x != 0 && p3.y != 0 && p3.z != 0) {
-        //         //     this.p_vertices.push(p1, p2, p3);
-        //         // }
-
-        //     }
-        //     if (this.p_vertices.length > 0) {
-        //         // pointsOfIntersection.setFromPoints(p_vertices);
-        //         // pointsOfIntersection.computeBoundingSphere()
-        //         // pointsOfIntersection.attributes.position.needsUpdate = true;
-
-        //         // // convexGeometry.setFromPoints(p_vertices);
-        //         // convexGeometry  = new ConvexGeometry( p_vertices );
-        //         // convexGeometry.computeBoundingSphere()
-        //         // convexGeometry.attributes.position.needsUpdate = true;
-
-        //         // let test = this.p_vertices.map(v => {
-        //         //     return [v.x, v.z];
-        //         // });
-        //         // // const indexHull = hull(test, 20); // returns points of the hull (in clockwise order)  
-        //         // const indexHull = concaveman(test, 1.5);
-        //         // let vertices = indexHull.map(a => {
-        //         //     return new Vector3(a[0], this.p_vertices[0].y, a[1]);
-        //         // });
-        //         // let cntrGeom = new BufferGeometry();
-        //         // cntrGeom.setFromPoints(vertices);
-        //         // let contour = new Line(cntrGeom, new LineBasicMaterial({
-        //         //     color: Math.random() * 0xffffff //0x777777 + 0x777777
-        //         // }));
-        //         // this.borderGroup.add(contour);
-
-        //         // const indexAlpha = concaveman(test, 1);
-        //         // let vertices = indexAlpha.map(a => {
-        //         //     return new Vector3(a[0], a[1], a[2]);
-        //         // });
-
-        //         pointsOfIntersection.setFromPoints(this.p_vertices);
-        //         pointsOfIntersection.computeBoundingSphere()
-        //         pointsOfIntersection.attributes.position.needsUpdate = true;
-
-        //         let contours = this.getContours(this.p_vertices, [], true);
-        //         contours.forEach(cntr => {
-        //             let cntrGeom = new BufferGeometry();
-        //             cntrGeom.setFromPoints(cntr);
-        //             let contour = new Line(cntrGeom, new LineBasicMaterial({
-        //                 color: Math.random() * 0xffffff //0x777777 + 0x777777
-        //             }));
-        //             this.borderGroup.add(contour);
-        //         });
-        //     }
+            //     let mathPlane = new Plane();
+            //     plane.localToWorld(planePointA.copy(plane.geometry.vertices[0]));
+            //     plane.localToWorld(planePointB.copy(plane.geometry.vertices[1]));
+            //     plane.localToWorld(planePointC.copy(plane.geometry.vertices[2]));
+            //     mathPlane.setFromCoplanarPoints(planePointA, planePointB, planePointC);
 
 
+            //     let geom = this.mainMesh.geometry;
+            //     // this.mainMesh.geometry.faces.forEach(function (face) {
+            //     for (let vi = 0; vi < geom.index.array.length; vi += 3) {
 
+            //         let idx0 = geom.index.array[vi];
+            //         let idx1 = geom.index.array[vi + 1];
+            //         let idx2 = geom.index.array[vi + 2];
 
-        // });
+            //         let vx0 = geom.attributes.position.array[3 * idx0];
+            //         let vy0 = geom.attributes.position.array[3 * idx0 + 1];
+            //         let vz0 = geom.attributes.position.array[3 * idx0 + 2];
+
+            //         let vx1 = geom.attributes.position.array[3 * idx1];
+            //         let vy1 = geom.attributes.position.array[3 * idx1 + 1];
+            //         let vz1 = geom.attributes.position.array[3 * idx1 + 2];
+
+            //         let vx2 = geom.attributes.position.array[3 * idx2];
+            //         let vy2 = geom.attributes.position.array[3 * idx2 + 1];
+            //         let vz2 = geom.attributes.position.array[3 * idx2 + 2];
+
+            //         let v0 = new Vector3(vx0, vy0, vz0);
+            //         let v1 = new Vector3(vx1, vy1, vz1);
+            //         let v2 = new Vector3(vx2, vy2, vz2);
+
+            //         this.mainMesh.localToWorld(a.copy(v0));
+            //         this.mainMesh.localToWorld(b.copy(v1));
+            //         this.mainMesh.localToWorld(c.copy(v2));
+            //         lineAB = new Line3(a, b);
+            //         lineBC = new Line3(b, c);
+            //         lineCA = new Line3(c, a);
+            //         let p1 = this.setPointOfIntersection(lineAB, mathPlane, vi);
+            //         let p2 = this.setPointOfIntersection(lineBC, mathPlane, vi);
+            //         let p3 = this.setPointOfIntersection(lineCA, mathPlane, vi);
+            //         // if (p1.x != 0 && p1.y != 0 && p1.z != 0 && p2.x != 0 && p2.y != 0 && p2.z != 0 && p3.x != 0 && p3.y != 0 && p3.z != 0) {
+            //         //     this.p_vertices.push(p1, p2, p3);
+            //         // }
+
+            //     }
+            //     if (this.p_vertices.length > 0) {
+            //         // pointsOfIntersection.setFromPoints(p_vertices);
+            //         // pointsOfIntersection.computeBoundingSphere()
+            //         // pointsOfIntersection.attributes.position.needsUpdate = true;
+
+            //         // // convexGeometry.setFromPoints(p_vertices);
+            //         // convexGeometry  = new ConvexGeometry( p_vertices );
+            //         // convexGeometry.computeBoundingSphere()
+            //         // convexGeometry.attributes.position.needsUpdate = true;
+
+            //         // let test = this.p_vertices.map(v => {
+            //         //     return [v.x, v.z];
+            //         // });
+            //         // // const indexHull = hull(test, 20); // returns points of the hull (in clockwise order)  
+            //         // const indexHull = concaveman(test, 1.5);
+            //         // let vertices = indexHull.map(a => {
+            //         //     return new Vector3(a[0], this.p_vertices[0].y, a[1]);
+            //         // });
+            //         // let cntrGeom = new BufferGeometry();
+            //         // cntrGeom.setFromPoints(vertices);
+            //         // let contour = new Line(cntrGeom, new LineBasicMaterial({
+            //         //     color: Math.random() * 0xffffff //0x777777 + 0x777777
+            //         // }));
+            //         // this.borderGroup.add(contour);
+
+            //         // const indexAlpha = concaveman(test, 1);
+            //         // let vertices = indexAlpha.map(a => {
+            //         //     return new Vector3(a[0], a[1], a[2]);
+            //         // });
+
+            //         pointsOfIntersection.setFromPoints(this.p_vertices);
+            //         pointsOfIntersection.computeBoundingSphere()
+            //         pointsOfIntersection.attributes.position.needsUpdate = true;
+
+            //         let contours = this.getContours(this.p_vertices, [], true);
+            //         contours.forEach(cntr => {
+            //             let cntrGeom = new BufferGeometry();
+            //             cntrGeom.setFromPoints(cntr);
+            //             let contour = new Line(cntrGeom, new LineBasicMaterial({
+            //                 color: Math.random() * 0xffffff //0x777777 + 0x777777
+            //             }));
+            //             this.borderGroup.add(contour);
+            // });
+            //     }
 
 
 
-        // this.frontStencil = new Scene();
-        // let frontMesh = new Mesh(this.geometry.clone(), material.frontStencilMaterial);
-        // frontMesh.userData.layerId = this.index;
-        // this.frontStencil.add(frontMesh);
 
-        // this.backStencil = new Scene();
-        // let backMesh = new Mesh(this.geometry.clone(), material.backStencilMaterial);
-        // backMesh.userData.layerId = this.index;
-        // this.backStencil.add(frontMesh);
-
-        // this.capsScene = new Scene();
-        // this.capsScene.add(this.borderMesh);
+        });
     }
-    debugRenderOrder() {
+
+    private debugRenderOrder() {
         console.log(this.name);
     }
 
@@ -462,35 +459,6 @@ class TinLayer extends Layer {
         return index;
     }
 
-
-
-    // animate() {
-    //     let gl = this._map.renderer.getContext();
-
-    //     if (gl != undefined && this.capsScene != undefined) {
-    //         gl.enable(gl.STENCIL_TEST);
-    //         // this.renderer.state.setStencilFunc( true );
-    //         // gl.stencilFunc( gl.ALWAYS, 1, 0xff );
-    //         // gl.stencilOp( gl.REPLACE, gl.REPLACE, gl.REPLACE );
-
-    //         gl.stencilFunc(gl.ALWAYS, 1, 0xff);
-    //         gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
-    //         this._map.renderer.render(this.backStencil, this._map.camera);
-
-    //         gl.stencilFunc(gl.ALWAYS, 1, 0xff);
-    //         gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR);
-    //         this._map.renderer.render(this.frontStencil, this._map.camera);
-
-    //         gl.stencilFunc(gl.EQUAL, 1, 0xff);
-    //         gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-    //         this._map.renderer.render(this.capsScene, this._map.camera);
-
-
-    //         // disable stencil test
-    //         gl.disable(gl.STENCIL_TEST);
-    //     }
-    // }
-
     setWireframeMode(wireframe) {
         this.materialsArray.forEach(function (mat) {
             //if (m.w) return;
@@ -508,14 +476,15 @@ class TinLayer extends Layer {
 
     scaleZ(z) {
         this.scale = z;
-        this.objectGroup.scale.z = z;
+        // this.objectGroup.scale.z = z;
+        this.mainMesh.scale.z = z;
         this.emit('scale-change', z);
     }
 
     async onAdd(map) {
         proj4.defs("EPSG:4312", "+proj=longlat +ellps=bessel +towgs84=577.326,90.129,463.919,5.137,1.474,5.297,2.4232 +no_defs");
         proj4.defs("EPSG:3034", "+proj=lcc +lat_1=35 +lat_2=65 +lat_0=52 +lon_0=10 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
-        await this.build(this.getScene());
+        await this.build(this.getModelNode());
         map.update();
     }
 
@@ -699,7 +668,7 @@ class TinLayer extends Layer {
 
     }
 
-    async build(app_scene) {
+    async build(modelNode) {
         let geometry = this.geometry = new BufferGeometry();
         let vertices = await (this.points(this.featuregeom_id));
 
@@ -813,11 +782,23 @@ class TinLayer extends Layer {
                 flatShading: true,
                 side: DoubleSide,
             }, this.uniforms.clipping);
-            // }, this.uniforms.clipping);
+
+
+            // this.material = new MeshStandardMaterial({
+            //     color: color,
+            //     metalness: 0.1,
+            //     roughness: 0.75,
+            //     flatShading: true,
+            //     side: DoubleSide,
+            //     clippingPlanes: [ this.xLocalPlane ]               
+            // });
+
+
         }
 
         this.materialsArray.push(this.material);
         let mesh = this.mainMesh = new Mesh(geometry, this.material);
+        mesh.name = this.name;
         mesh.userData.layerId = this.index;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
@@ -825,6 +806,9 @@ class TinLayer extends Layer {
         // if (app_scene) {
         //     app_scene.add(this.objectGroup);
         // }
+        if (modelNode) {
+            modelNode.add(this.mainMesh);
+        }
     }
 
     private _addObject(object, queryable) {
@@ -845,13 +829,13 @@ class TinLayer extends Layer {
     }
 
     async points(geomId) {
-        const url = POINTURL + geomId;
+        const url = this.pointUrl + geomId;
         const buffer = await this._request(url);
         return this._unpackVertices(buffer);
     }
 
     async edges(geomId) {
-        const url = EDGEURL + geomId;
+        const url = this.edgeUrl + geomId;
         const buffer = await this._request(url);
         return this._unpackEdges(buffer);
     }

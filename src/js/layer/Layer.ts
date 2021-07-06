@@ -2,6 +2,7 @@ import { EventEmitter } from '../core/EventEmitter';
 import { BoreholePopup } from '../controls/BoreholePopup';
 import { Map } from '../core/Map';
 import { Scene } from 'three/src/scenes/Scene';
+import { Group } from 'three';
 
 abstract class Layer extends EventEmitter {
 
@@ -55,6 +56,10 @@ abstract class Layer extends EventEmitter {
 
 
     getScene(): Scene {
+        return this._map.scene;
+    }
+
+    getModelNode(): Group {
         return this._map.scene;
     }
 

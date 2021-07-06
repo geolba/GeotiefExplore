@@ -4,9 +4,11 @@ import { LineBasicMaterial } from 'three/src/materials/LineBasicMaterial';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { uniforms } from "./uniforms";
 import { shader } from './shader';
-import { DoubleSide, BackSide, FrontSide, EqualStencilFunc, KeepStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, GreaterStencilFunc, NeverStencilFunc, LessStencilFunc, LessEqualStencilFunc } from 'three/src/constants';
+import { DoubleSide, BackSide, FrontSide, EqualStencilFunc, KeepStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp } from 'three/src/constants';
 import { DecrementWrapStencilOp, IncrementWrapStencilOp } from 'three/src/constants';
 import { NotEqualStencilFunc, ReplaceStencilOp, AlwaysStencilFunc } from 'three/src/constants';
+import { Vector3 } from 'three/src/math/Vector3';
+import { Plane } from 'three/src/math/Plane';
 
 // let profileMaterial = new ShaderMaterial({
 //     // metalness: 0.1,
@@ -22,33 +24,39 @@ import { NotEqualStencilFunc, ReplaceStencilOp, AlwaysStencilFunc } from 'three/
 //     vertexShader: shader.vertex,
 //     fragmentShader: shader.fragment
 // });
+// y normal will not clip models on northern hemisphere
+// but why not -1 ??
+function dummyPlane()   {
+    const normal = new Vector3( 0, 1, 0 );
+    return new Plane( normal, 0 );
+}
+
+let featureMat = new MeshStandardMaterial({
+    color: 0xC1FF07,
+    metalness: 0.1,
+    roughness: 0.75,
+    flatShading: true,
+    side: DoubleSide,
+    // clippingPlanes: [ dummyPlane() ]
+});
+
+
 let profileMaterial = new MeshStandardMaterial( {
     color: 0xE91E63,
     metalness: 0.1,
     roughness: 0.75,
     flatShading: true,
-    stencilWrite: true,
-    stencilRef: 0,
+    stencilWrite: true,     
+    // stencilRef: 0,
     stencilFunc: NotEqualStencilFunc,
     stencilFail: ReplaceStencilOp,
     stencilZFail: ReplaceStencilOp,
-    stencilZPass: ReplaceStencilOp
+    stencilZPass: ReplaceStencilOp,
     // stencilFunc: NotEqualStencilFunc,
     // stencilFail: ReplaceStencilOp,
     // stencilZFail: ReplaceStencilOp,
     // stencilZPass: ReplaceStencilOp
 } );
-
-let stencilMaterial = new ShaderMaterial({
-    depthWrite: false,
-    depthTest: false,
-    colorWrite: false,
-    stencilWrite: true,
-    stencilFunc: AlwaysStencilFunc,
-    // uniforms: uniforms.clipping,
-    vertexShader: shader.vertexClipping,
-    fragmentShader: shader.fragmentClippingFront, 
-});
 
 let frontStencilMaterial = new ShaderMaterial({
     depthWrite: false,
@@ -59,6 +67,7 @@ let frontStencilMaterial = new ShaderMaterial({
     uniforms: uniforms.clipping,
     vertexShader: shader.vertexClipping,
     fragmentShader: shader.fragmentClippingFront, 
+    // clippingPlanes: [dummyPlane()],
     side: FrontSide,
     // stencilFail: DecrementWrapStencilOp,
     // stencilZFail: DecrementWrapStencilOp,
@@ -77,6 +86,7 @@ let backStencilMaterial = new ShaderMaterial({
     uniforms: uniforms.clipping,
     vertexShader: shader.vertexClipping,
     fragmentShader: shader.fragmentClippingFront,   
+    // clippingPlanes: [ dummyPlane() ],
     side: BackSide,
     // stencilFail: IncrementWrapStencilOp,
     // stencilZFail: IncrementWrapStencilOp,
@@ -102,21 +112,6 @@ let Invisible = new ShaderMaterial({
     side: DoubleSide
 });
 
-// export const profileMat = new MeshStandardMaterial( {
-
-//     color: 0xE91E63,
-//     metalness: 0.1,
-//     roughness: 0.75,
-//     flatShading: true,
-//     stencilWrite: true,
-//     // stencilRef: 0,
-//     stencilFunc: NotEqualStencilFunc,
-//     stencilFail: ReplaceStencilOp,
-//     stencilZFail: ReplaceStencilOp,
-//     stencilZPass: ReplaceStencilOp
-// } );
-
-
 function toBack(mat) {    
     const material = mat.clone();
     material.side = BackSide,
@@ -140,7 +135,7 @@ function toFront(mat) {
 export {
     toBack,
     toFront,
-    stencilMaterial,
+    featureMat,
     profileMaterial,
     frontStencilMaterial,
     backStencilMaterial,

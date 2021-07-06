@@ -28,7 +28,7 @@ export class Selection extends Layer {
     constructor(parameters, low, high) {
         super();
         this.type = 'Selection';
-        this.visible = true;
+        this.visible = false;
         this.opacity = 1;
         for (var k in parameters) {
             this[k] = parameters[k];
@@ -98,6 +98,7 @@ export class Selection extends Layer {
     onAdd(map) {
         this.map = map;
         this.build(this.getScene());
+        this.setVisible(this.visible);
         this.emit('add');
         
         if (this.map.layers) {

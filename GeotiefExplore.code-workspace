@@ -16,7 +16,7 @@
 				"request": "launch",
 				"name": "Launch Chrome against localhost",
 				// "port": 9222,
-				"url": "http://localhost:8080",
+				"url": "http://localhost:8080?modelid=20",
 				"webRoot": "${workspaceFolder}",
 				"breakOnLoad": true,
 				"runtimeExecutable": "C:/ProgramData/scoop/apps/googlechrome/current/chrome.exe",

@@ -21,8 +21,7 @@ import * as domUtil from './core/domUtil';
 import { PickingTool } from './clip/PickingTool';
 import { ShowModal } from './components/ShowModal';
 import * as material from './clip/material';
-import { Group } from 'three/src/objects/Group';
-
+import { Color } from 'three/src/math/Color';
 import { Selection } from './clip/Selection';
 import _ from "lodash";
 
@@ -65,9 +64,9 @@ class Application {
         let parentContainer = document.getElementById("app");
         this.dialog = new ShowModal("Help", parentContainer, { klass: "fm_about" });
 
-        // this.dialog = new MobileDialog("Help", container, { klass: "fm_about" });
         this.aboutIcon = document.querySelector('#menu-about-icon');
-        // this.createScene();
+        this.menuEmailButton = document.querySelector('#menu-email-button');
+
         // this.addEventListeners();
     }
     async build() {
@@ -92,6 +91,11 @@ class Application {
             })();
         }
 
+    }
+
+    debugRenderOrder() {
+
+        console.log(this.name);
     }
 
     async createScene() {
@@ -175,91 +179,106 @@ class Application {
         // this.camera.position.set(0, -0.1, 150);
         // this.camera.lookAt(new Vector3(0, 0, 0));
 
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        let modelid = 20;
+        let serviceUrl = 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta_all?modelid=';
+        if (urlParams.has('modelid')) {
+            modelid = urlParams.get('modelid');
+        }
+        if (SERVICE_URL != "") {
+            serviceUrl = SERVICE_URL;
+        }
         let map = this.map = await Map.build(
             this.scene,
             this.container,
-            'https://geusegdi01.geus.dk/meta3d/rpc/model_meta_all?modelid=20'
+            serviceUrl + modelid
         );
         this.mapTitle = document.querySelector('#map-title');
         this.mapTitle.innerHTML += map.title;
+        this.menuEmailButton.href = 'mailto:' + map.contact;
+
         map.on('ready', () => {
             this.selectionBox.setUniforms();
-
-
 
             // this.capsScene.add(this.selectionBox.boxMesh);
             // this.scene.add(this.selection.displayMeshes);
             // this.scene.add(this.selection.touchMeshes);
+          
             this.map.addLayer(this.selectionBox);
-
-            let modelNode = new Group();
-            let profileNode = new Group();
-            let stencilNode = new Group();
+            // this.selectionBox.toggle();
+         
             for (const [i, layer] of Object.entries(this.map.layers)) {
                 // let layer = map.layers[i];
                 if (layer instanceof TinLayer && layer.name != "Topography") {
-                    modelNode.add(layer.mainMesh);
-                    // this.capsScene.add(layer.borderMesh);
-                    profileNode.add(layer.borderMesh);
+                    // modelNode.add(layer.mainMesh);
 
-                    // const stencilMaterial = material.stencilMaterial.clone();
+                    // let f_color = parseInt(layer.color, 16);
+                    // let featureMaterial =  this.material = new MyMeshStandardMaterial({
+                    //     color: f_color,
+                    //     metalness: 0.1,
+                    //     roughness: 0.75,
+                    //     flatShading: true,
+                    //     side: DoubleSide,
+                    // }, uniforms.clipping);
+                    // featureMaterial.color = new Color(f_color);
+                    // // featureMaterial.clippingPlanes[0] =  layer.xLocalPlane;
 
-                    let stencilFeatureBack = new Mesh(layer.geometry, material.backStencilMaterial.clone());
+                    // let volume = new Mesh(layer.geometry, featureMaterial);
+                    // // featureMaterial.clippingPlanes[0] =  layer.yLocalPlane;
+                    // // featureMaterial.clipIntersection = false;
+                    // volume.name = layer.name + i;
+                    // map.modelNode.add(volume);
+                    // volume.onAfterRender = this.debugRenderOrder;                         
+                  
+
+                    let backStencilMaterial = material.backStencilMaterial;
+                    let stencilFeatureBack = new Mesh(layer.geometry, backStencilMaterial);
                     stencilFeatureBack.name = 'stencilFeatureBack_' + i;
                     stencilFeatureBack.userData.layerId = layer.index;
-                    stencilNode.add(stencilFeatureBack);
+                    // backStencilMaterial.clippingPlanes[0] = layer.xLocalPlane;
+                    map.stencilNode.add(stencilFeatureBack);
+                    // stencilFeatureBack.onAfterRender = this.debugRenderOrder;
 
-                    let stencilFeatureFront = new Mesh(layer.geometry, material.frontStencilMaterial.clone());
+
+                    let frontStencilMaterial = material.frontStencilMaterial;
+                    let stencilFeatureFront = new Mesh(layer.geometry, frontStencilMaterial);
                     stencilFeatureFront.name = 'stencilFeatureFront_' + i;
                     stencilFeatureFront.userData.layerId = layer.index;
-                    stencilNode.add(stencilFeatureFront);
+                    // frontStencilMaterial.clippingPlanes[0] = layer.xLocalPlane;
+                    map.stencilNode.add(stencilFeatureFront);
+                    // stencilFeatureFront.onAfterRender = this.debugRenderOrder;
+
+                    // this.capsScene.add(layer.borderMesh);
+                    // profileNode.add(layer.borderMesh);
+                    // layer.borderMesh.onAfterRender = this.debugRenderOrder;                    
+                    let profileMaterial = material.profileMaterial.clone();
+                    let color = parseInt(layer.color, 16);
+                    profileMaterial.color = new Color(color);
+                    // profileMaterial.uniforms = caps;
+                    let borderMesh = new Mesh(layer.box, profileMaterial);
+                    // this.borderMesh.name = 'stencilFeatureBack_' + this.index;
+                    borderMesh.name = 'profilePlane_' + i;
+                    map.profileNode.add(borderMesh);
+                    // borderMesh.onAfterRender = this.debugRenderOrder;
+
 
                     layer.on('visibility-change', (args) => {
                         let visible = args[0];
                         stencilFeatureFront.visible = visible;
                         stencilFeatureBack.visible = visible;
-                        layer.borderMesh.visible = visible;
+                        borderMesh.visible = visible;
                     });
                     layer.on('scale-change', (args) => {
                         let z = args[0];
                         stencilFeatureFront.scale.z = z;
                         stencilFeatureBack.scale.z = z;
-                        layer.borderMesh.scale.z = z;
+                        borderMesh.scale.z = z;
                     });
                 }
-            }
-            // this.scene.add(profileNode);
+            }            
 
 
-            // for (var i in map.layers) {
-            //     let layer = map.layers[i];
-            //     if (layer instanceof TinLayer && layer.name != "Topography") {
-            //         let stencilFeatureBack = new Mesh(layer.geometry, material.backStencilMaterial);
-            //         stencilFeatureBack.name = 'stencilFeatureBack_' + i;
-            //         stencilFeatureBack.userData.layerId = layer.index;
-            //         stencilNode.add(stencilFeatureBack);
-
-            //         let stencilFeatureFront = new Mesh(layer.geometry, material.frontStencilMaterial);
-            //         stencilFeatureFront.name = 'stencilFeatureFront_' + i;
-            //         stencilFeatureFront.userData.layerId = layer.index;
-            //         stencilNode.add(stencilFeatureFront);
-            //         layer.on('visibility-change', (args) => {
-            //             let visible = args[0];
-            //             stencilFeatureFront.visible = visible;
-            //             stencilFeatureBack.visible = visible;
-            //         });
-            //         layer.on('scale-change', (args) => {
-            //             let z = args[0];
-            //             stencilFeatureFront.scale.z = z;
-            //             stencilFeatureBack.scale.z = z;
-            //         });
-            //     }
-            // }   
-
-            // scene.add(node('selectNode'));
-            this.scene.add(modelNode);
-            this.scene.add(stencilNode);
-            this.scene.add(profileNode);
 
             this.animate();
         }, this);
@@ -398,7 +417,7 @@ class Application {
 
         // if (this.showCaps && gl != undefined) {
         //     // enable stencil test
-        //     gl.enable(gl.STENCIL_TEST);
+        // gl.enable(gl.STENCIL_TEST);
 
         //     // for (let i in this.map.layers) {
         //     //     let layer = this.map.layers[i];
@@ -421,7 +440,7 @@ class Application {
         //     this.renderer.render(this.capsScene, this.map.camera);
 
         //     // disable stencil test
-        //      gl.disable(gl.STENCIL_TEST);
+        // gl.disable(gl.STENCIL_TEST);
         //     // gl.stencilMask(0);
         //     // this.renderer.state.setStencilFunc( false );
         // }
