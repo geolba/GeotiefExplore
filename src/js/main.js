@@ -182,9 +182,9 @@ class Application {
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
         let modelid = 20;
-        let serviceUrl = 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta_all?modelid=';
-        if (urlParams.has('modelid')) {
-            modelid = urlParams.get('modelid');
+        let serviceUrl = 'https://geusegdi01.geus.dk/meta3d/rpc/model_meta_all?model_id=';
+        if (urlParams.has('model_id')) {
+            modelid = urlParams.get('model_id');
         }
         if (SERVICE_URL != "") {
             serviceUrl = SERVICE_URL;

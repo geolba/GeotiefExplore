@@ -112,7 +112,7 @@ class Map extends OrbitControls {
         map._initControls();
 
         map.title = modelData.model.model_name;
-        map.contact = modelData.model.model_owner;
+        map.contact = modelData.model.model_point_of_contact;
         return map;
     }
 
