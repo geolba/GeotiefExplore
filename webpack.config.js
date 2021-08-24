@@ -35,14 +35,17 @@ module.exports = {
     // },
     module: {
         rules: [
-            {
-                test: /\.(svg|eot|ttf|woff|woff2)$/,
-                loader: 'url-loader',
-                options: {
-                    limit: 10000,
-                    name: 'webfonts/[name].[ext]'
-                }
-            },
+           
+            
+            // {
+            //     test: /\.(svg|eot|ttf|woff|woff2)$/,
+            //     loader: 'url-loader',
+            //     options: {
+            //         limit: 10000,
+            //         name: 'webfonts/[name].[ext]'
+            //     }
+            // },
+
             // {
             //     test: /\.(png|jpg|gif)$/,
             //     loaders: [
@@ -101,7 +104,9 @@ module.exports = {
                             sourceMap: true
                         }
                     },
-                    'resolve-url-loader',
+                    // {
+                    //     loader:  'resolve-url-loader',
+                    //   },
                       // Compiles Sass to CSS
                     {
                         loader: "sass-loader",

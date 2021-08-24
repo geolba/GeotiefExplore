@@ -6,7 +6,7 @@ abstract class Control extends EventEmitter {
 
     // @section
     // @aka Control options
-    abstract options = {
+    options = {
         position: 'topright',
     };
     protected _map;
