@@ -22,7 +22,7 @@ export class LayerService {
         layer.addBlock({
             "width": 299, //267,
             "plane": {
-                "width": baseExtent.x.max.x - baseExtent.x.min, //100.0,
+                "width": baseExtent.x.max - baseExtent.x.min, //100.0,
                 // "offsetX": 0,
                 // "offsetY": 0,
                 // "offsetX" : x.avg,
