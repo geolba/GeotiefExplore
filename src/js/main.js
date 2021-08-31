@@ -192,7 +192,7 @@ class Application {
         let map = this.map = await Map.build(
             this.scene,
             this.container,
-            serviceUrl + modelid
+            serviceUrl, modelid
         );
         this.mapTitle = document.querySelector('#map-title');
         this.mapTitle.innerHTML += map.title;

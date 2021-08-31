@@ -6,9 +6,12 @@ import { BoreholeControl } from '../controls/BoreholeControl';
 import { BoreholePopup } from '../controls/BoreholePopup';
 import * as util from './utilities';
 import { TinLayer } from '../layer/TinLayer';
+import { DemLayer } from '../layer/DemLayer';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Vector3 } from 'three/src/math/Vector3';
 import { Group } from 'three';
+import { Layer } from '../layer/Layer';
+import { LayerService } from '../services/layer.service';
 
 class Map extends OrbitControls {
 
@@ -22,18 +25,19 @@ class Map extends OrbitControls {
     public length: number;
     public width: number;
     public height: number;
-    public x: number; public y: number; public z: number;
+    public x; public y; public z;
     public title: string;
     public serviceUrl: string;
     public basemaps: Object;
     public baseExtent: Object;
-    public currentBasemap;
+    public currentBasemap: Layer;
     public contact: string;
+    public model_id: number;
     private _modelNode: Group;
     private _stencilNode: Group;
     private _profileNode: Group;
 
-    constructor(x, y, z, scene, container) {
+    constructor(x, y, z, scene, container, model_id) {
 
         let size = Math.max(x.max - x.min, y.max - y.min, z.max - z.min);
         let center = new Vector3((x.min + x.max) / 2, (y.min + y.max) / 2, 0);
@@ -59,6 +63,7 @@ class Map extends OrbitControls {
         // call parent constructor of OrbitControls
         super(size, center, camera, scene, container);
 
+        this.model_id = model_id;
         this.size = size;
         this.camera = camera;
         this.container = container;
@@ -95,19 +100,20 @@ class Map extends OrbitControls {
             "currentVersion": 10.01,
             "services": [
                 { "name": "osm:wms", "type": "MapServer", 'image': 'background_osm_world_topography.png', 'title': 'OSM WMS' },
-                { "name": "esri:topograhy", "type": "MapServer", 'image': 'background_esri_world_topography.png', 'title': 'ESRI Topography' },
+                { "name": "osm:gray-wms", "type": "MapServer", 'image': 'background_esri_world_topography.png', 'title': 'OSM Gray WMS' },
+                // { "name": "esri:topograhy", "type": "MapServer", 'image': 'background_esri_world_topography.png', 'title': 'ESRI Topography' },
 
             ]
         };
     }
 
-    static async build(scene, container, serviceUrl) {
-        const modelData = await util.getMetadata(serviceUrl);
+    static async build(scene, container, serviceUrl, model_id) {
+        const modelData = await util.getMetadata(serviceUrl + model_id);
         let modelarea = modelData.modelarea;
 
         // do your async stuff here
         // now instantiate and return a class
-        let map = new Map(modelarea.x, modelarea.y, modelarea.z, scene, container);
+        let map = new Map(modelarea.x, modelarea.y, modelarea.z, scene, container, model_id);
         map._initDataLayers(modelData.mappedfeatures);
         map._initControls();
 
@@ -151,10 +157,17 @@ class Map extends OrbitControls {
                 feature_type: layerData.geologicdescription !== null ? layerData.geologicdescription['feature type'] : null,
             });
             callStack.push(this.addLayer(dxfLayer));
-            if (dxfLayer.name == "Topography") {
-                this.currentBasemap = dxfLayer;
-            }
+            // if (dxfLayer.name == "Topography") {
+            //     this.currentBasemap = dxfLayer;
+            // }            
         }
+        if (this.model_id == 20) {
+            let layerService = new LayerService();
+            let demLayer = layerService.getDemLayer(this.center, this.baseExtent);          
+            callStack.push(this.addLayer(demLayer));
+            this.currentBasemap = demLayer;
+        }
+
         await Promise.all(callStack);
         this.emit("ready");
     }
@@ -165,12 +178,6 @@ class Map extends OrbitControls {
         this._controlContainer =
             dom.createDom("div", { "class": l + 'control-container' }, this.container);
 
-        // function createCorner(vSide, hSide) {
-        //     var className = l + vSide + ' ' + l + hSide;
-
-        //     //corners[vSide + hSide] = util.create('div', className, container);
-        //     corners[vSide + hSide] = dom.createDom("div", { "class": className }, this._controlContainer);
-        // }
         let createCorner = (vSide: string, hSide: string): void => {
             let className = l + vSide + ' ' + l + hSide;
             corners[vSide + hSide] = dom.createDom("div", { "class": className }, this._controlContainer);
@@ -196,7 +203,7 @@ class Map extends OrbitControls {
         this._controls.boreholePopup.addTo(this);
     }
 
-    async addLayer(layer) {
+    public async addLayer(layer) {
         let id = util.stamp(layer);
         if (this._layers[id]) {
             return this;
@@ -215,7 +222,7 @@ class Map extends OrbitControls {
         return this;
     }
 
-    removeLayer(layer) {
+    public removeLayer(layer) {
         let id = util.stamp(layer);
 
         if (!this._layers[id]) { return this; }
@@ -246,11 +253,11 @@ class Map extends OrbitControls {
         return this;
     }
 
-    hasLayer(layer) {
+    public hasLayer(layer) {
         return !!layer && (util.stamp(layer) in this._layers);
     }
 
-    getCenter() { // (Boolean) -> LatLng      
+    public getCenter() { // (Boolean) -> LatLng      
         return this.target;
     }
 

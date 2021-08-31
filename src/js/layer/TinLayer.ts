@@ -714,62 +714,62 @@ class TinLayer extends Layer {
 
         let color = parseInt(this.color, 16);
 
-        if (this.name == "Topography") {
-            // //add bounding  box of layer:
-            // let width = this.baseExtent.max.x - this.baseExtent.min.x;
-            // let height = this.baseExtent.max.y - this.baseExtent.min.y;
-            // let planeGeometry = new PlaneGeometry(width, height, 298, 134)
-            // let planeMaterial = new MeshLambertMaterial({ color: 0xecf0f1, side: DoubleSide });
-            // let planeMesh = new Mesh(planeGeometry, planeMaterial);
-            // let center = new Vector3((this.baseExtent.min.x + this.baseExtent.max.x) / 2, (this.baseExtent.min.y + this.baseExtent.max.y) / 2, 0);
-            // planeMesh.position.x = center.x;
-            // planeMesh.position.y = center.y;
-            // this._addObject(planeMesh, false);
+        // if (this.name == "Topography") {
+        //     // //add bounding  box of layer:
+        //     // let width = this.baseExtent.max.x - this.baseExtent.min.x;
+        //     // let height = this.baseExtent.max.y - this.baseExtent.min.y;
+        //     // let planeGeometry = new PlaneGeometry(width, height, 298, 134)
+        //     // let planeMaterial = new MeshLambertMaterial({ color: 0xecf0f1, side: DoubleSide });
+        //     // let planeMesh = new Mesh(planeGeometry, planeMaterial);
+        //     // let center = new Vector3((this.baseExtent.min.x + this.baseExtent.max.x) / 2, (this.baseExtent.min.y + this.baseExtent.max.y) / 2, 0);
+        //     // planeMesh.position.x = center.x;
+        //     // planeMesh.position.y = center.y;
+        //     // this._addObject(planeMesh, false);
 
-            // load image:
-            let image = this.images[0];
-            if (image.texture === undefined) {
+        //     // load image:
+        //     let image = this.images[0];
+        //     if (image.texture === undefined) {
 
-                // if (image.type == "esri") {
-                //     // image.texture = this._loadTextureData(image.data);
-                //     let data = await this.requestImage(image.url, image);
+        //         // if (image.type == "esri") {
+        //         //     // image.texture = this._loadTextureData(image.data);
+        //         //     let data = await this.requestImage(image.url, image);
 
-                //     // image.texture = await new TextureLoader().load(data.href);
-                //     image.texture = await this.loadTexture(data.href);
-                // } 
-                if (image.type == "wms") {
-                    image.texture = await this.loadTextureWms(image.url, image);
-                }
-            }
-            // this.uniforms.clipping.clippingScale = { type: "f", value: 1.0 };
-            // this.uniforms.clipping.clippingLow = { type: "v3", value: new Vector3(0, 0, 0) };
-            // this.uniforms.clipping.clippingHigh = { type: "v3", value: new Vector3(0, 0, 0) };
-            this.uniforms.clipping.map = { type: 't', value: image.texture };
-            this.uniforms.clipping.percent = { type: "f", value: 0.7 };
+        //         //     // image.texture = await new TextureLoader().load(data.href);
+        //         //     image.texture = await this.loadTexture(data.href);
+        //         // } 
+        //         if (image.type == "wms") {
+        //             image.texture = await this.loadTextureWms(image.url, image);
+        //         }
+        //     }
+        //     // this.uniforms.clipping.clippingScale = { type: "f", value: 1.0 };
+        //     // this.uniforms.clipping.clippingLow = { type: "v3", value: new Vector3(0, 0, 0) };
+        //     // this.uniforms.clipping.clippingHigh = { type: "v3", value: new Vector3(0, 0, 0) };
+        //     this.uniforms.clipping.map = { type: 't', value: image.texture };
+        //     this.uniforms.clipping.percent = { type: "f", value: 0.7 };
 
 
-            //calculate UV coordinates for projecting image, if uv attribute is not present, it will be added
-            // https://jsfiddle.net/mmalex/pcjbysn1/
-            // https://stackoverflow.com/questions/20774648/three-js-generate-uv-coordinate
-            this.applyBoxUV(geometry, new Matrix4());
-            //let three.js know
-            geometry.attributes.uv.needsUpdate = true;
+        //     //calculate UV coordinates for projecting image, if uv attribute is not present, it will be added
+        //     // https://jsfiddle.net/mmalex/pcjbysn1/
+        //     // https://stackoverflow.com/questions/20774648/three-js-generate-uv-coordinate
+        //     this.applyBoxUV(geometry, new Matrix4());
+        //     //let three.js know
+        //     geometry.attributes.uv.needsUpdate = true;
 
-            // this.material = new MeshLambertMaterial({
-            //     map: image.texture,
-            //     transparent: true,
-            //     side: DoubleSide,
-            //     opacity: 0.7
-            // });
-            this.material = new ShaderMaterial({
-                transparent: true,
-                // side: DoubleSide,
-                uniforms: this.uniforms.clipping,
-                vertexShader: shader.vertexClipping,
-                fragmentShader: shader.fragmentClippingFront,
-            });
+        //     // this.material = new MeshLambertMaterial({
+        //     //     map: image.texture,
+        //     //     transparent: true,
+        //     //     side: DoubleSide,
+        //     //     opacity: 0.7
+        //     // });
+        //     this.material = new ShaderMaterial({
+        //         transparent: true,
+        //         // side: DoubleSide,
+        //         uniforms: this.uniforms.clipping,
+        //         vertexShader: shader.vertexClipping,
+        //         fragmentShader: shader.fragmentClippingFront,
+        //     });
 
-        } else {
+        // } else {
             // this.uniforms.clipping.clippingScale = { type: "f", value: 1.0 };
             // this.uniforms.clipping.color = { type: "c", value: new Color(color) };
             // this.uniforms.clipping.clippingLow = { type: "v3", value: new Vector3(0, 0, 0) };
@@ -794,7 +794,7 @@ class TinLayer extends Layer {
             // });
 
 
-        }
+        // }
 
         this.materialsArray.push(this.material);
         let mesh = this.mainMesh = new Mesh(geometry, this.material);
@@ -947,15 +947,15 @@ class TinLayer extends Layer {
         proj4.transform(source, dest, p1);
         proj4.transform(source, dest, p2);
 
-        // let bbox = this.baseExtent.x.min + "," + this.baseExtent.y.min + "," + this.baseExtent.x.max + "," + this.baseExtent.y.max;
+        // let bbox = this.baseExtent.min.x + "," + this.baseExtent.min.y + "," + this.baseExtent.max.x + "," + this.baseExtent.max.y;
         let bbox = p1.x + "," + p1.y + "," + p2.x + "," + p2.y;
 
         let params = {
             version: "1.3.0",
             service: "WMS",
             request: "GetMap",
-            "width": distWidth, //imageParameter.width,
-            "height": distHeight, //imageParameter.height,
+            "width": this._map.domElement.clientWidth, // distWidth, //imageParameter.width,
+            "height": this._map.domElement.clientHeight, //istHeight, //imageParameter.height,
             // "size": imageParameter.width + "," + imageParameter.height,
             "crs": "EPSG:3857", //  + imageParameter.bboxSR,
             // "bboxSR": imageParameter.bboxSR,

@@ -125,7 +125,7 @@ module.exports = {
     stats: {
         colors: true
     },
-    // devtool: 'inline-source-map',
+    devtool: 'inline-source-map',
 
     optimization: {
         minimize: isProduction,
