@@ -5,11 +5,7 @@ import { DemBlock } from './DemBlock';
 // import { MeshLambertMaterial } from 'three/src/materials/MeshLambertMaterial';
 import { DoubleSide, FlatShading, LinearFilter } from 'three/src/constants';
 import * as browser from '../core/browser';
-
-
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
-
-// import { Vector3 } from 'three/src/math/Vector3';
 import proj4 from 'proj4/dist/proj4';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { shader } from '../clip/shader';
@@ -72,7 +68,7 @@ export class DemLayer extends Layer {
         this.uniforms = uniforms;
     }
 
-    async initMaterials() {
+    private async initMaterials() {
         if (this.materialParameter.length === 0) return;
         let sum_opacity = 0;
         this.material;
@@ -155,11 +151,11 @@ export class DemLayer extends Layer {
         this.opacity = sum_opacity / this.materialsArray.length;
     }
 
-    scaleZ(z) {
+    public scaleZ(z) {
         this.objectGroup.scale.z = z;
     }
 
-    setVisible(visible) {
+    public setVisible(visible) {
         this.visible = visible;
         this.objectGroup.visible = visible;
         //Q3D.application.queryObjNeedsUpdate = true;
@@ -174,7 +170,7 @@ export class DemLayer extends Layer {
         return block;
     }
 
-    setWireframeMode(wireframe) {
+    public setWireframeMode(wireframe) {
         this.materialsArray.forEach(function (mat) {
             //if (m.w) return;
             //m.mat.wireframe = wireframe;
@@ -182,7 +178,7 @@ export class DemLayer extends Layer {
         });
     }
 
-    async changeImage(i) {
+    public async changeImage(i) {
         //this.mainMesh.material.map = THREE.ImageUtils.loadTexture(src);
         let image = this.images[i];
         if (image.texture === undefined) {
@@ -207,7 +203,7 @@ export class DemLayer extends Layer {
     }
 
     //helper function to load in the texture
-    async loadTexture(texturePath) {
+    private async loadTexture(texturePath) {
         const textureLoader = new TextureLoader();
         return new Promise((resolve, reject) => {
             textureLoader.load(
@@ -219,7 +215,7 @@ export class DemLayer extends Layer {
         });
     }
 
-    async loadTextureWms(url, imageParameter) {
+    private async loadTextureWms(url, imageParameter) {
         let dest = new proj4.Proj("EPSG:3857");
         let source = new proj4.Proj("EPSG:3034");
         let p1 = proj4.toPoint([this.baseExtent.min.x, this.baseExtent.min.y]);
@@ -262,7 +258,7 @@ export class DemLayer extends Layer {
         });
     }
 
-    async onAdd(map) {
+    public async onAdd(map) {
         proj4.defs("EPSG:4312", "+proj=longlat +ellps=bessel +towgs84=577.326,90.129,463.919,5.137,1.474,5.297,2.4232 +no_defs");
         proj4.defs("EPSG:3034", "+proj=lcc +lat_1=35 +lat_2=65 +lat_0=52 +lon_0=10 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
         // this.baseExtent.x.min = map.baseExtent.x.min;
@@ -281,11 +277,11 @@ export class DemLayer extends Layer {
         this.emit('add');
     }
 
-    onRemove(map) {
+    public onRemove(map) {
         map.scene.remove(this.objectGroup);
     }
 
-    async build(app_scene) {
+    private async build(app_scene) {
         //var opt = Gba3D.Options;
         this.blocks.forEach(function (block) {
             block.build(this);
@@ -296,7 +292,7 @@ export class DemLayer extends Layer {
         }
     }
 
-    addObject(object, queryable) {
+    private addObject(object, queryable) {
         if (queryable === undefined) {
             queryable = this.q;
         }
@@ -307,14 +303,14 @@ export class DemLayer extends Layer {
         }
     }
 
-    _addQueryableObject(object) {
+    private _addQueryableObject(object) {
         this.queryableObjects.push(object);
         //for (var i = 0, l = object.children.length; i < l; i++) {
         //    this._addQueryableObject(object.children[i]);
         //}
     }
 
-    removeObject(object, queryable) {
+    private removeObject(object, queryable) {
         if (queryable === undefined) {
             queryable = this.q;
         }
@@ -327,7 +323,7 @@ export class DemLayer extends Layer {
         }
     }
 
-    async requestImage(url, imageParameter) {
+    private async requestImage(url, imageParameter) {
         let dest = new proj4.Proj("EPSG:3857");
         let source = new proj4.Proj("EPSG:3034");
         let p1 = proj4.toPoint([this.baseExtent.min.x, this.baseExtent.min.y]);

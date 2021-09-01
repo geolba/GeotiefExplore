@@ -18,7 +18,7 @@ const devMode = (process.env.NODE_ENV !== 'production');
 const fileNamePrefix = isProduction ? '[chunkhash].' : '';
 
 module.exports = {
-    // mode: process.env.NODE_ENV,
+    mode: process.env.NODE_ENV,
     context: __dirname,
     entry: './src/js/main.js',
     output: {
@@ -35,8 +35,8 @@ module.exports = {
     // },
     module: {
         rules: [
-           
-            
+
+
             // {
             //     test: /\.(svg|eot|ttf|woff|woff2)$/,
             //     loader: 'url-loader',
@@ -97,7 +97,7 @@ module.exports = {
                     //         sourceMap: true
                     //     }
                     // },
-                     // Translates CSS into CommonJS
+                    // Translates CSS into CommonJS
                     {
                         loader: "css-loader",
                         options: {
@@ -107,7 +107,7 @@ module.exports = {
                     // {
                     //     loader:  'resolve-url-loader',
                     //   },
-                      // Compiles Sass to CSS
+                    // Compiles Sass to CSS
                     {
                         loader: "sass-loader",
                         options: {
@@ -121,11 +121,11 @@ module.exports = {
     },
     resolve: {
         extensions: ['*', '.js', '.jsx', '.tsx', '.ts'],
-      },
+    },
     stats: {
         colors: true
     },
-    devtool: 'inline-source-map',
+    devtool: (isProduction === true) ? 'hidden-source-map' : 'inline-source-map',
 
     optimization: {
         minimize: isProduction,
@@ -150,6 +150,22 @@ module.exports = {
                 }
             })
         ],
+        runtimeChunk: 'single',
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    test: /[\\\/]node_modules[\\\/]/,
+                    name: 'vendors',
+                    chunks: 'all'
+                },
+                // styles: {
+                //     name: 'styles',
+                //     test: /\.css$/,
+                //     chunks: 'all',
+                //     enforce: true
+                // }
+            }
+        },
     },
 
     plugins: [
@@ -160,9 +176,9 @@ module.exports = {
             CONSTANT_VALUE: JSON.stringify(process.env.CONSTANT_VALUE),
             MATOMO_SITE_ID: JSON.stringify(process.env.MATOMO_SITE_ID),
             MATOMO_TRACKER_URL: JSON.stringify(process.env.MATOMO_TRACKER_URL),
-            SERVICE_URL : JSON.stringify(process.env.SERVICE_URL),
-            POINT_URL : JSON.stringify(process.env.POINT_URL),
-            EDGE_URL : JSON.stringify(process.env.EDGE_URL),
+            SERVICE_URL: JSON.stringify(process.env.SERVICE_URL),
+            POINT_URL: JSON.stringify(process.env.POINT_URL),
+            EDGE_URL: JSON.stringify(process.env.EDGE_URL),
 
             CUSTOM_VAR: JSON.stringify('value5 goes here'), // no quotes needed, string value
         }),
