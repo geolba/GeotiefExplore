@@ -9,7 +9,7 @@ import { TinLayer } from '../layer/TinLayer';
 import { DemLayer } from '../layer/DemLayer';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Vector3 } from 'three/src/math/Vector3';
-import { Group } from 'three';
+import { Group } from 'three/src/objects/Group';
 import { Layer } from '../layer/Layer';
 import { LayerService } from '../services/layer.service';
 
@@ -100,7 +100,7 @@ class Map extends OrbitControls {
             "currentVersion": 10.01,
             "services": [
                 { "name": "osm:wms", "type": "MapServer", 'image': 'background_osm_world_topography.png', 'title': 'OSM WMS' },
-                { "name": "osm:gray-wms", "type": "MapServer", 'image': 'background_esri_world_topography.png', 'title': 'OSM Gray WMS' },
+                { "name": "osm:gray-wms", "type": "MapServer", 'image': 'background_osm_gray_world_topography.png', 'title': 'OSM Gray WMS' },
                 // { "name": "esri:topograhy", "type": "MapServer", 'image': 'background_esri_world_topography.png', 'title': 'ESRI Topography' },
 
             ]

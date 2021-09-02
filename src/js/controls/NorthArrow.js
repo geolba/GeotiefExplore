@@ -170,7 +170,7 @@ export class NorthArrow extends Control {
         ];
         this.boxGeometry = new UpdatableBoxGeometry(vertices);        
          this.boxMesh = new Mesh(this.boxGeometry,
-            [southMaterial, material.BoxBackFace, eastMaterial, westMaterial, northMaterial, topMaterial]);
+            [southMaterial, material.BoxBackFace, westMaterial, eastMaterial, northMaterial, topMaterial]);
 
         // this.boxGeometry = new BoxGeometry(5, 5, 5);
         // this.boxMesh = new Mesh(this.boxGeometry,

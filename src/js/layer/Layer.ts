@@ -2,7 +2,7 @@ import { EventEmitter } from '../core/EventEmitter';
 import { BoreholePopup } from '../controls/BoreholePopup';
 import { Map } from '../core/Map';
 import { Scene } from 'three/src/scenes/Scene';
-import { Group } from 'three';
+import { Group } from 'three/src/objects/Group';
 
 abstract class Layer extends EventEmitter {
 

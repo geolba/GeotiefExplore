@@ -12,7 +12,7 @@ export class BoreholeTool extends EventEmitter {
 
     options = {
         zIndex: 1000,
-        markerClass: MarkerLayer,//THREE.CylinderGeometry,     
+        markerClass: MarkerLayer,// CylinderGeometry,     
         drawingCSSClass: 'gba-editable-drawing',
         drawingCursor: 'crosshair'
     };

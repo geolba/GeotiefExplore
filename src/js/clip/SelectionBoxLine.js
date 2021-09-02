@@ -5,7 +5,7 @@ import { BufferGeometry } from 'three/src/core/BufferGeometry';
 export class SelectionBoxLine {
 
     constructor(v0, v1, f0, f1, selection) {
-        // var lineGeometry = new THREE.Geometry();
+        // var lineGeometry = new Geometry();
         // lineGeometry.vertices.push(v0, v1);
         // lineGeometry.computeLineDistances();
         // lineGeometry.dynamic = true;       

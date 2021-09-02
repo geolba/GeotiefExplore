@@ -14,7 +14,8 @@ export class LayerControl extends Control {
     options = {
         collapsed: true,
         position: 'topright',
-        autoZIndex: true
+        autoZIndex: true,
+        parentDiv: '',
     };
 
     // private class fields:
@@ -29,6 +30,7 @@ export class LayerControl extends Control {
     _layers;
     _handlingClick;
     _dialog;
+    _layerContainer;
 
     constructor(overlayLayers, options) {
         super(options);
@@ -101,6 +103,10 @@ export class LayerControl extends Control {
         }
     }
 
+    onRemove(){
+        //to do
+    }
+
     _addLayer(layer, name, overlay) {
         let id = util.stamp(layer);
 
@@ -110,6 +116,10 @@ export class LayerControl extends Control {
             overlay: overlay
         };
         layer.addListener('visibility-change', this._updateLayerList, this);
+        layer.addListener('visibility-change',(args) => {
+            let visible = args[0];
+            this._onVisibilityChange(id, visible); 
+        }, this);
     }
 
     _updateLayerList() {
@@ -135,15 +145,14 @@ export class LayerControl extends Control {
     }
 
     _addLegendEntry(obj) {
-        var checked = obj.layer.visible;//this._map.hasLayer(obj.layer);
-        var container = obj.overlay ? this._overlaysList : this._baseLayersList;
+        let container = obj.overlay ? this._overlaysList : this._baseLayersList;
         //container.appendChild(legendEntryRow);
 
-        var legendEntryRow = dom.createDom("tr", { style: "display: row-table; height: 20px;" }, container);
+        let legendEntryRow = dom.createDom("tr", { style: "display: row-table; height: 20px;" }, container);
         //domStyle.set(legendEntryRow, 'display', rowVisibility);
         //dom.setProperties(legendEntryRow, { style: "display: row-table;" });
 
-        var legendDataCell = dom.createDom("td", { "style": "width:25px;vertical-align: top;" }, legendEntryRow);
+        let legendDataCell = dom.createDom("td", { "style": "width:25px;vertical-align: top;" }, legendEntryRow);
         let legendDiv = dom.createDom("div", { "style": "width:20px; height:20px;" }, legendDataCell);
         legendDiv.style.backgroundColor = "#" + obj.layer.color;
 
@@ -214,6 +223,28 @@ export class LayerControl extends Control {
         }
         
         return legendEntryRow;
+    }
+
+    _onVisibilityChange(layerId, visible) {
+        if (! this._layerContainer) {
+            return;
+        }
+        let inputs = this._layerContainer.getElementsByTagName('input');
+        // this._handlingClick = true;
+
+        for (let i = 0; i < inputs.length; i++) {
+            let input = inputs[i];
+            if (input.type == 'checkbox' && layerId === input.layerId) {
+                // let objLayer = this._layers[input.layerId];
+                // var isChecked = input.checked;
+                // obj.layer.setVisible(isChecked);
+                input.checked = visible;
+            }
+        }
+
+        // this._handlingClick = false;
+        this._map.update();
+        //this._refocusOnMap();
     }
 
     _onInputClick(layerId) {

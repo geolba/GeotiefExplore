@@ -25,9 +25,9 @@ export class DemBlock {
         let heightSegments = yPixel - 1;
 
         //appSettings.Options.exportMode = true;
-        // let PlaneGeometry = (appSettings.Options.exportMode) ? THREE.PlaneGeometry : THREE.PlaneBufferGeometry;
+        // let PlaneGeometry = (appSettings.Options.exportMode) ? PlaneGeometry : PlaneBufferGeometry;
         //var geom = layer.mainGeometry = new PlaneGeometry(this.plane.width, this.plane.height, widthSegments, heightSegments);
-        let geom = layer.mainGeometry = this.buildPlaneBufferGeometry(this.plane.width, this.plane.height, widthSegments, heightSegments);// new THREE.PlaneBufferGeometry(this.plane.width, this.plane.height, 11, 7);
+        let geom = layer.mainGeometry = this.buildPlaneBufferGeometry(this.plane.width, this.plane.height, widthSegments, heightSegments);// new PlaneBufferGeometry(this.plane.width, this.plane.height, 11, 7);
 
         // let geom = layer.mainGeometry = new PlaneBufferGeometry( 10, 5, 20, 20 );
 
@@ -90,12 +90,12 @@ export class DemBlock {
         //}
         geom.computeBoundingBox();//for building border geometry
 
-        //var material = new THREE.MeshPhongMaterial({ color: 0x223322, wireframe: true });
-        //var mesh = new THREE.Mesh(geom, material);
+        //var material = new MeshPhongMaterial({ color: 0x223322, wireframe: true });
+        //var mesh = new Mesh(geom, material);
 
-        //var wireframe_material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, wireframe_linewidth: 10 });
+        //var wireframe_material = new MeshBasicMaterial({ color: 0x000000, wireframe: true, wireframe_linewidth: 10 });
         //var materials = [layer.materials[this.mIndex].mat, wireframe_material];
-        //var mesh = THREE.SceneUtils.createMultiMaterialObject(geom, materials);
+        //var mesh = SceneUtils.createMultiMaterialObject(geom, materials);
 
 
         var mesh = layer.mainMesh = new Mesh(geom, layer.material); //layer.materials[this.mIndex].mat);
@@ -103,7 +103,7 @@ export class DemBlock {
 
         //mesh.matrixAutoUpdate = true;
 
-        //var egh = new THREE.EdgesHelper(mesh, 0x00ffff);
+        //var egh = new EdgesHelper(mesh, 0x00ffff);
         //egh.material.linewidth = 2;
         //layer.addObject(egh);
 
@@ -194,8 +194,8 @@ export class DemBlock {
 
         }
         //geometry.attributes['index'] = { array: indices, itemSize: 1 };
-        //geometry.setIndex(new THREE.BufferAttribute(indices, 1).setDynamic(true));
-        //geometry.addAttribute('index', new THREE.BufferAttribute(indices, 1));
+        //geometry.setIndex(new BufferAttribute(indices, 1).setDynamic(true));
+        //geometry.addAttribute('index', new BufferAttribute(indices, 1));
         let index = new BufferAttribute(indices, 1);//setDynamic(true);
         geometry.setIndex(index);
 

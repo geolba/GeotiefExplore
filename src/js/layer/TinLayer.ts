@@ -984,7 +984,6 @@ class TinLayer extends Layer {
     }
 
     async changeImage(i) {
-        //this.mainMesh.material.map = THREE.ImageUtils.loadTexture(src);
         let image = this.images[i];
         // if (image.texture === undefined) {
         if (image.type == "esri") {

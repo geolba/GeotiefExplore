@@ -62,9 +62,9 @@ export class BoreholeIdentify {
                     vector.sub(this.camera.position);
                     vector.normalize();
                     let raycaster = new Raycaster(this.camera.position, vector);
-                    //var raycaster = new THREE.Raycaster(vector, new THREE.Vector3(0, 1, 0).normalize());
-                    //var direction = new THREE.Vector3(0, 0, 1);
-                    //var raycaster = new THREE.Raycaster();
+                    //var raycaster = new Raycaster(vector, new Vector3(0, 1, 0).normalize());
+                    //var direction = new Vector3(0, 0, 1);
+                    //var raycaster = new Raycaster();
                     //raycaster.set(vector, direction);
 
                     let visibleMehses = this._getvisibleQueryableObjects();//only the visible layers
@@ -114,46 +114,46 @@ export class BoreholeIdentify {
             });
     }
 
-    _highlightFeature(layerId, featureId) {
-        //if (app.highlightObject) {
-        //    // remove highlight object from the scene
-        //    app.scene.remove(app.highlightObject);
-        //    app.selectedLayerId = null;
-        //    app.selectedFeatureId = null;
-        //    app.highlightObject = null;
-        //}
+    // _highlightFeature(layerId, featureId) {
+    //     //if (app.highlightObject) {
+    //     //    // remove highlight object from the scene
+    //     //    app.scene.remove(app.highlightObject);
+    //     //    app.selectedLayerId = null;
+    //     //    app.selectedFeatureId = null;
+    //     //    app.highlightObject = null;
+    //     //}
 
-        if (layerId === null) return;
-        var layer = this.layers[layerId];
-        if (layer === undefined) return;
+    //     if (layerId === null) return;
+    //     var layer = this.layers[layerId];
+    //     if (layer === undefined) return;
 
-        var f = layer.features[featureId];
-        if (f === undefined) return;
+    //     var f = layer.features[featureId];
+    //     if (f === undefined) return;
 
-        var high_mat = this.highlightMaterial;
-        //var setMaterial = function (obj) {
-        //    obj.material = high_mat;
-        //};
+    //     var high_mat = this.highlightMaterial;
+    //     //var setMaterial = function (obj) {
+    //     //    obj.material = high_mat;
+    //     //};
 
-        // create a highlight object (if layer type is Point, slightly bigger than the object)
-        // var highlightObject = new THREE.Group();
-        //var clone;
-        //var s = (layer.type == Q3D.LayerType.Point) ? 1.01 : 1;
+    //     // create a highlight object (if layer type is Point, slightly bigger than the object)
+    //     // var highlightObject = new Group();
+    //     //var clone;
+    //     //var s = (layer.type == Q3D.LayerType.Point) ? 1.01 : 1;
 
-        var geo = new THREE.Geometry();
-        var v1 = new Vector3(f.Punkt0.x, f.Punkt0.y, f.Punkt0.z);
-        var v2 = new Vector3(f.Punkt1.x, f.Punkt1.y, f.Punkt1.z);
-        var v3 = new Vector3(f.Punkt2.x, f.Punkt2.y, f.Punkt2.z);
-        geo.vertices.push(v1);
-        geo.vertices.push(v2);
-        geo.vertices.push(v3);
-        var face = new THREE.Face3(0, 1, 2);
-        geo.faces.push(face);
-        //clone.traverse(setMaterial);           
-        var clone = new THREE.Mesh(geo, high_mat);
+    //     var geo = new Geometry();
+    //     var v1 = new Vector3(f.Punkt0.x, f.Punkt0.y, f.Punkt0.z);
+    //     var v2 = new Vector3(f.Punkt1.x, f.Punkt1.y, f.Punkt1.z);
+    //     var v3 = new Vector3(f.Punkt2.x, f.Punkt2.y, f.Punkt2.z);
+    //     geo.vertices.push(v1);
+    //     geo.vertices.push(v2);
+    //     geo.vertices.push(v3);
+    //     var face = new Face3(0, 1, 2);
+    //     geo.faces.push(face);
+    //     //clone.traverse(setMaterial);           
+    //     var clone = new Mesh(geo, high_mat);
 
-        return clone;
-    }
+    //     return clone;
+    // }
 
     _getvisibleQueryableObjects() {
         let _queryableObjects = [];

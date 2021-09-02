@@ -198,7 +198,13 @@ class Application {
         this.mapTitle.innerHTML += map.title;
         this.menuEmailButton.href = 'mailto:' + map.contact;
 
+        
         map.on('ready', () => {
+            this.layerControl = new LayerControl(this.map.layers, {
+                collapsed: true,
+                parentDiv: 'layer-control-parent-id'
+            }).addTo(this.map);
+
             this.selectionBox.setUniforms();
 
             // this.capsScene.add(this.selectionBox.boxMesh);
@@ -210,6 +216,9 @@ class Application {
          
             for (const [i, layer] of Object.entries(this.map.layers)) {
                 // let layer = map.layers[i];
+                if (layer instanceof TinLayer & layer.name == "Topography") {
+                    layer.setVisible(false);
+                }
                 if (layer instanceof TinLayer && layer.name != "Topography") {
                     // modelNode.add(layer.mainMesh);
 
@@ -286,7 +295,7 @@ class Application {
         this.selectionBox = new Selection(
             { name: 'Slicing Box' },
             new Vector3(this.map.x.min, this.map.y.min, this.map.z.min),
-            new Vector3(this.map.x.max, this.map.y.max, this.map.z.max)
+            new Vector3(this.map.x.max, this.map.y.max, this.map.z.max + 1000)
         );
         // this.map.addLayer(this.selectionBox);
         this.map.picking = new PickingTool(this.map.size, this.map.center, this);
@@ -313,11 +322,6 @@ class Application {
 
         this.gridlayer = new GridLayer({ center: this.map.center, name: "coordinate grid", appWidth: this.width, appHeight: this.height });
         this.map.addLayer(this.gridlayer);
-
-        new LayerControl(this.map.layers, {
-            collapsed: true,
-            parentDiv: 'layer-control-parent-id'
-        }).addTo(this.map);
 
         this.basemapControl = new BasemapControl('Baselayer', {
             position: 'topright'
