@@ -11,12 +11,20 @@
 // $fa-font-path: "../../webfonts" !default;
 
 $fa-font-path: "~@fortawesome/fontawesome-free/webfonts" !default;
-@import '~@fortawesome/fontawesome-free/scss/solid';
-@import '~@fortawesome/fontawesome-free/scss/fontawesome';
-
+@import "~@fortawesome/fontawesome-free/scss/solid";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
 
 // Import a Google Font
-@import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
+// @import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
+@import "@fontsource/open-sans/400.css"; // Weight 500.
+
+// @font-face {
+//   font-family: "Open Sans";
+//   font-style: normal;
+//   font-weight: normal;
+//   src: url("open-sans-greek-400-normal.woff2") format("woff2"),
+//     url("open-sans-greek-400-normal.woff") format("woff");
+// }
 
 // 1. Import the initial variables
 @import "../../node_modules/bulma/sass/utilities/_all.sass";
@@ -25,18 +33,18 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts" !default;
 // Update the blue shade, used for links
 $blue: #06bcef;
 // Add pink and its invert
-$pink: #FA7C91;
+$pink: #fa7c91;
 $pink-invert: #fff;
-$purple: #8A4D76;
+$purple: #8a4d76;
 $brown: #757763;
-$beige-light: #D0D1CD;
-$beige-lighter: #EFF0EB;
+$beige-light: #d0d1cd;
+$beige-lighter: #eff0eb;
 $mouse-grey: #6c6e6b;
 $select-green: #03a678;
 
 // Update Bulma's global variables
 // Update the sans-serif font family
-$family-sans-serif: "Nunito", sans-serif;
+$family-sans-serif: "Open Sans", sans-serif;
 
 // 3. Set the derived variables
 $grey-dark: $brown;
@@ -49,7 +57,6 @@ $fullhd-enabled: false;
 $tabs-link-active-border-bottom-color: $select-green;
 $tabs-link-active-color: $select-green;
 
-
 // Update some of Bulma's component variables
 // $body-background-color: $beige-lighter;
 $control-border-width: 2px;
@@ -57,27 +64,28 @@ $input-border-color: transparent;
 // $input-shadow: none;
 
 .main.columns:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .navbar-brand img {
-    height: 51px;
+  height: 51px;
 }
 
 html,
 body {
-    height: 100%;
-    width: 100%;
-    line-height: 1.6;
-    font-weight: 400;
-    font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #222;
+  height: 100%;
+  width: 100%;
+  line-height: 1.6;
+  font-weight: 400;
+//   font-family: $family-sans-serif;
+  font-family: 'Open Sans', sans-serif;
+  color: #222;
 }
 
 ol,
 ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 /* body {
@@ -90,217 +98,217 @@ ul {
 // }
 
 .main {
-    padding-top: 51px;
-    // display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    /* height: 100%; */
-    position: absolute;
-    overflow: hidden;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    overflow-y: scroll;
+  padding-top: 51px;
+  // display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  /* height: 100%; */
+  position: absolute;
+  overflow: hidden;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow-y: scroll;
 }
 
 .canvas-area {
-    /* flex: 2;
+  /* flex: 2;
     display: flex;
     align-items: center;
     justify-content: center; */
-    height: 100%;  
+  height: 100%;
 }
 
 .input-area {
-    //  flex: 1;
-    // display: flex;
-    // flex-direction: column;
-    align-items: center;
-    justify-content: center;     
+  //  flex: 1;
+  // display: flex;
+  // flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 #map-title {
-    display: block;
-    padding: 1em;
+  display: block;
+  padding: 1em;
 }
 
 .btnDownloadMeme {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 #div-map {
-    position: relative;
-    height: 100%;
-    width: 100%;
+  position: relative;
+  height: 100%;
+  width: 100%;
 }
 
 #webgl {
-    height: auto;
-    width: auto;
+  height: auto;
+  width: auto;
 }
 
 .mapDesktop {
-    overflow: hidden;
-    position: absolute;
-    bottom: 30px;
-    top: 30px;
-    left: 30px;
-    right: 30px;
-    /* Old browsers */
-    background: #cde6f9;
-    background-image: -moz-linear-gradient(top, #cde6f9 0%, white 70%, #6b716f);
-    background: -webkit-linear-gradient(top, #cde6f9 0%, white 70%, #6b716f);
-    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    background: linear-gradient(top, #cde6f9 0%, white 60%, #6b716f);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cde6f9', endColorstr='#6b716f', GradientType=0);
+  overflow: hidden;
+  position: absolute;
+  bottom: 30px;
+  top: 30px;
+  left: 30px;
+  right: 30px;
+  /* Old browsers */
+  background: #cde6f9;
+  background-image: -moz-linear-gradient(top, #cde6f9 0%, white 70%, #6b716f);
+  background: -webkit-linear-gradient(top, #cde6f9 0%, white 70%, #6b716f);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  background: linear-gradient(top, #cde6f9 0%, white 60%, #6b716f);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cde6f9', endColorstr='#6b716f', GradientType=0);
 }
 
 #inset {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    border: none;
-    width: 120px;
-    height: 120px;
-    /*background-color:lightcyan;*/
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  border: none;
+  width: 120px;
+  height: 120px;
+  /*background-color:lightcyan;*/
 }
 
 /* control positioning */
 .gba-control {
-    position: relative;
-    z-index: 7;
-    pointer-events: auto;
-    float: left;
-    clear: both;
+  position: relative;
+  z-index: 7;
+  pointer-events: auto;
+  float: left;
+  clear: both;
 }
 
 .gba-top,
 .gba-bottom {
-    position: absolute;
-    // z-index: 5;
-    pointer-events: none;
+  position: absolute;
+  // z-index: 5;
+  pointer-events: none;
 }
 
 .gba-top {
-    top: 0;
+  top: 0;
 }
 
 .gba-right {
-    right: 0;
-    /*right: 5px;*/
+  right: 0;
+  /*right: 5px;*/
 }
 
 .gba-bottom {
-    bottom: 0;
+  bottom: 0;
 }
 
 .gba-left {
-    left: 0;
+  left: 0;
 }
 
 .gba-right .gba-control {
-    float: right;
+  float: right;
 }
 
 .gba-top .gba-control:not(:first-child) {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .gba-bottom .gba-control {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .gba-left .gba-control {
-    margin-left: 0px;
+  margin-left: 0px;
 }
 
 .gba-control-home a {
-    width: 30px;
-    height: 30px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    cursor: pointer;
-    border-radius: 4px;
-    display: block;
-    background-color: #999999;
-    text-align: center;
-    color: #ffffff;
-    display: block;
+  width: 30px;
+  height: 30px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  border-radius: 4px;
+  display: block;
+  background-color: #999999;
+  text-align: center;
+  color: #ffffff;
+  display: block;
 }
 
-
 .red-label {
-    color: #f00;
-    padding: 2px;
-    text-shadow: -1px -1px #fff, 0 -1px #fff, 1px -1px #fff, -1px 0 #fff, 1px 0 #fff, -1px 1px #fff, 0 1px #fff,
-        1px 1px #fff;
-    position: absolute;
-    pointer-events: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -webkit-user-select: none;
-    user-select: none;
+  color: #f00;
+  padding: 2px;
+  text-shadow: -1px -1px #fff, 0 -1px #fff, 1px -1px #fff, -1px 0 #fff,
+    1px 0 #fff, -1px 1px #fff, 0 1px #fff, 1px 1px #fff;
+  position: absolute;
+  pointer-events: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .green-label {
-    color: #3ad29f;
-    padding: 2px;
-    text-shadow: -1px -1px #fff, 0 -1px #fff, 1px -1px #fff, -1px 0 #fff, 1px 0 #fff, -1px 1px #fff, 0 1px #fff,
-        1px 1px #fff;
-    position: absolute;
-    pointer-events: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -webkit-user-select: none;
-    user-select: none;
+  color: #3ad29f;
+  padding: 2px;
+  text-shadow: -1px -1px #fff, 0 -1px #fff, 1px -1px #fff, -1px 0 #fff,
+    1px 0 #fff, -1px 1px #fff, 0 1px #fff, 1px 1px #fff;
+  position: absolute;
+  pointer-events: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .grey-label {
-    color: #6b716f;
-    padding: 2px;
-    text-shadow: -1px -1px #fff, 0 -1px #fff, 1px -1px #fff, -1px 0 #fff, 1px 0 #fff, -1px 1px #fff, 0 1px #fff,
-        1px 1px #fff;
-    position: absolute;
-    pointer-events: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -webkit-user-select: none;
-    user-select: none;
+  color: #6b716f;
+  padding: 2px;
+  text-shadow: -1px -1px #fff, 0 -1px #fff, 1px -1px #fff, -1px 0 #fff,
+    1px 0 #fff, -1px 1px #fff, 0 1px #fff, 1px 1px #fff;
+  position: absolute;
+  pointer-events: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 #div-tabs {
-    padding-top: 30px;
-    position: relative;
-    height: 100%;
-    width: 100%;
+  padding-top: 30px;
+  position: relative;
+  height: 100%;
+  width: 100%;
 }
-.tabs {  
-    display: flex;
-    flex-direction: column;
+.tabs {
+  display: flex;
+  flex-direction: column;
 }
 .tab-content .tab-pane {
-    display: none;
-    /* visibility: hidden; */
+  display: none;
+  /* visibility: hidden; */
 }
 .tab-content .tab-pane.active {
-    display: block;
-    /* visibility: visible; */
+  display: block;
+  /* visibility: visible; */
 }
 .tab-content {
-    padding:1em;
-  }
-  .tab-pane section {
-      padding: 0;
-  }
+  padding: 1em;
+}
+.tab-pane section {
+  padding: 0;
+}
 
 // 4. Import the rest of bulma, only what you need from Bulma
 // @import "../../node_modules/bulma/sass/utilities/_all.sass";
 @import "../../node_modules/bulma/sass/grid/_all.sass";
-@import "../../node_modules/bulma/sass/base/_all.sass";
+// @import "../../node_modules/bulma/sass/base/_all.sass";
+@import "../../node_modules/bulma/sass/base/minireset.sass";
 @import "../../node_modules/bulma/sass/elements/box.sass";
 @import "../../node_modules/bulma/sass/elements/button.sass";
 @import "../../node_modules/bulma/sass/elements/container.sass";
@@ -316,5 +324,5 @@ ul {
 @import "../../node_modules/bulma/sass/layout/section.sass";
 
 html {
-    overflow-y: hidden;
+  overflow-y: hidden;
 }

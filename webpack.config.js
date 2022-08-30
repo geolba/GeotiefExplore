@@ -34,15 +34,15 @@ module.exports = {
     //     extensions: ['*', '.js', '.vue', '.json']
     // },
     module: {
-        rules: [
-
-
-            // {
+        rules: [          
+			// {
             //     test: /\.(svg|eot|ttf|woff|woff2)$/,
             //     loader: 'url-loader',
+			// 	// include: path.resolve(__dirname, '~@fontsource/open-sans/files/'),
             //     options: {
             //         limit: 10000,
-            //         name: 'webfonts/[name].[ext]'
+            //         name: '[name].[ext]',
+            // 		outputPath: 'assets/fonts/',
             //     }
             // },
 
