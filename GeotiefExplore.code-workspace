@@ -17,10 +17,9 @@
 				"name": "Launch Chrome against localhost",
 				// "port": 9222,
 				"url": "http://localhost:8080?model_id=20",
-				"webRoot": "${workspaceFolder}",
-				"breakOnLoad": true,
-				"runtimeExecutable": "C:/ProgramData/scoop/apps/googlechrome/current/chrome.exe",
-				// "runtimeExecutable": "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
+				"webRoot": "${workspaceFolder}",				
+				// "runtimeExecutable": "C:/ProgramData/scoop/apps/googlechrome/current/chrome.exe",
+				"runtimeExecutable": "C:/Program Files/Google/Chrome/Application/chrome.exe",
 				// "sourceMapPathOverrides": {
 				// 	"webpack:///./~/*": "${workspaceFolder}/node_modules/*", 
 				// 	"webpack:///./*":   "${workspaceFolder}/*", 

@@ -3,6 +3,7 @@ import * as util from '../core/utilities';
 import * as domEvent from '../core/domEvent';
 import * as dom from '../core/domUtil';
 import { BarChart } from '../core/BarChart';
+import { Map } from "../core/Map";
 
 import './BoreholePopup.css';
 
@@ -19,7 +20,7 @@ export class BoreholePopup extends Control {
         position: 'topleft',
         width: '300px',
         height: '100%',
-        parentDiv: null
+        parentDiv: undefined
     };
     _source;
 
@@ -41,7 +42,7 @@ export class BoreholePopup extends Control {
     }
 
     // happens after added to map
-    onAdd(map) {
+    onAdd(map: Map) {
         if (!map) {
             // this.destroy();
             //logger.warning('HomeButton::map required', true);
@@ -108,13 +109,13 @@ export class BoreholePopup extends Control {
         }
     }
 
-    show() {
+    show(): void {
         //this._clearContent();
         this._toggleVisibility(true);
         //this._animate(true);
     }
 
-    hide() {
+    hide(): void {
         //var test = this._isShowing;
         if (this._isShowing) {
             (this._toggleVisibility(false));
@@ -124,7 +125,7 @@ export class BoreholePopup extends Control {
         //}
     }
 
-    setContent(innerHTML) {
+    setContent(innerHTML): void {
         if (innerHTML instanceof HTMLElement) {
             this._contentPane.innerHTML = "";
             this._contentPane.appendChild(innerHTML);
@@ -135,7 +136,7 @@ export class BoreholePopup extends Control {
         this._contentPane.style.display = "block";
     }
 
-    setChartContent(data) {
+    setChartContent(data): void {
         this._contentPane.innerHTML = "";
 
         let valTextColor = "ffffff";
@@ -149,17 +150,17 @@ export class BoreholePopup extends Control {
         this._contentPane.appendChild(table);
     }
 
-    close() {
+    close(): void {
         this._clearContent();
         this._toggleVisibility(false);
         this.emit("closed");
     }
 
-    private _clearContent() {
+    private _clearContent(): void {
         this._contentPane.innerHTML = '';
     }
 
-    private _toggleVisibility(visible) {
+    private _toggleVisibility(visible: boolean): void {
         this._setVisibility(visible);
         this._isShowing = visible;
 
@@ -171,19 +172,22 @@ export class BoreholePopup extends Control {
         // let analysisTabContent = document.querySelector('.tab-pane.content-file');       
         // if it's not the analysis tab, make it active
         if (analysisTabButton !== activeTabButton) {
-            activeTabButton.classList.remove('is-active');
-            analysisTabButton.classList.add('is-active');
+            activeTabButton?.classList.remove('is-active');
+            analysisTabButton?.classList.add('is-active');
 
-            document.querySelector(activeTabButton.getAttribute('name')).classList.remove('active');
-            document.querySelector(analysisTabButton.getAttribute('name')).classList.add('active');
+            let activeNameAttribute = activeTabButton?.getAttribute('name');
+            (activeNameAttribute) &&  document.querySelector(activeNameAttribute)?.classList.remove('active');
+           
+            let analysisNameAttribute = analysisTabButton?.getAttribute('name');
+            (analysisNameAttribute) && document.querySelector(analysisNameAttribute)?.classList.add('active');
         }
     }
 
-    private _setVisibility(addOrRemove) {
+    private _setVisibility(addOrRemove: boolean) :void {
         this._menu.style.visibility = addOrRemove ? "visible" : "hidden";
     }
 
-    onRemove() {
+    onRemove(): void {
         //this.cleanup();
         this._isShowing && this.hide();
         //for (var i = 0; i < this._eventConnections.length; i ++)
