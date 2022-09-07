@@ -3,20 +3,42 @@ import { MobileDialog } from "./MobileDialog";
 import * as dom from '../core/domUtil';
 import * as util from '../core/utilities';
 import * as domEvent from '../core/domEvent';
+import { Map } from "../core/Map";
 
 import './BasemapControl.css';
 
+interface BasemapOptions {
+    title: string
+    position: string
+    width?: string
+    height?: string
+    parentDiv?: string
+}
+
 export class BasemapControl extends Control {
 
-    defaultTitle = '3DViewer';
+    options: BasemapOptions = {
+        title: 'Default Title',
+        position: 'topleft',
+        width: '300px',
+        height: '100%',
+        parentDiv: undefined
+    };
+
+    // private _map: Map;
+    private _layersLink;    
+    private dialog: MobileDialog
+    private basemaps: any;
 
     constructor(title, options) {
-        super(title, options);
+        // super(title, options);
+        super();
+        this.options.title = title;
         util.setOptions(this, options);
     }
 
-    onAdd(map) {
-        let container = this._initLayout(map);
+    onAdd(map: Map): HTMLElement {
+        let container: HTMLElement = this._initLayout();
         this._map = map;
         return container;
     }
@@ -37,15 +59,20 @@ export class BasemapControl extends Control {
         let html = this._initBasemapHtml(basemaps.services);
 
         // domEvent.on(link, 'click', this.expand, this);
-        domEvent.on(link, 'click', domEvent.stopPropagation);
-        domEvent.on(link, 'mousedown', domEvent.stopPropagation);
-        domEvent.on(link, 'dblclick', domEvent.stopPropagation);
-        domEvent.on(link, 'click', domEvent.preventDefault);
-        domEvent.on(link, 'click', () => {
-                this.dialog.show(html);
-            }, this);
+        domEvent.on(this._layersLink, 'click', domEvent.stopPropagation);
+        domEvent.on(this._layersLink, 'mousedown', domEvent.stopPropagation);
+        domEvent.on(this._layersLink, 'dblclick', domEvent.stopPropagation);
+        domEvent.on(this._layersLink, 'click', domEvent.preventDefault);
+        // domEvent.on(link, 'click', this.showDialog(html), this);
+        domEvent.on(this._layersLink, 'click', () => {
+            this.showDialog(html);
+        }, this);
 
         return container;
+    }
+
+    private showDialog(html) {
+        this.dialog.show(html);
     }
 
     _initBasemapHtml(basemapServices) {
@@ -100,6 +127,13 @@ export class BasemapControl extends Control {
                 return true;
             }
         }
+    }
+
+    onRemove(): void {      
+        domEvent.off(this._layersLink, 'click', this.showDialog);
+        //C.destroy(this.domNode);
+        //this.getContainer().parentNode.removeChild(this.getContainer());
+        this._layersLink = null;
     }
 
 }

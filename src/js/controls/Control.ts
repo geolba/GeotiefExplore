@@ -31,7 +31,7 @@ abstract class Control extends EventEmitter {
 
     abstract onRemove(map): void;
     
-    abstract onAdd(map) : HTMLElement;
+    abstract onAdd(map: any) : HTMLElement;
 
     addTo(map: Map): Control {
         this._map = map;

@@ -137,7 +137,7 @@ module.exports = (env, argv) => {
       colors: true,
     },
     // devtool: (isProduction === true) ? 'hidden-source-map' : 'inline-source-map',
-    devtool: (isProduction === true) ? 'hidden-source-map' : 'eval',
+    devtool: (isProduction === true) ? 'hidden-source-map' : 'inline-source-map',
 
     optimization: {
       minimize: isProduction,
